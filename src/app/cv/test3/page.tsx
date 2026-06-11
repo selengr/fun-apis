@@ -16,7 +16,7 @@ import {
 
 export default function AcademicCV() {
   return (
-    <main className="bg-zinc-100 min-h-screen py-10">
+    <main className="bg-zinc-100 min-h-screen py-10 w-fit">
       <div className="mx-auto w-[210mm] min-h-[297mm] bg-white shadow-2xl">
 
         {/* HEADER */}
