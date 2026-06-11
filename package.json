@@ -2,10 +2,7 @@
   "name": "my-app",
   "version": "0.1.0",
   "private": true,
-  "engines": {
-    "pnpm": "^11.0.9",
-    "packageManager": "pnpm@11.0.9"
-  },
+  "packageManager": "pnpm@10",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
