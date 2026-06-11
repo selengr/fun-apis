@@ -78,7 +78,7 @@ export default function CVPage() {
               <span className="text-xs text-muted-foreground group-hover:text-primary transition-colors">GitHub</span>
             </a>
             <a href="#" className="flex items-center gap-2 px-4 py-3 bg-card/30 border border-card/60 rounded-lg hover:border-accent/40 hover:bg-card/50 transition-all group">
-              <LinkedinIcon className="w-4 h-4 text-accent" />
+              <LinkedinIcon />
               <span className="text-xs text-muted-foreground group-hover:text-primary transition-colors">LinkedIn</span>
             </a>
             <a href="#" className="flex items-center gap-2 px-4 py-3 bg-card/30 border border-card/60 rounded-lg hover:border-accent/40 hover:bg-card/50 transition-all group">
@@ -356,7 +356,7 @@ export default function CVPage() {
                   <span className="group-hover:underline">github.com/rezakarbakhsh</span>
                 </a>
                 <a href="#" className="flex items-center gap-3 text-xs text-muted-foreground hover:text-primary transition-colors group">
-                  <LinkedinIcon className="w-4 h-4 text-accent" />
+                  <LinkedinIcon  />
                   <span className="group-hover:underline">linkedin.com/in/rezakarbakhsh</span>
                 </a>
                 <a href="#" className="flex items-center gap-3 text-xs text-muted-foreground hover:text-primary transition-colors group">
