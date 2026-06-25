@@ -50,7 +50,7 @@ function BentoCard({ children, className = "", delay = 0 }: { children: React.Re
   return (
     <div
       ref={ref}
-      className={`group relative rounded-2xl border border-black/[0.07] bg-white overflow-hidden transition-all duration-700 hover:border-black/[0.15] hover:bg-[#fafaf8] ${className}`}
+      className={`group relative rounded-2xl border border-black/[0.07] dark:border-white/[0.1] bg-white dark:bg-[#2a2a2a] overflow-hidden transition-all duration-700 hover:border-black/[0.15] dark:hover:border-white/[0.2] hover:bg-[#fafaf8] dark:hover:bg-[#333333] ${className}`}
       style={{
         opacity: inView ? 1 : 0,
         transform: inView ? "translateY(0)" : "translateY(28px)",
@@ -69,7 +69,7 @@ function BentoCard({ children, className = "", delay = 0 }: { children: React.Re
 // ─── Pill tag ─────────────────────────────────────────────────────────────────
 function Tag({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] tracking-widest font-sans text-black/40 bg-black/[0.04]">
+    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] tracking-widest font-sans text-black/40 dark:text-white/40 bg-black/[0.04] dark:bg-white/[0.08]">
       {children}
     </span>
   )
@@ -99,7 +99,7 @@ export default function AgenticPage() {
   }
 
   return (
-    <div className="bg-[#F5F4F0] text-[#111] min-h-screen font-sans antialiased">
+    <div className="bg-white dark:bg-[#1a1a1a] text-[#111] dark:text-white min-h-screen font-sans antialiased">
 
       {/* ── INTRO ANIMATION ───────────────────────────────────────────────── */}
       <IntroAnimation onDone={handleIntroDone} />
@@ -127,7 +127,20 @@ export default function AgenticPage() {
 
 
         {/* Progressive blur + light gradient rising from bottom */}
-        <div className="absolute inset-x-0 bottom-0 z-10 pointer-events-none" style={{ height: "65%", background: "linear-gradient(to top, #F5F4F0 0%, #F5F4F0 18%, rgba(245,244,240,0.85) 35%, rgba(245,244,240,0.5) 55%, rgba(245,244,240,0.15) 75%, transparent 100%)" }} />
+        <div 
+          className="absolute inset-x-0 bottom-0 z-10 pointer-events-none" 
+          style={{ 
+            height: "65%", 
+            background: "linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 18%, rgba(255,255,255,0.85) 35%, rgba(255,255,255,0.5) 55%, rgba(255,255,255,0.15) 75%, transparent 100%)"
+          }}
+        />
+        <div 
+          className="dark:block hidden absolute inset-x-0 bottom-0 z-10 pointer-events-none" 
+          style={{ 
+            height: "65%", 
+            background: "linear-gradient(to top, rgba(26,26,26,1) 0%, rgba(26,26,26,1) 18%, rgba(26,26,26,0.85) 35%, rgba(26,26,26,0.5) 55%, rgba(26,26,26,0.15) 75%, transparent 100%)"
+          }}
+        />
         {/* Backdrop blur layers — progressively lighter toward top */}
         <div className="absolute inset-x-0 bottom-0 z-10 pointer-events-none" style={{ height: "20%", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", maskImage: "linear-gradient(to top, black 0%, transparent 100%)", WebkitMaskImage: "linear-gradient(to top, black 0%, transparent 100%)" }} />
         <div className="absolute inset-x-0 bottom-0 z-10 pointer-events-none" style={{ height: "38%", backdropFilter: "blur(6px)", WebkitBackdropFilter: "blur(6px)", maskImage: "linear-gradient(to top, black 0%, transparent 100%)", WebkitMaskImage: "linear-gradient(to top, black 0%, transparent 100%)" }} />
@@ -253,7 +266,7 @@ export default function AgenticPage() {
       </section>
 
       {/* ── BUILD YOUR AGENTS (4 cards) ───────────────────────────────────── */}
-      <section id="agents" className="py-32 px-6 md:px-12 lg:px-20 border-t border-black/[0.06]">
+      <section id="agents" className="py-32 px-6 md:px-12 lg:px-20 border-t border-black/[0.06] dark:border-white/[0.08]">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-16">
             <div>
@@ -273,7 +286,7 @@ export default function AgenticPage() {
       </section>
 
       {/* ── HOW IT WORKS ──────────────────────────────────────────────────── */}
-      <section id="workflow" className="py-32 px-6 md:px-12 lg:px-20 border-t border-black/[0.06] overflow-hidden">
+      <section id="workflow" className="py-32 px-6 md:px-12 lg:px-20 border-t border-black/[0.06] dark:border-white/[0.08] overflow-hidden">
         <div className="max-w-6xl mx-auto">
           <div className="mb-16">
             <PixelIcon type="workflow" size={40} />
@@ -319,7 +332,7 @@ export default function AgenticPage() {
       </section>
 
       {/* ── INTEGRATIONS ──────────────────────────────────────────────────── */}
-      <section id="integrations" className="py-32 px-6 md:px-12 lg:px-20 border-t border-black/[0.06]">
+      <section id="integrations" className="py-32 px-6 md:px-12 lg:px-20 border-t border-black/[0.06] dark:border-white/[0.08]">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-16">
             <div>
@@ -389,7 +402,7 @@ export default function AgenticPage() {
       </section>
 
       {/* ── SECURITY & OBSERVABILITY ──────────────────────────────────��──── */}
-      <section id="security" className="py-32 px-6 md:px-12 lg:px-20 border-t border-black/[0.06]">
+      <section id="security" className="py-32 px-6 md:px-12 lg:px-20 border-t border-black/[0.06] dark:border-white/[0.08]">
         <div className="max-w-6xl mx-auto">
           <div className="mb-16">
             <PixelIcon type="platform" size={40} />
@@ -473,12 +486,12 @@ export default function AgenticPage() {
       <DevExSection />
 
       {/* ── MARQUEE CAPABILITIES ──────────────────────────────────────────── */}
-      <section className="py-0 border-t border-black/[0.06] overflow-hidden select-none">
-        <div className="flex border-b border-black/[0.06]" style={{ animation: "marqueeLeft 28s linear infinite" }}>
+      <section className="py-0 border-t border-black/[0.06] dark:border-white/[0.08] overflow-hidden select-none">
+        <div className="flex border-b border-black/[0.06] dark:border-white/[0.08]" style={{ animation: "marqueeLeft 28s linear infinite" }}>
           {[...Array(3)].map((_, rep) => (
             <div key={rep} className="flex shrink-0">
               {["Web Research", "Code Generation", "Email Drafting", "Data Analysis", "PR Reviews", "Scheduling", "SQL Queries", "API Calls", "File Processing", "Monitoring"].map((cap) => (
-                <div key={cap} className="flex items-center gap-6 px-10 py-5 border-r border-black/[0.06] shrink-0">
+                <div key={cap} className="flex items-center gap-6 px-10 py-5 border-r border-black/[0.06] dark:border-white/[0.08] shrink-0">
                   <span className="w-1.5 h-1.5 rounded-full bg-black/20 shrink-0" />
                   <span className="text-sm text-black/45 whitespace-nowrap tracking-wide">{cap}</span>
                 </div>
@@ -490,7 +503,7 @@ export default function AgenticPage() {
           {[...Array(3)].map((_, rep) => (
             <div key={rep} className="flex shrink-0">
               {["Report Writing", "Slack Summaries", "Lead Scoring", "Image Tagging", "Test Running", "Deployment", "Log Parsing", "Invoice Processing", "Meeting Notes", "Sentiment Analysis"].map((cap) => (
-                <div key={cap} className="flex items-center gap-6 px-10 py-5 border-r border-black/[0.06] shrink-0">
+                <div key={cap} className="flex items-center gap-6 px-10 py-5 border-r border-black/[0.06] dark:border-white/[0.08] shrink-0">
                   <span className="w-1.5 h-1.5 rounded-full bg-black/12 shrink-0" />
                   <span className="text-sm text-black/30 whitespace-nowrap tracking-wide">{cap}</span>
                 </div>
@@ -501,7 +514,7 @@ export default function AgenticPage() {
       </section>
 
       {/* ── LIVE AGENTS ��──────────────────────────────────────────────────── */}
-      <section id="live" className="py-32 px-6 md:px-12 lg:px-20 border-t border-black/[0.06]">
+      <section id="live" className="py-32 px-6 md:px-12 lg:px-20 border-t border-black/[0.06] dark:border-white/[0.08]">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
             <div>
@@ -526,7 +539,7 @@ export default function AgenticPage() {
       </section>
 
       {/* ── PRICING ───────────────────────────────────���────������─────────────── */}
-      <section id="pricing" className="py-32 px-6 md:px-12 lg:px-20 border-t border-black/[0.06]">
+      <section id="pricing" className="py-32 px-6 md:px-12 lg:px-20 border-t border-black/[0.06] dark:border-white/[0.08]">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16 flex flex-col items-center">
             <PixelIcon type="pricing" size={40} />
@@ -597,7 +610,7 @@ export default function AgenticPage() {
       </section>
 
       {/* ── CTA ───────────────────────────────────────────────────────────── */}
-      <section className="relative py-32 px-6 md:px-12 lg:px-20 border-t border-black/[0.06] overflow-hidden">
+      <section className="relative py-32 px-6 md:px-12 lg:px-20 border-t border-black/[0.06] dark:border-white/[0.08] overflow-hidden">
         {/* Glass panels image — anchored to bottom center */}
         <img
           src="/images/footer.png"
@@ -661,7 +674,7 @@ export default function AgenticPage() {
 
 
       {/* ── FOOTER ────────────────────────────────────────────────────────── */}
-      <footer className="py-10 px-6 md:px-12 lg:px-20 border-t border-black/[0.06]">
+      <footer className="py-10 px-6 md:px-12 lg:px-20 border-t border-black/[0.06] dark:border-white/[0.08]">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
           <span className="font-pixel text-xs tracking-[0.25em] text-black/50">AGENTIC</span>
 
