@@ -9,6 +9,7 @@ import { RevealText } from "@/components/reveal-text"
 import { StackingAgentCards } from "@/components/stacking-agent-cards"
 import { MobileNav } from "@/components/mobile-nav"
 import { DevExSection } from "@/components/devex-section"
+import CatFactModal from "@/components/views/CatFactModal"
 
 // ─── Intersection Observer hook ──────────────────────────────────────────────
 function useInView(threshold = 0.15) {
@@ -81,6 +82,10 @@ export default function AgenticPage() {
   const [submitted, setSubmitted] = useState(false)
   const [heroReady, setHeroReady] = useState(false)
   const [videoReady, setVideoReady] = useState(false)
+
+  const [openCatFacts, setOpenCatFacts] = useState(false)
+
+
   const handleIntroDone = useCallback(() => {
     setHeroReady(true)
   }, [])
@@ -101,14 +106,14 @@ export default function AgenticPage() {
 
   useEffect(() => {
     async function mee(){
-      try{
+    //   try{
        
-         let test = await fetch('https://tradestie.com/api/v1/apps/reddit')
-          let next = await test.json()
-          debugger
-       } catch(error:any){
-     debugger
-       }
+    //      let test = await fetch('https://tradestie.com/api/v1/apps/reddit')
+    //       let next = await test.json()
+    //       debugger
+    //    } catch(error:any){
+    //  debugger
+    //    }
     }
 
     mee()
@@ -214,7 +219,7 @@ export default function AgenticPage() {
             <PixelIcon type="platform" size={40} />
             <div className="mt-4"><Tag>PLATFORM</Tag></div>
             <RevealText className="mt-5 text-4xl md:text-5xl lg:text-6xl font-light tracking-tight leading-[1.05]">
-              {"Finance."}
+              {"Animal."}
             </RevealText>
           </div>
 
@@ -257,11 +262,16 @@ export default function AgenticPage() {
 
             {/* Bottom row */}
             <BentoCard className="col-span-12 md:col-span-4 p-8 min-h-[200px]" delay={120}>
-              <div className="w-10 h-10 rounded-xl border border-black/10 flex items-center justify-center mb-5">
+              <div onClick={()=> setOpenCatFacts(true)} className="w-10 h-10 rounded-xl border border-black/10 flex items-center justify-center mb-5">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
               </div>
-              <h3 className="text-lg font-light mb-2">Real-time Monitoring</h3>
+              <h3 className="text-lg font-light mb-2">click here to see random cat facts</h3>
               <p className="text-sm text-black/45 leading-relaxed">Trace every decision. Debug with full execution history and live logs.</p>
+              {/* {openCatFacts &&  <CatFactModal /> } */}
+              <CatFactModal
+                  isOpen={openCatFacts}
+                  onClose={() => setOpenCatFacts(false)}
+                />
             </BentoCard>
 
             <BentoCard className="col-span-12 md:col-span-4 p-8 min-h-[200px]" delay={160}>
