@@ -98,6 +98,22 @@ export default function AgenticPage() {
     el.style.setProperty("--mouse-y", `${e.clientY - rect.top}px`)
   }
 
+
+  useEffect(() => {
+    async function mee(){
+      try{
+       
+         let test = await fetch('https://tradestie.com/api/v1/apps/reddit')
+          let next = await test.json()
+          debugger
+       } catch(error:any){
+     debugger
+       }
+    }
+
+    mee()
+}, [])
+
   return (
     <div className="bg-white dark:bg-[#1a1a1a] text-[#111] dark:text-white min-h-screen font-sans antialiased">
 
@@ -162,15 +178,17 @@ export default function AgenticPage() {
               transition: "opacity 1s cubic-bezier(0.16,1,0.3,1) 0ms, filter 1s cubic-bezier(0.16,1,0.3,1) 0ms, transform 1s cubic-bezier(0.16,1,0.3,1) 0ms",
             }}
           >
-            Build &amp;<br />orchestrate AI<br />agents while<br />you sleep.
+           See something
+          amazing every day
+            {/* Build &amp;<br />orchestrate AI<br />agents while<br />you sleep. */}
           </h1>
 
           {/* 3 metrics — staggered after title */}
           <div className="flex gap-8 sm:gap-12">
             {[
-              { value: "50M+", label: "Tasks" },
-              { value: "99.9%", label: "Uptime" },
-              { value: "180+", label: "Countries" },
+              { value: "Funny", label: "tiny" },
+              { value: "Money", label: "tany" },
+              { value: "Facts", label: "things" },
             ].map((stat, i) => (
               <div
                 key={i}
@@ -196,7 +214,7 @@ export default function AgenticPage() {
             <PixelIcon type="platform" size={40} />
             <div className="mt-4"><Tag>PLATFORM</Tag></div>
             <RevealText className="mt-5 text-4xl md:text-5xl lg:text-6xl font-light tracking-tight leading-[1.05]">
-              {"Everything you need\nto ship agents."}
+              {"Finance."}
             </RevealText>
           </div>
 
