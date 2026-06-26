@@ -12,6 +12,10 @@ interface AuthCardProps {
   setEmail: (email: string) => void
   password: string
   setPassword: (password: string) => void
+  firstName: string
+  setFirstName: (password: string) => void
+  lastName: string
+  setLastName: (password: string) => void
   rememberMe: boolean
   setRememberMe: (remember: boolean) => void
   onSignIn: (e: React.FormEvent) => void
@@ -30,12 +34,14 @@ export function AuthCard({
   setRememberMe,
   onSignIn,
   onSignUp,
+  firstName, 
+  setFirstName,
+  lastName, 
+  setLastName,
   onSocialLogin,
   onForgotPassword,
 }: AuthCardProps) {
   const [activeTab, setActiveTab] = useState("signup")
-  const [firstName, setFirstName] = useState("John")
-  const [lastName, setLastName] = useState("")
   const [phoneNumber, setPhoneNumber] = useState("(775) 351-6501")
   const [showPassword, setShowPassword] = useState(false)
 
