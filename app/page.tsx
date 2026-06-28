@@ -10,6 +10,8 @@ import { StackingAgentCards } from "@/components/stacking-agent-cards"
 import { MobileNav } from "@/components/mobile-nav"
 import { DevExSection } from "@/components/devex-section"
 import CatFactModal from "@/components/views/CatFactModal"
+import DictionaryModal from '../components/views/DictionaryModal';
+import DictionaryPage from "@/components/views/DictionaryPage"
 
 // ─── Intersection Observer hook ──────────────────────────────────────────────
 function useInView(threshold = 0.15) {
@@ -84,6 +86,7 @@ export default function AgenticPage() {
   const [videoReady, setVideoReady] = useState(false)
 
   const [openCatFacts, setOpenCatFacts] = useState(false)
+  const [openDictionary, setOpenDictionary] = useState(false)
 
 
   const handleIntroDone = useCallback(() => {
@@ -320,13 +323,40 @@ export default function AgenticPage() {
             <PixelIcon type="workflow" size={40} />
             <div className="mt-4"><Tag>WORKFLOW</Tag></div>
             <RevealText className="mt-5 text-4xl md:text-5xl font-light tracking-tight leading-[1.05]">
-              {"From idea to running agent\nin four steps."}
+              {"Enjoy English."}
             </RevealText>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3" onMouseMove={handleMouse}>
+             <BentoCard  className="relative overflow-hidden flex flex-col min-h-[320px]" delay={0}>
+                {/* Image at top — mask fades it out strongly before the bottom edge */}
+                <div className="absolute inset-x-0 top-0 h-56 pointer-events-none">
+                  <img
+                    src={"https://hebbkx1anhila5yf.public.blob.vercel-storage.com/define-5aafAmGBrxZpOqJ3XLHY3n3qzC2I5K.png"}
+                    className="w-full h-full object-cover object-top"
+                    style={{
+                      maskImage: "linear-gradient(to bottom, black 0%, black 30%, transparent 80%)",
+                      WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 30%, transparent 80%)",
+                    }}
+                  />
+                </div>
+                {/* Number top-left */}
+                <div className="relative z-10 p-7">
+                  <span className="font-pixel text-[11px] text-black/20 tracking-widest block">01</span>
+                </div>
+                {/* Text pushed further down */}
+                <div className="relative z-10 px-7 pb-7 mt-auto pt-16" onClick={()=> setOpenDictionary(true)}>
+                  <h3 className="text-2xl font-light mb-3">A lovely Dictionary</h3>
+                  <p className="text-sm text-black/45 leading-relaxed">use it if you need, you can test it at least</p>
+                </div>
+                 <DictionaryPage
+                      isOpen={openDictionary}
+                      onClose={() => setOpenDictionary(false)}
+                      // word="serendipity"
+                    />
+              </BentoCard>
             {[
-              { n: "01", title: "Define",  desc: "Describe your agent in plain language. Set objectives, tools, and boundaries.", delay: 0,   img: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/define-5aafAmGBrxZpOqJ3XLHY3n3qzC2I5K.png" },
+              // { n: "01", title: "Define",  desc: "Describe your agent in plain language. Set objectives, tools, and boundaries.", delay: 0,   img: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/define-5aafAmGBrxZpOqJ3XLHY3n3qzC2I5K.png" },
               { n: "02", title: "Compose", desc: "Chain agents together in the visual editor. Wire triggers, conditions, and outputs.", delay: 80,  img: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/compose-5RT5VR4f1Y3GoFmovqTKLTG4UXp3g2.png" },
               { n: "03", title: "Test",    desc: "Run sandboxed simulations. Inspect every decision in the execution trace.", delay: 140, img: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/test-zm8guZwxJHtwWsJ7XO4B0CF7GzlNK8.png" },
               { n: "04", title: "Deploy",  desc: "Push globally in one click. Agents auto-scale, self-heal, and report back.", delay: 200, img: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/deploy-an8fgHSLzniojkcmRyGGIFQUJF9T5J.png" },
