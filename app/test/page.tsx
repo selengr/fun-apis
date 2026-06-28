@@ -1,5 +1,9 @@
-// import DictionaryPage from '@/components/views/DictionaryPage'
+const page = () => {
+    return (
+        <div>
+            Enter
+        </div>
+    );
+}
 
-// export default function Page() {
-//   return <DictionaryPage />
-// }
+export default page;
