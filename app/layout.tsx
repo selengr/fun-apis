@@ -55,14 +55,14 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`font-sans antialiased`}>
-        {/* <ThemeProvider
+        <ThemeProvider
           attribute="class"
           defaultTheme="dark"
           enableSystem
           storageKey="theme-preference"
-        > */}
+        >
           {children}
-        {/* </ThemeProvider> */}
+        </ThemeProvider>
         <Analytics />
       </body>
     </html>
