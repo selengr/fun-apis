@@ -13,6 +13,8 @@ export interface Meaning {
 export interface Phonetic {
   text?: string
   audio?: string
+  sourceUrl?: string        
+  license?: License         
 }
 export interface License {
   name: string

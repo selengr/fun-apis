@@ -65,30 +65,30 @@ export default function DictionaryImage({
     return <ImageSkeleton />;
   }
 
-  if (error) {
-    return (
-      <div className="rounded-lg border p-4 text-red-500">
-        {error}
-      </div>
-    );
-  }
+//   if (error) {
+//     return (
+//       <div className="rounded-lg border p-4 text-red-500">
+//         {error}
+//       </div>
+//     );
+//   }
 
-  if (!photo?.image) {
-    return (
-          <div className="relative aspect-[4/4] space-y-3 space-x-3 w-full h-32 overflow-hidden rounded-xl">
-      <div className="rounded-lg border p-6 text-center text-gray-500">
-        No image found.
-      </div>
-          </div>
+  if (!photo?.image) { return null
+//     return (
+//           <div className="relative aspect-[4/4] space-y-3 space-x-3 w-full h-32 overflow-hidden rounded-xl">
+//       <div className="rounded-lg border p-6 text-center text-gray-500">
+//         No image found.
+//       </div>
+//           </div>
           
-    );
+//     );
   }
 
   return (
     // <div className="space-y-3 h-32 w-80">
       <div className="relative aspect-[4/4] space-y-3 space-x-3 w-full h-32 overflow-hidden rounded-xl">
         <Image
-          src={photo.image}
+          src={photo?.image}
           alt={word}
           fill
           className="object-cover"
@@ -104,8 +104,6 @@ function ImageSkeleton() {
   return (
     <div className="animate-pulse space-y-3">
       <div className="aspect-[4/3] w-full rounded-xl bg-gray-200" />
-
-      <div className="h-4 w-40 rounded bg-gray-200" />
     </div>
   );
 }

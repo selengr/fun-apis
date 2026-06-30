@@ -301,7 +301,8 @@ export default function AgenticPage() {
             >
               {/* Arc background image — always fills container, objects pushed to bottom third */}
               <img
-                src="/images/arc.png"
+                // src="/images/arc.png"
+                src="/images/banners/https___west.avif"
                 alt=""
                 aria-hidden="true"
                 className="absolute inset-0 w-full h-full object-cover"
@@ -624,7 +625,8 @@ export default function AgenticPage() {
             {/* Image */}
             <div className="relative w-full h-[280px] md:h-[480px] shrink-0">
               <img
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Org%20Arc%20-%20Upscaled-Sk90jShfu7nltLnhoQbaMJC1YaQKuU.png"
+                src="/images/banners/https___west.avif"
+                // src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Org%20Arc%20-%20Upscaled-Sk90jShfu7nltLnhoQbaMJC1YaQKuU.png"
                 alt="Agent orchestration architecture"
                 className="absolute inset-0 w-full h-full object-cover object-center"
               />

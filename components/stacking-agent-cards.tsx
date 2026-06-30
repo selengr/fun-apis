@@ -102,7 +102,8 @@ export function StackingAgentCards() {
                 {agent.img && (
                   <div className="relative w-full h-52 pointer-events-none md:hidden">
                     <img
-                      src={agent.img}
+                      // src={agent.img}
+                             src="/images/banners/https___west.avif"
                       alt={agent.label}
                       className="absolute inset-0 w-full h-full object-cover object-center"
                       style={{
@@ -117,7 +118,8 @@ export function StackingAgentCards() {
                 {agent.img && (
                   <div className="hidden md:block absolute inset-y-0 right-0 w-1/2 pointer-events-none">
                     <img
-                      src={agent.img}
+                      // src={agent.img}
+                       src="/images/banners/https___west.avif"
                       alt={agent.label}
                       className="w-full h-full object-cover object-center"
                     />

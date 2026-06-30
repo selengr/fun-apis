@@ -9,7 +9,7 @@ export default function DictionaryIntercepted() {
   return (
     <Dialog open={true} onOpenChange={() => router.back()}>
       <DialogContent className="sm:max-w-lg p-0 gap-0 overflow-hidden rounded-2xl border border-border bg-background">
-        <div className="overflow-y-scroll min-h-[60vh] max-h-[60vh] p-4">
+        <div className="overflow-y-scroll min-h-[60vh] max-h-[60vh]">
           <DictionaryContent />
         </div>
       </DialogContent>
