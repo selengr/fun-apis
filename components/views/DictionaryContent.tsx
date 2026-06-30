@@ -1,11 +1,12 @@
 "use client";
+import { cn } from "@/lib/utils";
 import { useState, useCallback, useEffect } from "react";
 import { Search, Copy, Share2, Volume2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { cn } from "@/lib/utils";
+import DictionaryImage from "./DictionaryImage";
 import type { DictionaryEntry } from "@/types/dictionary";
 import { getPos, POS_ICON } from "@/lib/dictionary-utils";
 
@@ -15,6 +16,7 @@ export function DictionaryContent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
+  const [photos, setPhotos] = useState<any[]>([]);
 
   const lookup = useCallback(async (word: string) => {
     if (!word.trim()) return;
@@ -40,6 +42,12 @@ export function DictionaryContent() {
 
   useEffect(() => {
     lookup("serendipity");
+  }, []);
+
+  useEffect(() => {
+    fetch(`/api/photos?word=${query}`)
+      .then((res) => res.json())
+      .then((data) => setPhotos(data));
   }, []);
 
   const handleSearch = () => lookup(query);
@@ -104,7 +112,7 @@ export function DictionaryContent() {
               {loading ? "Searching…" : "Search"}
             </Button>
           </div>
-
+          
           {/* Error */}
           {error && (
             <div className="text-center py-12 text-muted-foreground border border-dashed border-border rounded-xl">
@@ -129,75 +137,75 @@ export function DictionaryContent() {
           {/* Result */}
           {data && !loading && entry && (
             <div className="border border-border rounded-xl overflow-hidden bg-card">
-              {/* <div>
-                          {photos.map((p) => (
-                              <img key={p.id} src={p.urls.small} />
-                          ))}
-                          </div> */}
-
-              {/* Word header */}
-              <div className="px-5 pt-5 pb-0">
-                <div className="flex items-start gap-3 mb-1">
-                  <div className="flex-1">
-                    <h1 className="text-3xl font-medium text-foreground tracking-tight leading-none">
-                      {entry.word}
-                    </h1>
+              <div className="flex flex-row w-full justify-between">
+                {/* Word header */}
+                <div className="px-5 pt-5 pb-0 w-[60%]">
+                  <div className="flex items-start gap-3 mb-1">
+                    <div className="flex-1">
+                      <h1 className="text-3xl font-medium text-foreground tracking-tight leading-none">
+                        {entry.word}
+                      </h1>
+                    </div>
+                    <div className="flex gap-1.5 mt-1">
+                      <button
+                        onClick={copyWord}
+                        className={cn(
+                          "w-8 h-8 rounded-full cursor-pointer border flex items-center justify-center transition-colors",
+                          copied
+                            ? "border-green-300 bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-400"
+                            : "border-border bg-muted/40 text-muted-foreground hover:text-foreground",
+                        )}
+                        aria-label="Copy word"
+                      >
+                        <Copy size={13} />
+                      </button>
+                      <button
+                        onClick={shareWord}
+                        className="w-8 h-8 cursor-pointer rounded-full border border-border bg-muted/40 flex items-center justify-center text-muted-foreground hover:text-foreground"
+                        aria-label="Share"
+                      >
+                        <Share2 size={13} />
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex gap-1.5 mt-1">
-                    <button
-                      onClick={copyWord}
-                      className={cn(
-                        "w-8 h-8 rounded-full cursor-pointer border flex items-center justify-center transition-colors",
-                        copied
-                          ? "border-green-300 bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-400"
-                          : "border-border bg-muted/40 text-muted-foreground hover:text-foreground",
-                      )}
-                      aria-label="Copy word"
-                    >
-                      <Copy size={13} />
-                    </button>
-                    <button
-                      onClick={shareWord}
-                      className="w-8 h-8 cursor-pointer rounded-full border border-border bg-muted/40 flex items-center justify-center text-muted-foreground hover:text-foreground"
-                      aria-label="Share"
-                    >
-                      <Share2 size={13} />
-                    </button>
+                  {phoneticText && (
+                    <p className="text-sm text-muted-foreground mb-4">
+                      {phoneticText}
+                    </p>
+                  )}
+
+                  {/* Audio buttons */}
+                  <div className="grid grid-cols-2 gap-2 mb-5">
+                    {[
+                      { p: ukAudio, label: "UK", flag: "🇬🇧" },
+                      { p: usAudio, label: "US", flag: "🇺🇸" },
+                    ].map(({ p, label, flag }) =>
+                      p?.audio ? (
+                        <button
+                          key={label}
+                          onClick={() => playAudio(p.audio!)}
+                          className="flex items-center gap-2.5 px-3 py-2.5 border border-border rounded-lg bg-muted/20 hover:bg-muted/50 transition-colors text-left"
+                        >
+                          <span className="text-xl">{flag}</span>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-medium text-foreground">
+                              {label}
+                            </p>
+                            <p className="text-[11px] text-muted-foreground truncate">
+                              {p.text ?? "—"}
+                            </p>
+                          </div>
+                          <div className="w-6 h-6 cursor-pointer rounded-full bg-blue-500 flex items-center justify-center shrink-0">
+                            <Volume2 size={11} className="text-white" />
+                          </div>
+                        </button>
+                      ) : null,
+                    )}
                   </div>
                 </div>
-                {phoneticText && (
-                  <p className="text-sm text-muted-foreground mb-4">
-                    {phoneticText}
-                  </p>
-                )}
 
-                {/* Audio buttons */}
-                <div className="grid grid-cols-2 gap-2 mb-5">
-                  {[
-                    { p: ukAudio, label: "UK", flag: "🇬🇧" },
-                    { p: usAudio, label: "US", flag: "🇺🇸" },
-                  ].map(({ p, label, flag }) =>
-                    p?.audio ? (
-                      <button
-                        key={label}
-                        onClick={() => playAudio(p.audio!)}
-                        className="flex items-center gap-2.5 px-3 py-2.5 border border-border rounded-lg bg-muted/20 hover:bg-muted/50 transition-colors text-left"
-                      >
-                        <span className="text-xl">{flag}</span>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-medium text-foreground">
-                            {label}
-                          </p>
-                          <p className="text-[11px] text-muted-foreground truncate">
-                            {p.text ?? "—"}
-                          </p>
-                        </div>
-                        <div className="w-6 h-6 cursor-pointer rounded-full bg-blue-500 flex items-center justify-center shrink-0">
-                          <Volume2 size={11} className="text-white" />
-                        </div>
-                      </button>
-                    ) : null,
-                  )}
+                <div className="flex w-[40%] justify-center items-center pr-5">
+                  <DictionaryImage word={query} />
                 </div>
               </div>
 
