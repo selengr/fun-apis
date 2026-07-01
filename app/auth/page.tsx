@@ -9,7 +9,7 @@ import { AuthCard } from "@/components/auth/auth-card";
 export default function AuthPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [password, setPassword] = useState("");
-  const [firstName, setFirstName] = useState("John");
+  const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
@@ -33,14 +33,37 @@ export default function AuthPage() {
 
     setIsLoading(true);
 
-    // Simulate authentication
-    setTimeout(() => {
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message);
+      }
       setIsLoading(false);
       toast({
         title: "Signed in successfully!",
         description: "Welcome back to your account.",
       });
-    }, 1500);
+    } catch (error : any) {
+      setIsLoading(false);
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "default",
+      });
+    }
+
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
