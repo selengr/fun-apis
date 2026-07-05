@@ -4,6 +4,7 @@ import { Geist, Geist_Mono, IBM_Plex_Sans } from 'next/font/google'
 import { Courier_Prime } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { ThemeProvider } from '@/components/theme-provider'
+import { FaviconSwitcher } from '@/components/favicon-switcher'
 import './globals.css'
 
 const _geist = Geist({ subsets: ["latin"] });
@@ -39,11 +40,11 @@ export const metadata: Metadata = {
         media: '(prefers-color-scheme: dark)',
       },
       {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
+        url: '/icon-dark-32x32.png',
       },
     ],
     apple: '/apple-icon.png',
+    shortcut: '/icon-dark-32x32.png',
   },
 }
 
@@ -57,10 +58,11 @@ export default function RootLayout({
       <body className={`font-sans antialiased`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
+          defaultTheme="light"
           enableSystem
-          storageKey="theme-preference"
+          storageKey="light-theme"
         >
+          <FaviconSwitcher />
           {children}
         </ThemeProvider>
         <Analytics />

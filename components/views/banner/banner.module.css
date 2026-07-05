@@ -1,0 +1,125 @@
+.landing-main {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  margin-top: 7rem;
+}
+
+.landing-img {
+  inset: 0;
+  box-sizing: border-box;
+  padding: 0;
+  border: none;
+  margin: auto;
+  object-position: center 50%;
+  width: 100% !important;
+  max-width: 1200px !important;
+  border-radius: 24px;
+  height: 30vh !important;
+  object-fit: cover;
+  box-shadow: 2px 2px 8px 4px hsla(0, 0%, 6%, 0.1);
+}
+
+@media (max-width: 1200px) {
+  .landing-img {
+    width: 100vw !important;
+    border-radius: 0;
+  }
+}
+
+.landing-div-rounded {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 124px;
+  height: 124px;
+  border-radius: 50%;
+  box-shadow: 4px 4px 24px 0 rgba(0, 0, 0, 0.21);
+  margin-top: -62px;
+}
+
+.landing-div-rounded-home {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 100%;
+  width: 100%;
+  height: 100%;
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+@media (max-width: 720px) {
+  .landing-div-rounded {
+    width: 114px;
+    height: 114px;
+  }
+
+  .landing-div-rounded-home {
+    width: 104px;
+    height: 104px;
+  }
+}
+
+@media (max-width: 576px) {
+  .landing-div-rounded {
+    width: 100px;
+    height: 100px;
+  }
+
+  .landing-div-rounded-home {
+    width: 90px;
+    height: 90px;
+  }
+}
+
+.landing-title {
+  width: 100%;
+  font-size: 2.5em;
+  margin-top: 1em;
+  line-height: 1.2;
+  text-align: center;
+  font-weight: bold;
+  overflow: hidden;
+}
+
+
+.landing-article {
+    display: flex;
+    flex-direction: column;
+    width: 72%;
+    margin-top: 20px;
+}
+
+
+.landing-hover-highlight{
+    color: inherit;
+    word-break: break-word;
+    text-decoration: dashed;
+    border-bottom: 0.05em solid;
+    border-color: rgba(255, 255, 255, 0.9);
+    transition: unset;
+    opacity: 1;
+    border-bottom-width: 0.1rem;
+    background: transparent;
+    background-origin: border-box;
+    background-repeat: no-repeat;
+    background-position: 50% 100%;
+    background-size: 0 0.1rem;
+    -webkit-transition: unset;
+    -moz-transition: unset;
+    -ms-transition: unset;
+    -o-transition: unset;
+}
+.landing-hover-highlight:hover  {
+   border-bottom-color: transparent;
+   background-image: linear-gradient(90.68deg, #b439df 0.26%, #e5337e 102.37%);
+   background-repeat: no-repeat;
+   background-position: 0 100%;
+   background-size: 100% 0.1rem;
+   transition-property: background-position, background-size;
+   transition-duration: 300ms;
+
+}

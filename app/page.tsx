@@ -15,6 +15,8 @@ import { StackingAgentCards } from "@/components/stacking-agent-cards";
 import { MobileNav } from "@/components/mobile-nav";
 import { DevExSection } from "@/components/devex-section";
 import CatFactModal from "@/components/views/CatFactModal";
+import Banner from "@/components/views/banner/banner";
+import TimeMachine from "@/components/time-machine";
 
 // ─── Intersection Observer hook ──────────────────────────────────────────────
 function useInView(threshold = 0.15) {
@@ -76,7 +78,7 @@ function BentoCard({
   return (
     <div
       ref={ref}
-      className={`group relative rounded-2xl border border-black/[0.07] dark:border-white/[0.1] bg-white dark:bg-[#2a2a2a] overflow-hidden transition-all duration-700 hover:border-black/[0.15] dark:hover:border-white/[0.2] hover:bg-[#fafaf8] dark:hover:bg-[#333333] ${className}`}
+      className={`group relative rounded-2xl border border-border bg-card overflow-hidden transition-all duration-700 hover:border-border/80 hover:bg-accent ${className}`}
       style={{
         opacity: inView ? 1 : 0,
         transform: inView ? "translateY(0)" : "translateY(28px)",
@@ -85,11 +87,7 @@ function BentoCard({
     >
       {/* Hover glow spot */}
       <div
-        className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-        style={{
-          background:
-            "radial-gradient(400px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(0,0,0,0.03), transparent 60%)",
-        }}
+        className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 [background:radial-gradient(400px_circle_at_var(--mouse-x,50%)_var(--mouse-y,50%),color-mix(in_srgb,var(--foreground)_3%,transparent),transparent_60%)]"
       />
       {children}
     </div>
@@ -99,7 +97,7 @@ function BentoCard({
 // ─── Pill tag ─────────────────────────────────────────────────────────────────
 function Tag({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] tracking-widest font-sans text-black/40 dark:text-white/40 bg-black/[0.04] dark:bg-white/[0.08]">
+    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] tracking-widest font-sans text-muted-foreground bg-muted">
       {children}
     </span>
   );
@@ -147,7 +145,7 @@ export default function AgenticPage() {
   }, []);
 
   return (
-    <div className="bg-white dark:bg-[#1a1a1a] text-[#111] dark:text-white min-h-screen font-sans antialiased">
+    <div className="bg-background text-foreground min-h-screen font-sans antialiased">
       {/* ── INTRO ANIMATION ───────────────────────────────────────────────── */}
       <IntroAnimation onDone={handleIntroDone} />
 
@@ -155,50 +153,15 @@ export default function AgenticPage() {
       <MobileNav />
 
       {/* ── HERO ──────────────────────────────────────────────────────────── */}
-      <section className="relative h-screen overflow-hidden">
-        {/* Video background — zooms in once intro is done */}
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover z-0"
-          src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/agentic-hero-9yW3wnTNMfn2U6lsVhTTZSJFEvAoSj.mp4"
-          style={{
-            transform: videoReady ? "scale(1.05)" : "scale(0.85)",
-            transition: "transform 2s cubic-bezier(0.16, 1, 0.3, 1)",
-          }}
+      <section className="relative min-h-screen overflow-hidden">
+        <Banner
+          banner="/images/banners/https___west.avif"
+          user={'/LOGO/rk-light-logo.png'}
+          home
+          videoReady={videoReady}
         />
 
         {/* Progressive blur + light gradient rising from bottom */}
-        <div
-          className="absolute inset-x-0 bottom-0 z-10 pointer-events-none"
-          style={{
-            height: "65%",
-            background:
-              "linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 18%, rgba(255,255,255,0.85) 35%, rgba(255,255,255,0.5) 55%, rgba(255,255,255,0.15) 75%, transparent 100%)",
-          }}
-        />
-        <div
-          className="dark:block hidden absolute inset-x-0 bottom-0 z-10 pointer-events-none"
-          style={{
-            height: "65%",
-            background:
-              "linear-gradient(to top, rgba(26,26,26,1) 0%, rgba(26,26,26,1) 18%, rgba(26,26,26,0.85) 35%, rgba(26,26,26,0.5) 55%, rgba(26,26,26,0.15) 75%, transparent 100%)",
-          }}
-        />
-        {/* Backdrop blur layers — progressively lighter toward top */}
-        <div
-          className="absolute inset-x-0 bottom-0 z-10 pointer-events-none"
-          style={{
-            height: "20%",
-            backdropFilter: "blur(12px)",
-            WebkitBackdropFilter: "blur(12px)",
-            maskImage: "linear-gradient(to top, black 0%, transparent 100%)",
-            WebkitMaskImage:
-              "linear-gradient(to top, black 0%, transparent 100%)",
-          }}
-        />
         <div
           className="absolute inset-x-0 bottom-0 z-10 pointer-events-none"
           style={{
@@ -221,59 +184,15 @@ export default function AgenticPage() {
               "linear-gradient(to top, black 0%, transparent 100%)",
           }}
         />
+      </section>
 
-        {/* Spacer so hero content doesn't sit under the fixed nav */}
-        <div className="h-20" />
-
-        {/* Title + metrics — anchored to bottom left */}
-        <div className="absolute inset-x-0 bottom-0 z-30 flex flex-col px-6 md:px-12 pb-12 max-w-3xl">
-          {/* Title */}
-          <h1
-            className="text-6xl sm:text-7xl md:text-8xl font-light text-[#111] leading-[1.0] tracking-tight mb-10"
-            style={{
-              fontFamily: '"IBM Plex Sans", sans-serif',
-              opacity: heroReady ? 1 : 0,
-              filter: heroReady ? "blur(0px)" : "blur(24px)",
-              transform: heroReady ? "translateY(0px)" : "translateY(32px)",
-              transition:
-                "opacity 1s cubic-bezier(0.16,1,0.3,1) 0ms, filter 1s cubic-bezier(0.16,1,0.3,1) 0ms, transform 1s cubic-bezier(0.16,1,0.3,1) 0ms",
-            }}
-          >
-            See something amazing every day
-            {/* Build &amp;<br />orchestrate AI<br />agents while<br />you sleep. */}
-          </h1>
-
-          {/* 3 metrics — staggered after title */}
-          <div className="flex gap-8 sm:gap-12">
-            {[
-              { value: "Funny", label: "tiny" },
-              { value: "Money", label: "tany" },
-              { value: "Facts", label: "things" },
-            ].map((stat, i) => (
-              <div
-                key={i}
-                style={{
-                  opacity: heroReady ? 1 : 0,
-                  filter: heroReady ? "blur(0px)" : "blur(16px)",
-                  transform: heroReady ? "translateY(0px)" : "translateY(20px)",
-                  transition: `opacity 0.8s cubic-bezier(0.16,1,0.3,1) ${120 + i * 80}ms, filter 0.8s cubic-bezier(0.16,1,0.3,1) ${120 + i * 80}ms, transform 0.8s cubic-bezier(0.16,1,0.3,1) ${120 + i * 80}ms`,
-                }}
-              >
-                <div
-                  className="text-3xl sm:text-4xl text-[#111] font-light tracking-tight"
-                  style={{ fontFamily: '"IBM Plex Sans", sans-serif' }}
-                >
-                  {stat.value}
-                </div>
-                <div
-                  className="text-xs text-black/40 tracking-widest uppercase mt-1"
-                  style={{ fontFamily: '"IBM Plex Sans", sans-serif' }}
-                >
-                  {stat.label}
-                </div>
-              </div>
-            ))}
-          </div>
+      {/* ── TIME MACHINE ──────────────────────────────────────────────────── */}
+      <section
+        id="time-machine"
+        className="w-full border-t border-border bg-background py-12 px-6 md:px-12 flex items-center justify-center"
+      >
+        <div className="relative w-full max-w-3xl h-[450px] max-h-[450px] mx-auto">
+          <TimeMachine shouldImplementPreloading={false} />
         </div>
       </section>
 
@@ -320,18 +239,19 @@ export default function AgenticPage() {
                   WebkitBackdropFilter: "blur(16px)",
                 }}
               />
-              {/* Fade-to-background gradient — matches site bg color #f5f4f0 */}
+              {/* Fade-to-background gradient — light mode only */}
               <div
-                className="absolute inset-0"
+                className="absolute inset-0 dark:hidden"
                 style={{
                   background:
                     "linear-gradient(to bottom, transparent 35%, rgba(245,244,240,0.3) 50%, rgba(245,244,240,0.75) 65%, rgba(245,244,240,0.95) 80%, rgb(245,244,240) 100%)",
                 }}
               />
+              <div className="absolute inset-0 hidden dark:block bg-gradient-to-b from-transparent from-35% via-background/75 via-65% to-background to-100%" />
               {/* Content */}
               <div className="relative z-10">
                 <div
-                  className="w-10 h-10 rounded-xl border border-black/10 bg-white/60 flex items-center justify-center mb-6"
+                  className="w-10 h-10 rounded-xl border border-border bg-card/60 flex items-center justify-center mb-6"
                   style={{ backdropFilter: "blur(8px)" }}
                 >
                   <svg
@@ -350,7 +270,7 @@ export default function AgenticPage() {
                 <h3 className="text-xl font-light mb-3">
                   Visual Agent Builder
                 </h3>
-                <p className="text-sm text-black/45 leading-relaxed max-w-sm">
+                <p className="text-sm text-muted-foreground leading-relaxed max-w-sm">
                   Drag, connect, and configure agents through an intuitive graph
                   editor. No boilerplate. Ship in minutes, not days.
                 </p>
@@ -364,7 +284,7 @@ export default function AgenticPage() {
             >
               <div
                 onClick={() => setOpenCatFacts(true)}
-                className="w-10 h-10 rounded-xl border border-black/10 flex items-center justify-center mb-5"
+                className="w-10 h-10 rounded-xl border border-border flex items-center justify-center mb-5"
               >
                 <svg
                   width="18"
@@ -380,7 +300,7 @@ export default function AgenticPage() {
               <h3 className="text-lg font-light mb-2">
                 click here to see random cat facts
               </h3>
-              <p className="text-sm text-black/45 leading-relaxed">
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 Trace every decision. Debug with full execution history and live
                 logs.
               </p>
@@ -395,7 +315,7 @@ export default function AgenticPage() {
               className="col-span-12 md:col-span-4 p-8 min-h-[200px]"
               delay={160}
             >
-              <div className="w-10 h-10 rounded-xl border border-black/10 flex items-center justify-center mb-5">
+              <div className="w-10 h-10 rounded-xl border border-border flex items-center justify-center mb-5">
                 <svg
                   width="18"
                   height="18"
@@ -409,7 +329,7 @@ export default function AgenticPage() {
                 </svg>
               </div>
               <h3 className="text-lg font-light mb-2">Memory & Context</h3>
-              <p className="text-sm text-black/45 leading-relaxed">
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 Persistent long-term memory across sessions. Agents learn from
                 every interaction.
               </p>
@@ -419,7 +339,7 @@ export default function AgenticPage() {
               className="col-span-12 md:col-span-4 p-8 min-h-[200px]"
               delay={200}
             >
-              <div className="w-10 h-10 rounded-xl border border-black/10 flex items-center justify-center mb-5">
+              <div className="w-10 h-10 rounded-xl border border-border flex items-center justify-center mb-5">
                 <svg
                   width="18"
                   height="18"
@@ -434,7 +354,7 @@ export default function AgenticPage() {
               <h3 className="text-lg font-light mb-2">
                 Guardrails & Permissions
               </h3>
-              <p className="text-sm text-black/45 leading-relaxed">
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 Define what agents can and cannot do. Fine-grained access
                 control per tool.
               </p>
@@ -446,7 +366,7 @@ export default function AgenticPage() {
       {/* ── BUILD YOUR AGENTS (4 cards) ───────────────────────────────────── */}
       <section
         id="agents"
-        className="py-32 px-6 md:px-12 lg:px-20 border-t border-black/[0.06] dark:border-white/[0.08]"
+        className="py-32 px-6 md:px-12 lg:px-20 border-t border-border"
       >
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-16">
@@ -459,7 +379,7 @@ export default function AgenticPage() {
                 {"Plug-and-play agents\nready to deploy."}
               </RevealText>
             </div>
-            <p className="text-sm text-black/45 leading-relaxed max-w-xs">
+            <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
               Start with a pre-built agent or compose your own from primitives.
               Every agent is versioned, testable, and observable.
             </p>
@@ -472,7 +392,7 @@ export default function AgenticPage() {
       {/* ── HOW IT WORKS ──────────────────────────────────────────────────── */}
       <section
         id="workflow"
-        className="py-32 px-6 md:px-12 lg:px-20 border-t border-black/[0.06] dark:border-white/[0.08] overflow-hidden"
+        className="py-32 px-6 md:px-12 lg:px-20 border-t border-border overflow-hidden"
       >
         <div className="max-w-6xl mx-auto">
           <div className="mb-16">
@@ -508,7 +428,7 @@ export default function AgenticPage() {
                 </div>
                 {/* Number top-left */}
                 <div className="relative z-10 p-7">
-                  <span className="font-pixel text-[11px] text-black/20 tracking-widest block">
+                  <span className="font-pixel text-[11px] text-muted-foreground/60 tracking-widest block">
                     01
                   </span>
                 </div>
@@ -520,7 +440,7 @@ export default function AgenticPage() {
                   <h3 className="text-2xl font-light mb-3">
                     A lovely Dictionary
                   </h3>
-                  <p className="text-sm text-black/45 leading-relaxed">
+                  <p className="text-sm text-muted-foreground leading-relaxed">
                     use it if you need, you can test it at least
                   </p>
                 </div>
@@ -577,14 +497,14 @@ export default function AgenticPage() {
                 </div>
                 {/* Number top-left */}
                 <div className="relative z-10 p-7">
-                  <span className="font-pixel text-[11px] text-black/20 tracking-widest block">
+                  <span className="font-pixel text-[11px] text-muted-foreground/60 tracking-widest block">
                     {step.n}
                   </span>
                 </div>
                 {/* Text pushed further down */}
                 <div className="relative z-10 px-7 pb-7 mt-auto pt-16">
                   <h3 className="text-2xl font-light mb-3">{step.title}</h3>
-                  <p className="text-sm text-black/45 leading-relaxed">
+                  <p className="text-sm text-muted-foreground leading-relaxed">
                     {step.desc}
                   </p>
                 </div>
@@ -597,7 +517,7 @@ export default function AgenticPage() {
       {/* ── INTEGRATIONS ──────────────────────────────────────────────────── */}
       <section
         id="integrations"
-        className="py-32 px-6 md:px-12 lg:px-20 border-t border-black/[0.06] dark:border-white/[0.08]"
+        className="py-32 px-6 md:px-12 lg:px-20 border-t border-border"
       >
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-16">
@@ -610,7 +530,7 @@ export default function AgenticPage() {
                 {"Connect any tool.\nControl any system."}
               </RevealText>
             </div>
-            <p className="text-sm text-black/45 leading-relaxed max-w-xs">
+            <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
               200+ native connectors. Everything from Slack to your internal
               database. Build custom tools with our SDK in minutes.
             </p>
@@ -619,7 +539,7 @@ export default function AgenticPage() {
           {/* Full-width image block with glass cards */}
           {/* Mobile: flex-col, image + cards stacked. Desktop: image fills block, cards absolute */}
           <div
-            className="rounded-2xl overflow-hidden border border-black/[0.07] flex flex-col md:block md:relative"
+            className="rounded-2xl overflow-hidden border border-border flex flex-col md:block md:relative"
             onMouseMove={handleMouse}
           >
             {/* Image */}
@@ -635,23 +555,18 @@ export default function AgenticPage() {
             {/* Cards — flex row on mobile (equal spacing), absolute on desktop */}
             <div className="flex flex-col gap-3 p-4 md:absolute md:bottom-4 md:right-4 md:p-0 md:w-72">
               <div
-                className="rounded-xl border border-white/50 p-6"
-                style={{
-                  backdropFilter: "blur(24px)",
-                  WebkitBackdropFilter: "blur(24px)",
-                  background: "rgba(255,255,255,0.60)",
-                }}
+                className="rounded-xl border border-border/50 p-6 bg-card/60 backdrop-blur-xl"
               >
                 <Tag>SDK</Tag>
                 <h3 className="mt-3 text-lg font-light mb-2">
                   Build custom tools
                 </h3>
-                <p className="text-xs text-black/45 leading-relaxed mb-4">
+                <p className="text-xs text-muted-foreground leading-relaxed mb-4">
                   Define any function as a tool your agents can call. TypeScript
                   and Python.
                 </p>
-                <div className="bg-black/[0.05] rounded-lg border border-black/[0.07] p-3 font-mono text-[11px] text-black/50 leading-relaxed">
-                  <span className="text-black/25">// tool definition</span>
+                <div className="bg-muted/60 rounded-lg border border-border p-3 font-mono text-[11px] text-muted-foreground/70 leading-relaxed">
+                  <span className="text-muted-foreground/70">// tool definition</span>
                   <br />
                   <span className="text-blue-600/70">defineTool</span>
                   {"({"}
@@ -664,7 +579,7 @@ export default function AgenticPage() {
                   ,<br />
                   {"  "}
                   <span className="text-amber-700/70">run</span>:{" "}
-                  <span className="text-black/35">async (q) </span>={">"}
+                  <span className="text-muted-foreground/90">async (q) </span>={">"}
                   <br />
                   {"    "}
                   <span className="text-blue-600/70">api</span>.get(q)
@@ -674,20 +589,15 @@ export default function AgenticPage() {
               </div>
 
               <div
-                className="rounded-xl border border-white/50 p-6"
-                style={{
-                  backdropFilter: "blur(24px)",
-                  WebkitBackdropFilter: "blur(24px)",
-                  background: "rgba(255,255,255,0.60)",
-                }}
+                className="rounded-xl border border-border/50 p-6 bg-card/60 backdrop-blur-xl"
               >
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-2 h-2 rounded-full bg-emerald-500/80 animate-pulse" />
-                  <span className="text-xs text-black/40 tracking-widest">
+                  <span className="text-xs text-muted-foreground tracking-widest">
                     LIVE API
                   </span>
                 </div>
-                <p className="text-sm text-black/45">
+                <p className="text-sm text-muted-foreground">
                   Full REST + WebSocket API. Stream agent outputs directly into
                   your product.
                 </p>
@@ -700,7 +610,7 @@ export default function AgenticPage() {
       {/* ── SECURITY & OBSERVABILITY ──────────────────────────────────��──── */}
       <section
         id="security"
-        className="py-32 px-6 md:px-12 lg:px-20 border-t border-black/[0.06] dark:border-white/[0.08]"
+        className="py-32 px-6 md:px-12 lg:px-20 border-t border-border"
       >
         <div className="max-w-6xl mx-auto">
           <div className="mb-16">
@@ -717,7 +627,7 @@ export default function AgenticPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Left side — descriptions */}
             <div className="space-y-6">
-              <p className="text-sm text-black/45 leading-relaxed">
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 Every action is logged, every decision is traceable. Built for
                 teams that need compliance without compromise.
               </p>
@@ -738,10 +648,10 @@ export default function AgenticPage() {
                   },
                 ].map((item) => (
                   <div key={item.label} className="flex gap-4">
-                    <div className="w-1 bg-black/10 rounded-full shrink-0" />
+                    <div className="w-1 bg-muted rounded-full shrink-0" />
                     <div>
                       <h3 className="text-sm font-light mb-1">{item.label}</h3>
-                      <p className="text-xs text-black/35">{item.desc}</p>
+                      <p className="text-xs text-muted-foreground/90">{item.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -752,9 +662,9 @@ export default function AgenticPage() {
                 {["SOC 2", "GDPR", "HIPAA Ready", "ISO 27001"].map((badge) => (
                   <div
                     key={badge}
-                    className="flex items-center gap-2 text-xs text-black/25"
+                    className="flex items-center gap-2 text-xs text-muted-foreground/70"
                   >
-                    <span className="w-1 h-1 rounded-full bg-black/25" />
+                    <span className="w-1 h-1 rounded-full bg-muted-foreground/40" />
                     {badge}
                   </div>
                 ))}
@@ -763,7 +673,7 @@ export default function AgenticPage() {
 
             {/* Right side — live audit log visualization */}
             <BentoCard className="p-6 lg:row-span-1" delay={0}>
-              <div className="text-xs text-black/30 tracking-widest uppercase mb-4">
+              <div className="text-xs text-muted-foreground/80 tracking-widest uppercase mb-4">
                 Live Audit Trail
               </div>
               <div className="space-y-2">
@@ -796,15 +706,15 @@ export default function AgenticPage() {
                 ].map((log, i) => (
                   <div
                     key={i}
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-black/[0.02] hover:bg-black/[0.04] transition-colors border border-black/[0.04] group cursor-pointer"
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-muted/40 hover:bg-muted/60 transition-colors border border-border/60 group cursor-pointer"
                     style={{
                       animation: `fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) ${i * 80}ms both`,
                     }}
                   >
-                    <span className="text-[10px] text-black/25 font-mono min-w-[60px]">
+                    <span className="text-[10px] text-muted-foreground/70 font-mono min-w-[60px]">
                       {log.time}
                     </span>
-                    <span className="text-[11px] text-black/50 font-light flex-1">
+                    <span className="text-[11px] text-muted-foreground/70 font-light flex-1">
                       {log.action}
                     </span>
                     <span className="w-1.5 h-1.5 rounded-full bg-green-500/60 group-hover:bg-green-500 transition-colors" />
@@ -826,9 +736,9 @@ export default function AgenticPage() {
       <DevExSection />
 
       {/* ── MARQUEE CAPABILITIES ──────────────────────────────────────────── */}
-      <section className="py-0 border-t border-black/[0.06] dark:border-white/[0.08] overflow-hidden select-none">
+      <section className="py-0 border-t border-border overflow-hidden select-none">
         <div
-          className="flex border-b border-black/[0.06] dark:border-white/[0.08]"
+          className="flex border-b border-border"
           style={{ animation: "marqueeLeft 28s linear infinite" }}
         >
           {[...Array(3)].map((_, rep) => (
@@ -847,10 +757,10 @@ export default function AgenticPage() {
               ].map((cap) => (
                 <div
                   key={cap}
-                  className="flex items-center gap-6 px-10 py-5 border-r border-black/[0.06] dark:border-white/[0.08] shrink-0"
+                  className="flex items-center gap-6 px-10 py-5 border-r border-border shrink-0"
                 >
-                  <span className="w-1.5 h-1.5 rounded-full bg-black/20 shrink-0" />
-                  <span className="text-sm text-black/45 whitespace-nowrap tracking-wide">
+                  <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/30 shrink-0" />
+                  <span className="text-sm text-muted-foreground whitespace-nowrap tracking-wide">
                     {cap}
                   </span>
                 </div>
@@ -878,10 +788,10 @@ export default function AgenticPage() {
               ].map((cap) => (
                 <div
                   key={cap}
-                  className="flex items-center gap-6 px-10 py-5 border-r border-black/[0.06] dark:border-white/[0.08] shrink-0"
+                  className="flex items-center gap-6 px-10 py-5 border-r border-border shrink-0"
                 >
-                  <span className="w-1.5 h-1.5 rounded-full bg-black/12 shrink-0" />
-                  <span className="text-sm text-black/30 whitespace-nowrap tracking-wide">
+                  <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/25 shrink-0" />
+                  <span className="text-sm text-muted-foreground/80 whitespace-nowrap tracking-wide">
                     {cap}
                   </span>
                 </div>
@@ -894,7 +804,7 @@ export default function AgenticPage() {
       {/* ── LIVE AGENTS ��──────────────────────────────────────────────────── */}
       <section
         id="live"
-        className="py-32 px-6 md:px-12 lg:px-20 border-t border-black/[0.06] dark:border-white/[0.08]"
+        className="py-32 px-6 md:px-12 lg:px-20 border-t border-border"
       >
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
@@ -906,13 +816,13 @@ export default function AgenticPage() {
               <RevealText className="mt-5 text-4xl md:text-5xl lg:text-6xl font-light tracking-tight leading-[1.05]">
                 {"Agents working\n24 / 7, autonomously."}
               </RevealText>
-              <p className="mt-6 text-base text-black/40 leading-relaxed max-w-sm">
+              <p className="mt-6 text-base text-muted-foreground leading-relaxed max-w-sm">
                 At any moment, thousands of agents are running tasks on behalf
                 of teams around the world — no human in the loop.
               </p>
               <div className="mt-10 flex items-end gap-2">
                 <LiveAgentCounter />
-                <span className="text-black/30 text-sm mb-1 tracking-wide">
+                <span className="text-muted-foreground/80 text-sm mb-1 tracking-wide">
                   agents active globally
                 </span>
               </div>
@@ -927,7 +837,7 @@ export default function AgenticPage() {
       {/* ── PRICING ───────────────────────────────────���────������─────────────── */}
       <section
         id="pricing"
-        className="py-32 px-6 md:px-12 lg:px-20 border-t border-black/[0.06] dark:border-white/[0.08]"
+        className="py-32 px-6 md:px-12 lg:px-20 border-t border-border"
       >
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16 flex flex-col items-center">
@@ -990,22 +900,22 @@ export default function AgenticPage() {
             ].map((plan) => (
               <BentoCard
                 key={plan.name}
-                className={`p-8 flex flex-col ${plan.highlight ? "border-black/20 bg-[#F0EEE8]" : ""}`}
+                className={`p-8 flex flex-col ${plan.highlight ? "border-border bg-secondary dark:bg-secondary" : ""}`}
                 delay={plan.delay}
               >
                 <div className="mb-8">
-                  <div className="font-pixel text-[11px] tracking-widest text-black/40 mb-4">
+                  <div className="font-pixel text-[11px] tracking-widest text-muted-foreground mb-4">
                     {plan.name}
                   </div>
                   <div className="flex items-baseline gap-1 mb-1">
                     <span className="text-4xl font-light">{plan.price}</span>
                     {plan.period && (
-                      <span className="text-black/40 text-sm">
+                      <span className="text-muted-foreground text-sm">
                         {plan.period}
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-black/35 tracking-wide">
+                  <p className="text-xs text-muted-foreground/90 tracking-wide">
                     {plan.sub}
                   </p>
                 </div>
@@ -1013,9 +923,9 @@ export default function AgenticPage() {
                   {plan.features.map((f) => (
                     <li
                       key={f}
-                      className="flex items-center gap-3 text-sm text-black/55"
+                      className="flex items-center gap-3 text-sm text-foreground/70"
                     >
-                      <div className="w-1 h-1 rounded-full bg-black/25 shrink-0" />
+                      <div className="w-1 h-1 rounded-full bg-muted-foreground/40 shrink-0" />
                       {f}
                     </li>
                   ))}
@@ -1023,8 +933,8 @@ export default function AgenticPage() {
                 <button
                   className={`w-full py-3 rounded-xl text-sm tracking-widest transition-all duration-200 ${
                     plan.highlight
-                      ? "bg-[#111] text-white hover:bg-[#333]"
-                      : "border border-black/10 text-black/60 hover:border-black/25 hover:text-black hover:bg-black/[0.04]"
+                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                      : "border border-border text-muted-foreground hover:border-border hover:text-foreground hover:bg-muted/60"
                   }`}
                 >
                   {plan.name === "Enterprise" ? "CONTACT SALES" : "GET STARTED"}
@@ -1036,7 +946,7 @@ export default function AgenticPage() {
       </section>
 
       {/* ── CTA ───────────────────────────────────────────────────────────── */}
-      <section className="relative py-32 px-6 md:px-12 lg:px-20 border-t border-black/[0.06] dark:border-white/[0.08] overflow-hidden">
+      <section className="relative py-32 px-6 md:px-12 lg:px-20 border-t border-border overflow-hidden">
         {/* Glass panels image — anchored to bottom center */}
         <img
           src="/images/footer.png"
@@ -1056,21 +966,22 @@ export default function AgenticPage() {
             WebkitBackdropFilter: "blur(18px)",
           }}
         />
-        {/* Colour fade from bottom to site bg #f5f4f0 */}
+        {/* Colour fade from bottom to site bg — light mode */}
         <div
-          className="absolute inset-0 pointer-events-none"
+          className="absolute inset-0 pointer-events-none dark:hidden"
           style={{
             background:
               "linear-gradient(to top, rgb(245,244,240) 0%, rgba(245,244,240,0.92) 18%, rgba(245,244,240,0.55) 35%, transparent 55%)",
           }}
         />
+        <div className="absolute inset-0 pointer-events-none hidden dark:block bg-gradient-to-t from-background from-0% via-background/55 via-35% to-transparent to-55%" />
         <div className="relative z-10 max-w-2xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-light tracking-tight leading-[1.05] mb-6">
             Start building your
             <br />
             agent workforce.
           </h2>
-          <p className="text-sm text-black/45 leading-relaxed mb-10">
+          <p className="text-sm text-muted-foreground leading-relaxed mb-10">
             Join thousands of teams deploying AI agents that work around the
             clock, across every timezone.
           </p>
@@ -1088,11 +999,11 @@ export default function AgenticPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="flex-1 bg-white border border-black/10 rounded-xl px-4 py-3 text-sm text-[#111] placeholder:text-black/25 focus:outline-none focus:border-black/25 transition-colors"
+                className="flex-1 bg-card border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-ring transition-colors"
               />
               <button
                 type="submit"
-                className="px-8 py-3 bg-[#111] text-white text-sm rounded-xl hover:bg-[#333] transition-colors tracking-widest font-medium"
+                className="px-8 py-3 bg-primary text-primary-foreground text-sm rounded-xl hover:bg-primary/90 transition-colors tracking-widest font-medium"
               >
                 JOIN
               </button>
@@ -1107,9 +1018,9 @@ export default function AgenticPage() {
       </section>
 
       {/* ── FOOTER ────────────────────────────────────────────────────────── */}
-      <footer className="py-10 px-6 md:px-12 lg:px-20 border-t border-black/[0.06] dark:border-white/[0.08]">
+      <footer className="py-10 px-6 md:px-12 lg:px-20 border-t border-border">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
-          <span className="font-pixel text-xs tracking-[0.25em] text-black/50">
+          <span className="font-pixel text-xs tracking-[0.25em] text-muted-foreground/70">
             AGENTIC
           </span>
 
@@ -1126,7 +1037,7 @@ export default function AgenticPage() {
               <a
                 key={l.label}
                 href={l.href}
-                className="text-xs text-black/35 hover:text-black/70 transition-colors tracking-widest"
+                className="text-xs text-muted-foreground/90 hover:text-foreground transition-colors tracking-widest"
               >
                 {l.label}
               </a>
@@ -1144,15 +1055,15 @@ export default function AgenticPage() {
               <a
                 key={l.label}
                 href={l.href}
-                className="text-xs text-black/25 hover:text-black/55 transition-colors tracking-widest"
+                className="text-xs text-muted-foreground/70 hover:text-foreground/70 transition-colors tracking-widest"
               >
                 {l.label}
               </a>
             ))}
           </div>
         </div>
-        <div className="max-w-6xl mx-auto mt-8 pt-6 border-t border-black/[0.04]">
-          <span className="text-xs text-black/20">
+        <div className="max-w-6xl mx-auto mt-8 pt-6 border-t border-border/60">
+          <span className="text-xs text-muted-foreground/60">
             © 2026 Agentic. All rights reserved.
           </span>
         </div>
