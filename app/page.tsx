@@ -319,29 +319,39 @@ export default function AgenticPage() {
               />
             </BentoCard>
 
-            <BentoCard
-              className="col-span-12 md:col-span-4 p-8 min-h-[200px]"
-              delay={160}
-            >
-              <div className="w-10 h-10 rounded-xl border border-border flex items-center justify-center mb-5">
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                >
-                  <rect x="3" y="3" width="18" height="18" rx="2" />
-                  <path d="M8 10h8M8 14h5" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-light mb-2">Memory & Context</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Persistent long-term memory across sessions. Agents learn from
-                every interaction.
-              </p>
-            </BentoCard>
+            <Link href="/crypto" className="col-span-12 md:col-span-4 block">
+              <BentoCard
+                className="p-8 min-h-[200px] h-full cursor-pointer"
+                delay={160}
+              >
+                <div className="w-10 h-10 rounded-xl border border-amber-500/25 bg-gradient-to-br from-amber-500/15 to-violet-500/10 flex items-center justify-center mb-5">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  >
+                    <path d="M3 17l6-6 4 4 8-8" />
+                    <path d="M14 7h7v7" />
+                  </svg>
+                </div>
+                <div className="flex items-center gap-2 mb-2">
+                  <h3 className="text-lg font-light">Live Crypto Prices</h3>
+                  <span className="relative flex size-1.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full size-1.5 bg-emerald-500" />
+                  </span>
+                </div>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Here you can see real-time Bitcoin, Ethereum, and the top 50 coins
+                </p>
+                {/* <p className="mt-4 text-[11px] uppercase tracking-[0.2em] text-muted-foreground/70 group-hover:text-foreground transition-colors">
+                  Explore markets →
+                </p> */}
+              </BentoCard>
+            </Link>
 
             <BentoCard
               className="col-span-12 md:col-span-4 p-8 min-h-[200px]"

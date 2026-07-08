@@ -546,15 +546,6 @@ export function CryptoMarket() {
           </AnimatePresence>
         </div>
       </div>
-
-      <p className="text-center text-[11px] text-muted-foreground flex items-center justify-center gap-2">
-        <Radio className="size-3 text-emerald-500" />
-        Streaming via{' '}
-        <a href="https://www.coingecko.com" target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground transition-colors">
-          CoinGecko
-        </a>
-        {lastUpdated && <> · {lastUpdated.toLocaleTimeString()}</>}
-      </p>
     </div>
   )
 }
