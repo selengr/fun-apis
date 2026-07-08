@@ -14,8 +14,8 @@ import { RevealText } from "@/components/reveal-text";
 import { StackingAgentCards } from "@/components/stacking-agent-cards";
 import { MobileNav } from "@/components/mobile-nav";
 import { DevExSection } from "@/components/devex-section";
-import CatFactModal from "@/components/views/CatFactModal";
 import Banner from "@/components/views/banner/banner";
+import { MarketsBanner } from "@/components/markets-banner";
 // import TimeMachine from "@/components/time-machine";
 // import { ArtGallerySlider } from "@/components/art-gallery-slider";
 
@@ -111,7 +111,6 @@ export default function AgenticPage() {
   const [heroReady, setHeroReady] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
 
-  const [openCatFacts, setOpenCatFacts] = useState(false);
   const [openDictionary, setOpenDictionary] = useState(false);
 
   const handleIntroDone = useCallback(() => {
@@ -202,127 +201,41 @@ export default function AgenticPage() {
         </div>
       </section> */}
 
-      {/* ── PLATFORM OVERVIEW (bento) ──────────────────────────────────────── */}
+      {/* ── MARKETS (crypto & finance) ─────────────────────────────────────── */}
 
 
-      <section id="platform" className="py-32 px-6 md:px-12 lg:px-20">
-        <div className="max-w-6xl mx-auto">
+      <section id="markets" className="relative py-32 px-6 md:px-12 lg:px-20 overflow-hidden">
+        <div className="relative max-w-6xl mx-auto">
           <div className="mb-16">
             <PixelIcon type="platform" size={40} />
             <div className="mt-4">
-              <Tag>PLATFORM</Tag>
+              <Tag>MARKETS</Tag>
             </div>
             <RevealText className="mt-5 text-4xl md:text-5xl lg:text-6xl font-light tracking-tight leading-[1.05]">
-              {"Animal."}
+              {"Money & markets."}
             </RevealText>
+            <p className="mt-5 text-sm text-muted-foreground leading-relaxed max-w-md">
+              Crypto, stocks, and other finance tools — kept simple and easy to read.
+            </p>
           </div>
 
           <div
             className="grid grid-cols-12 grid-rows-auto gap-3"
             onMouseMove={handleMouse}
           >
-            {/* Big left card — full width now that multi-agent is removed */}
+            {/* Finance banner — styled after the crypto hero card, decorative (not a link) */}
             <BentoCard
-              className="col-span-12 p-8 min-h-[200px] flex flex-col justify-between relative overflow-hidden"
+              className="col-span-12 p-0 min-h-[220px] md:min-h-[260px] relative overflow-hidden border-amber-500/20 bg-gradient-to-br from-amber-500/10 via-card/80 to-orange-600/5"
               delay={0}
             >
-              {/* Arc background image — always fills container, objects pushed to bottom third */}
-              <img
-                // src="/images/arc.png"
-                src="/images/banners/https___west.avif"
-                alt=""
-                aria-hidden="true"
-                className="absolute inset-0 w-full h-full object-cover"
-                style={{ objectPosition: "center 70%" }}
-              />
-              {/* Progressive blur layer — blurs from 45% downward */}
-              <div
-                className="absolute inset-0"
-                style={{
-                  maskImage:
-                    "linear-gradient(to bottom, transparent 45%, black 100%)",
-                  WebkitMaskImage:
-                    "linear-gradient(to bottom, transparent 45%, black 100%)",
-                  backdropFilter: "blur(16px)",
-                  WebkitBackdropFilter: "blur(16px)",
-                }}
-              />
-              {/* Fade-to-background gradient — light mode only */}
-              <div
-                className="absolute inset-0 dark:hidden"
-                style={{
-                  background:
-                    "linear-gradient(to bottom, transparent 35%, rgba(245,244,240,0.3) 50%, rgba(245,244,240,0.75) 65%, rgba(245,244,240,0.95) 80%, rgb(245,244,240) 100%)",
-                }}
-              />
-              <div className="absolute inset-0 hidden dark:block bg-gradient-to-b from-transparent from-35% via-background/75 via-65% to-background to-100%" />
-              {/* Content */}
-              <div className="relative z-10">
-                <div
-                  className="w-10 h-10 rounded-xl border border-border bg-card/60 flex items-center justify-center mb-6"
-                  style={{ backdropFilter: "blur(8px)" }}
-                >
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                  >
-                    <circle cx="12" cy="12" r="3" />
-                    <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
-                    <path d="m4.93 4.93 2.12 2.12M16.95 16.95l2.12 2.12M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-light mb-3">
-                  Visual Agent Builder
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed max-w-sm">
-                  Drag, connect, and configure agents through an intuitive graph
-                  editor. No boilerplate. Ship in minutes, not days.
-                </p>
-              </div>
+              <MarketsBanner />
             </BentoCard>
 
             {/* Bottom row */}
-            <BentoCard
-              className="col-span-12 md:col-span-4 p-8 min-h-[200px]"
-              delay={120}
-            >
-              <div
-                onClick={() => setOpenCatFacts(true)}
-                className="w-10 h-10 rounded-xl border border-border flex items-center justify-center mb-5"
-              >
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                >
-                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-light mb-2">
-                click here to see random cat facts
-              </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Trace every decision. Debug with full execution history and live
-                logs.
-              </p>
-              {/* {openCatFacts &&  <CatFactModal /> } */}
-              <CatFactModal
-                isOpen={openCatFacts}
-                onClose={() => setOpenCatFacts(false)}
-              />
-            </BentoCard>
-
             <Link href="/crypto" className="col-span-12 md:col-span-4 block">
               <BentoCard
                 className="p-8 min-h-[200px] h-full cursor-pointer"
-                delay={160}
+                delay={120}
               >
                 <div className="w-10 h-10 rounded-xl border border-amber-500/25 bg-gradient-to-br from-amber-500/15 to-violet-500/10 flex items-center justify-center mb-5">
                   <svg
@@ -338,23 +251,50 @@ export default function AgenticPage() {
                   </svg>
                 </div>
                 <div className="flex items-center gap-2 mb-2">
-                  <h3 className="text-lg font-light">Live Crypto Prices</h3>
+                  <h3 className="text-lg font-light">Live crypto prices</h3>
                   <span className="relative flex size-1.5">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                     <span className="relative inline-flex rounded-full size-1.5 bg-emerald-500" />
                   </span>
                 </div>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Here you can see real-time Bitcoin, Ethereum, and the top 50 coins
+                  Bitcoin, Ethereum, and the top coins — updated every 30 seconds.
+                  Sparklines, ticker, and global stats in one clean view.
                 </p>
-                {/* <p className="mt-4 text-[11px] uppercase tracking-[0.2em] text-muted-foreground/70 group-hover:text-foreground transition-colors">
-                  Explore markets →
-                </p> */}
               </BentoCard>
             </Link>
 
             <BentoCard
-              className="col-span-12 md:col-span-4 p-8 min-h-[200px]"
+              className="col-span-12 md:col-span-4 p-8 min-h-[200px] opacity-90"
+              delay={160}
+            >
+              <div className="w-10 h-10 rounded-xl border border-border flex items-center justify-center mb-5">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                >
+                  <path d="M3 3v18h18" />
+                  <path d="M7 16l4-6 4 3 5-7" />
+                </svg>
+              </div>
+              <div className="flex items-center gap-2 mb-2">
+                <h3 className="text-lg font-light">Stock prices</h3>
+                <span className="text-[10px] uppercase tracking-widest text-muted-foreground/60 px-2 py-0.5 rounded-full border border-border">
+                  soon
+                </span>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Same simple layout for stocks — major indices and popular tickers.
+                Still working on it.
+              </p>
+            </BentoCard>
+
+            <BentoCard
+              className="col-span-12 md:col-span-4 p-8 min-h-[200px] opacity-90"
               delay={200}
             >
               <div className="w-10 h-10 rounded-xl border border-border flex items-center justify-center mb-5">
@@ -366,15 +306,20 @@ export default function AgenticPage() {
                   stroke="currentColor"
                   strokeWidth="1.5"
                 >
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M2 12h20" />
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-light mb-2">
-                Guardrails & Permissions
-              </h3>
+              <div className="flex items-center gap-2 mb-2">
+                <h3 className="text-lg font-light">More on the way</h3>
+                <span className="text-[10px] uppercase tracking-widest text-muted-foreground/60 px-2 py-0.5 rounded-full border border-border">
+                  soon
+                </span>
+              </div>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Define what agents can and cannot do. Fine-grained access
-                control per tool.
+                Forex, exchange rates, and other finance tools. This section will
+                grow as we add them.
               </p>
             </BentoCard>
           </div>
@@ -1045,7 +990,7 @@ export default function AgenticPage() {
           {/* Nav sections */}
           <div className="flex flex-wrap items-center gap-x-8 gap-y-3">
             {[
-              { label: "Platform", href: "#platform" },
+              { label: "Markets", href: "#markets" },
               { label: "Agents", href: "#agents" },
               { label: "Workflow", href: "#workflow" },
               { label: "Integrations", href: "#integrations" },
