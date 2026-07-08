@@ -1,6 +1,8 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
+import { MapPin, LineChart } from "lucide-react"
 import { ThemeToggle } from "./theme-toggle"
 
 const NAV_LINKS = [
@@ -49,9 +51,22 @@ export function MobileNav() {
 
           <div className="flex items-center gap-2">
             <ThemeToggle />
-            <button className="text-[11px] px-4 py-2 rounded-xl border border-black/10 dark:border-white/20 text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white hover:border-black/20 dark:hover:border-white/30 hover:bg-black/[0.03] dark:hover:bg-white/[0.08] transition-all duration-200 tracking-wide hidden md:block" style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}>
-              START BUILDING
-            </button>
+            <Link
+              href="/crypto"
+              className="text-[11px] px-4 py-2 rounded-xl border border-black/10 dark:border-white/20 text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white hover:border-black/20 dark:hover:border-white/30 hover:bg-black/[0.03] dark:hover:bg-white/[0.08] transition-all duration-200 tracking-wide hidden md:inline-flex items-center gap-1.5"
+              style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
+            >
+              <LineChart className="size-3.5" />
+              CRYPTO
+            </Link>
+            <Link
+              href="/location"
+              className="text-[11px] px-4 py-2 rounded-xl border border-black/10 dark:border-white/20 text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white hover:border-black/20 dark:hover:border-white/30 hover:bg-black/[0.03] dark:hover:bg-white/[0.08] transition-all duration-200 tracking-wide hidden md:inline-flex items-center gap-1.5"
+              style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
+            >
+              <MapPin className="size-3.5" />
+              WHERE AM I?
+            </Link>
 
             {/* Burger — mobile only */}
             <button
@@ -105,10 +120,25 @@ export function MobileNav() {
                 {l.label}
               </a>
             ))}
-            <div className="mt-1 px-2 pb-1">
-              <button className="w-full text-[11px] px-4 py-2.5 rounded-xl border border-black/10 dark:border-white/20 text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white hover:border-black/20 dark:hover:border-white/30 hover:bg-black/[0.03] dark:hover:bg-white/[0.08] transition-all duration-200 tracking-wide" style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}>
-                START BUILDING
-              </button>
+            <div className="mt-1 px-2 pb-1 flex flex-col gap-1.5">
+              <Link
+                href="/crypto"
+                onClick={close}
+                className="w-full flex items-center justify-center gap-1.5 text-[11px] px-4 py-2.5 rounded-xl border border-black/10 dark:border-white/20 text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white hover:border-black/20 dark:hover:border-white/30 hover:bg-black/[0.03] dark:hover:bg-white/[0.08] transition-all duration-200 tracking-wide"
+                style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
+              >
+                <LineChart className="size-3.5" />
+                CRYPTO
+              </Link>
+              <Link
+                href="/location"
+                onClick={close}
+                className="w-full flex items-center justify-center gap-1.5 text-[11px] px-4 py-2.5 rounded-xl border border-black/10 dark:border-white/20 text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white hover:border-black/20 dark:hover:border-white/30 hover:bg-black/[0.03] dark:hover:bg-white/[0.08] transition-all duration-200 tracking-wide"
+                style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
+              >
+                <MapPin className="size-3.5" />
+                WHERE AM I?
+              </Link>
             </div>
           </div>
         </div>

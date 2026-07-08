@@ -3,9 +3,9 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  images: {
-    unoptimized: true,
-  },
+    images: {
+      remotePatterns: [new URL('https://www.artic.edu/**')],
+    },
 }
 
 export default nextConfig

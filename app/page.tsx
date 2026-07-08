@@ -16,7 +16,8 @@ import { MobileNav } from "@/components/mobile-nav";
 import { DevExSection } from "@/components/devex-section";
 import CatFactModal from "@/components/views/CatFactModal";
 import Banner from "@/components/views/banner/banner";
-import TimeMachine from "@/components/time-machine";
+// import TimeMachine from "@/components/time-machine";
+// import { ArtGallerySlider } from "@/components/art-gallery-slider";
 
 // ─── Intersection Observer hook ──────────────────────────────────────────────
 function useInView(threshold = 0.15) {
@@ -186,17 +187,24 @@ export default function AgenticPage() {
         />
       </section>
 
+
+      {/* <div className="h-[50vh] py-20 w-screen overflow-hidden bg-black"> */}
+         {/* <ArtGallerySlider /> */}
+      {/* </div> */}
+    
       {/* ── TIME MACHINE ──────────────────────────────────────────────────── */}
-      <section
+      {/* <section
         id="time-machine"
         className="w-full border-t border-border bg-background py-12 px-6 md:px-12 flex items-center justify-center"
       >
         <div className="relative w-full max-w-3xl h-[450px] max-h-[450px] mx-auto">
           <TimeMachine shouldImplementPreloading={false} />
         </div>
-      </section>
+      </section> */}
 
       {/* ── PLATFORM OVERVIEW (bento) ──────────────────────────────────────── */}
+
+
       <section id="platform" className="py-32 px-6 md:px-12 lg:px-20">
         <div className="max-w-6xl mx-auto">
           <div className="mb-16">
