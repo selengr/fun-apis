@@ -304,10 +304,7 @@ export function BookExplorer() {
       {/* Search — elevated above content */}
       <section className="relative z-50 mb-10 md:mb-14">
         <div className="text-center max-w-2xl mx-auto mb-8">
-          <p className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] text-stone-500 dark:text-stone-400 mb-5">
-            <Sparkles className="size-3 text-violet-500" />
-            Open Library
-          </p>
+
           <h1 className="text-4xl sm:text-5xl font-light tracking-tight text-foreground leading-[1.05]">
             Find a book worth
             <span className="block mt-1 italic font-normal text-stone-500 dark:text-stone-400">
@@ -789,11 +786,6 @@ export function BookExplorer() {
         </div>
       )}
 
-      <footer className="mt-20 pt-6 border-t border-border/30 text-center">
-        <p className="text-[10px] uppercase tracking-[0.28em] text-muted-foreground/60">
-          Open Library · Internet Archive
-        </p>
-      </footer>
     </div>
   )
 }
