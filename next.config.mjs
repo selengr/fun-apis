@@ -4,7 +4,10 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
     images: {
-      remotePatterns: [new URL('https://www.artic.edu/**')],
+      remotePatterns: [
+        new URL('https://www.artic.edu/**'),
+        new URL('https://covers.openlibrary.org/**'),
+      ],
     },
 }
 
