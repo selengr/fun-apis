@@ -263,34 +263,37 @@ export default function AgenticPage() {
               </BentoCard>
             </Link>
 
-            <BentoCard
-              className="col-span-12 md:col-span-4 p-8 min-h-[200px] opacity-90"
-              delay={160}
-            >
-              <div className="w-10 h-10 rounded-xl border border-border flex items-center justify-center mb-5">
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                >
-                  <path d="M3 3v18h18" />
-                  <path d="M7 16l4-6 4 3 5-7" />
-                </svg>
-              </div>
-              <div className="flex items-center gap-2 mb-2">
-                <h3 className="text-lg font-light">Stock prices</h3>
-                <span className="text-[10px] uppercase tracking-widest text-muted-foreground/60 px-2 py-0.5 rounded-full border border-border">
-                  soon
-                </span>
-              </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Same simple layout for stocks — major indices and popular tickers.
-                Still working on it.
-              </p>
-            </BentoCard>
+            <Link href="/forex" className="col-span-12 md:col-span-4 block">
+              <BentoCard
+                className="p-8 min-h-[200px] h-full cursor-pointer"
+                delay={160}
+              >
+                <div className="w-10 h-10 rounded-xl border border-emerald-500/25 bg-gradient-to-br from-emerald-500/15 to-sky-500/10 flex items-center justify-center mb-5">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  >
+                    <path d="M3 3v18h18" />
+                    <path d="M7 16l4-6 4 3 5-7" />
+                  </svg>
+                </div>
+                <div className="flex items-center gap-2 mb-2">
+                  <h3 className="text-lg font-light">Exchange rates</h3>
+                  <span className="relative flex size-1.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full size-1.5 bg-emerald-500" />
+                  </span>
+                </div>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Frankfurter forex data — live rates, currency conversion, and
+                  7-day to 1-year history charts.
+                </p>
+              </BentoCard>
+            </Link>
 
             <BentoCard
               className="col-span-12 md:col-span-4 p-8 min-h-[200px] opacity-90"

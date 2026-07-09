@@ -53,14 +53,6 @@ export function MobileNav() {
             <ThemeToggle />
          
             <Link
-              href="/qr"
-              className="text-[11px] px-4 py-2 rounded-xl border border-black/10 dark:border-white/20 text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white hover:border-black/20 dark:hover:border-white/30 hover:bg-black/[0.03] dark:hover:bg-white/[0.08] transition-all duration-200 tracking-wide hidden lg:inline-flex items-center gap-1.5"
-              style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
-            >
-              <QrCode className="size-3.5" />
-              QR
-            </Link>
-            <Link
               href="/location"
               className="text-[11px] px-4 py-2 rounded-xl border border-black/10 dark:border-white/20 text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white hover:border-black/20 dark:hover:border-white/30 hover:bg-black/[0.03] dark:hover:bg-white/[0.08] transition-all duration-200 tracking-wide hidden md:inline-flex items-center gap-1.5"
               style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
@@ -122,15 +114,6 @@ export function MobileNav() {
               </a>
             ))}
             <div className="mt-1 px-2 pb-1 flex flex-col gap-1.5">
-              <Link
-                href="/qr"
-                onClick={close}
-                className="w-full flex items-center justify-center gap-1.5 text-[11px] px-4 py-2.5 rounded-xl border border-black/10 dark:border-white/20 text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white hover:border-black/20 dark:hover:border-white/30 hover:bg-black/[0.03] dark:hover:bg-white/[0.08] transition-all duration-200 tracking-wide"
-                style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
-              >
-                <QrCode className="size-3.5" />
-                QR & BARCODE
-              </Link>
               <Link
                 href="/location"
                 onClick={close}
