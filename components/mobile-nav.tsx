@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { MapPin, LineChart, Globe2, Laugh, RefreshCw } from "lucide-react"
+import { MapPin, LineChart, Globe2, Laugh, RefreshCw, FileText, BookOpen } from "lucide-react"
 import { ThemeToggle } from "./theme-toggle"
 
 const NAV_LINKS = [
@@ -51,6 +51,22 @@ export function MobileNav() {
 
           <div className="flex items-center gap-2">
             <ThemeToggle />
+            <Link
+              href="/wiktionary"
+              className="text-[11px] px-4 py-2 rounded-xl border border-black/10 dark:border-white/20 text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white hover:border-black/20 dark:hover:border-white/30 hover:bg-black/[0.03] dark:hover:bg-white/[0.08] transition-all duration-200 tracking-wide hidden lg:inline-flex items-center gap-1.5"
+              style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
+            >
+              <BookOpen className="size-3.5" />
+              WORDS
+            </Link>
+            <Link
+              href="/notion"
+              className="text-[11px] px-4 py-2 rounded-xl border border-black/10 dark:border-white/20 text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white hover:border-black/20 dark:hover:border-white/30 hover:bg-black/[0.03] dark:hover:bg-white/[0.08] transition-all duration-200 tracking-wide hidden lg:inline-flex items-center gap-1.5"
+              style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
+            >
+              <FileText className="size-3.5" />
+              NOTES
+            </Link>
             <Link
               href="/convert"
               className="text-[11px] px-4 py-2 rounded-xl border border-black/10 dark:border-white/20 text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white hover:border-black/20 dark:hover:border-white/30 hover:bg-black/[0.03] dark:hover:bg-white/[0.08] transition-all duration-200 tracking-wide hidden lg:inline-flex items-center gap-1.5"
@@ -138,6 +154,24 @@ export function MobileNav() {
             ))}
             <div className="mt-1 px-2 pb-1 flex flex-col gap-1.5">
 
+              <Link
+                href="/wiktionary"
+                onClick={close}
+                className="w-full flex items-center justify-center gap-1.5 text-[11px] px-4 py-2.5 rounded-xl border border-black/10 dark:border-white/20 text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white hover:border-black/20 dark:hover:border-white/30 hover:bg-black/[0.03] dark:hover:bg-white/[0.08] transition-all duration-200 tracking-wide"
+                style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
+              >
+                <BookOpen className="size-3.5" />
+                WORDS
+              </Link>
+              <Link
+                href="/notion"
+                onClick={close}
+                className="w-full flex items-center justify-center gap-1.5 text-[11px] px-4 py-2.5 rounded-xl border border-black/10 dark:border-white/20 text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white hover:border-black/20 dark:hover:border-white/30 hover:bg-black/[0.03] dark:hover:bg-white/[0.08] transition-all duration-200 tracking-wide"
+                style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
+              >
+                <FileText className="size-3.5" />
+                NOTES
+              </Link>
               <Link
                 href="/convert"
                 onClick={close}
