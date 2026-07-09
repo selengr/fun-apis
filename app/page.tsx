@@ -868,7 +868,7 @@ export default function AgenticPage() {
             {[
               { label: "Markets", href: "#markets" },
               { label: "Agents", href: "#agents" },
-              { label: "Workflow", href: "#workflow" },
+              { label: "English", href: "#english" },
               { label: "Integrations", href: "#integrations" },
               { label: "Live", href: "#live" },
               { label: "Pricing", href: "#pricing" },

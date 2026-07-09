@@ -178,7 +178,7 @@ function EnglishCard({
 export function EnglishSuiteSection() {
   return (
     <section
-      id="workflow"
+      id="english"
       className="relative py-32 px-6 md:px-12 lg:px-20 border-t border-amber-900/10 dark:border-amber-100/10 overflow-hidden"
     >
       <div className="pointer-events-none absolute inset-0 -z-10">
@@ -208,9 +208,6 @@ export function EnglishSuiteSection() {
           ))}
         </div>
 
-        <p className="mt-10 text-center text-[10px] uppercase tracking-[0.35em] text-muted-foreground/50">
-          Wiktionary · Free Dictionary · Wikipedia Commons
-        </p>
       </div>
     </section>
   )
