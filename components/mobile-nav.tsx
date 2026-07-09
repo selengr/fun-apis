@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { MapPin, BookOpen } from "lucide-react"
+import { MapPin, BookOpen, Feather } from "lucide-react"
 import { ThemeToggle } from "./theme-toggle"
 
 const NAV_LINKS = [
@@ -51,6 +51,14 @@ export function MobileNav() {
 
           <div className="flex items-center gap-2">
             <ThemeToggle />
+            <Link
+              href="/poetry"
+              className="text-[11px] px-4 py-2 rounded-xl border border-black/10 dark:border-white/20 text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white hover:border-black/20 dark:hover:border-white/30 hover:bg-black/[0.03] dark:hover:bg-white/[0.08] transition-all duration-200 tracking-wide hidden xl:inline-flex items-center gap-1.5"
+              style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
+            >
+              <Feather className="size-3.5" />
+              POETRY
+            </Link>
             <Link
               href="/books"
               className="text-[11px] px-4 py-2 rounded-xl border border-black/10 dark:border-white/20 text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white hover:border-black/20 dark:hover:border-white/30 hover:bg-black/[0.03] dark:hover:bg-white/[0.08] transition-all duration-200 tracking-wide hidden lg:inline-flex items-center gap-1.5"
@@ -103,7 +111,7 @@ export function MobileNav() {
         {/* Mobile dropdown */}
         <div
           className="md:hidden mt-2 overflow-hidden transition-all duration-300 ease-in-out"
-          style={{ maxHeight: open ? "480px" : "0px", opacity: open ? 1 : 0 }}
+          style={{ maxHeight: open ? "560px" : "0px", opacity: open ? 1 : 0 }}
         >
           <div
             className="rounded-2xl border border-black/[0.06] dark:border-white/[0.08] px-2 py-2 flex flex-col"
@@ -121,6 +129,15 @@ export function MobileNav() {
               </a>
             ))}
             <div className="mt-1 px-2 pb-1 flex flex-col gap-1.5">
+              <Link
+                href="/poetry"
+                onClick={close}
+                className="w-full flex items-center justify-center gap-1.5 text-[11px] px-4 py-2.5 rounded-xl border border-black/10 dark:border-white/20 text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white hover:border-black/20 dark:hover:border-white/30 hover:bg-black/[0.03] dark:hover:bg-white/[0.08] transition-all duration-200 tracking-wide"
+                style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
+              >
+                <Feather className="size-3.5" />
+                DAILY POETRY
+              </Link>
               <Link
                 href="/books"
                 onClick={close}
