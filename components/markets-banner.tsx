@@ -63,11 +63,10 @@ export function MarketsBanner() {
             Markets hub · live
           </div>
           <h3 className="text-2xl md:text-3xl font-light tracking-tight leading-[1.1] mb-3">
-            See what&apos;s moving.
+             Markets, at a glance.
           </h3>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            Prices and charts kept clean and easy to read. Crypto is live,
-            more coming soon.
+          <p>
+            Live crypto now.
           </p>
         </div>
 

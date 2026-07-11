@@ -120,7 +120,7 @@ export function ArtGallerySlider({
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
           {isBooks ? (
             <div>
-              <h2 className="font-serif text-xl md:text-2xl font-light tracking-tight text-white/90 max-w-md leading-snug">
+              <h2 className="font-serif text-2xl md:text-4xl font-light tracking-tight text-white/90 max-w-md leading-snug">
                 Find a book worth
                 <span className="block italic text-white/60">reading tonight</span>
               </h2>

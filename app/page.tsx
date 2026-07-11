@@ -16,6 +16,7 @@ import { MobileNav } from "@/components/mobile-nav";
 import { DevExSection } from "@/components/devex-section";
 import Banner from "@/components/views/banner/banner";
 import { MarketsBanner } from "@/components/markets-banner";
+import { MarketsBentoCards } from "@/components/markets-bento-cards";
 import { EnglishSuiteSection } from "@/components/english-suite";
 // import TimeMachine from "@/components/time-machine";
 import { ArtGallerySlider } from "@/components/art-gallery-slider";
@@ -71,10 +72,12 @@ function BentoCard({
   children,
   className = "",
   delay = 0,
+  style = {},
 }: {
   children: React.ReactNode;
   className?: string;
   delay?: number;
+  style?: React.CSSProperties;
 }) {
   const { ref, inView } = useInView(0.1);
   return (
@@ -85,6 +88,7 @@ function BentoCard({
         opacity: inView ? 1 : 0,
         transform: inView ? "translateY(0)" : "translateY(28px)",
         transition: `opacity 0.7s ease ${delay}ms, transform 0.7s ease ${delay}ms, border-color 0.3s ease, background-color 0.3s ease`,
+        ...style,
       }}
     >
       {/* Hover glow spot */}
@@ -211,10 +215,10 @@ export default function AgenticPage() {
               <Tag>MARKETS</Tag>
             </div>
             <RevealText className="mt-5 text-4xl md:text-5xl lg:text-6xl font-light tracking-tight leading-[1.05]">
-              {"Money & markets."}
+              {"Check markets."}
             </RevealText>
             <p className="mt-5 text-sm text-muted-foreground leading-relaxed max-w-md">
-              Crypto, stocks, and other finance tools — kept simple and easy to read.
+                 Explore crypto, stocks, and financial markets.
             </p>
           </div>
 
@@ -230,100 +234,9 @@ export default function AgenticPage() {
               <MarketsBanner />
             </BentoCard>
 
-            {/* Bottom row */}
-            <Link href="/crypto" className="col-span-12 md:col-span-4 block">
-              <BentoCard
-                className="p-8 min-h-[200px] h-full cursor-pointer"
-                delay={120}
-              >
-                <div className="w-10 h-10 rounded-xl border border-amber-500/25 bg-gradient-to-br from-amber-500/15 to-violet-500/10 flex items-center justify-center mb-5">
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                  >
-                    <path d="M3 17l6-6 4 4 8-8" />
-                    <path d="M14 7h7v7" />
-                  </svg>
-                </div>
-                <div className="flex items-center gap-2 mb-2">
-                  <h3 className="text-lg font-light">Live crypto prices</h3>
-                  <span className="relative flex size-1.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                    <span className="relative inline-flex rounded-full size-1.5 bg-emerald-500" />
-                  </span>
-                </div>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  Bitcoin, Ethereum, and the top coins — updated every 30 seconds.
-                  Sparklines, ticker, and global stats in one clean view.
-                </p>
-              </BentoCard>
-            </Link>
+            <MarketsBentoCards />
 
-            <Link href="/forex" className="col-span-12 md:col-span-4 block">
-              <BentoCard
-                className="p-8 min-h-[200px] h-full cursor-pointer"
-                delay={160}
-              >
-                <div className="w-10 h-10 rounded-xl border border-emerald-500/25 bg-gradient-to-br from-emerald-500/15 to-sky-500/10 flex items-center justify-center mb-5">
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                  >
-                    <path d="M3 3v18h18" />
-                    <path d="M7 16l4-6 4 3 5-7" />
-                  </svg>
-                </div>
-                <div className="flex items-center gap-2 mb-2">
-                  <h3 className="text-lg font-light">Exchange rates</h3>
-                  <span className="relative flex size-1.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                    <span className="relative inline-flex rounded-full size-1.5 bg-emerald-500" />
-                  </span>
-                </div>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  Frankfurter forex data — live rates, currency conversion, and
-                  7-day to 1-year history charts.
-                </p>
-              </BentoCard>
-            </Link>
-
-            <BentoCard
-              className="col-span-12 md:col-span-4 p-8 min-h-[200px] opacity-90"
-              delay={200}
-            >
-              <div className="w-10 h-10 rounded-xl border border-border flex items-center justify-center mb-5">
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                >
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="M2 12h20" />
-                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-                </svg>
-              </div>
-              <div className="flex items-center gap-2 mb-2">
-                <h3 className="text-lg font-light">More on the way</h3>
-                <span className="text-[10px] uppercase tracking-widest text-muted-foreground/60 px-2 py-0.5 rounded-full border border-border">
-                  soon
-                </span>
-              </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Forex, exchange rates, and other finance tools. This section will
-                grow as we add them.
-              </p>
-            </BentoCard>
+     
           </div>
         </div>
       </section>
