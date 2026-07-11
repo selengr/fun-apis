@@ -1,12 +1,11 @@
 import Link from 'next/link'
-import { Suspense } from 'react'
 import { ArrowLeft } from 'lucide-react'
-import { BookExplorer } from '@/components/book-explorer'
+import { LyricsFinder } from '@/components/lyrics/lyrics-finder'
 import { ThemeToggle } from '@/components/theme-toggle'
 
 export const metadata = {
-  title: 'Book Explorer — Open Library',
-  description: 'Discover books, authors, editions and subjects from Open Library',
+  title: 'Lyrics Finder',
+  description: 'Search song lyrics with a beautiful reading experience — great for English practice.',
 }
 
 const NAV_GLASS = {
@@ -16,28 +15,12 @@ const NAV_GLASS = {
   boxShadow: '0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.06)',
 } as const
 
-function BookExplorerFallback() {
-  return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-24 animate-pulse">
-      <div className="h-14 max-w-xl mx-auto rounded-2xl bg-muted/40 mb-14" />
-      <div className="grid lg:grid-cols-[220px_1fr] gap-10">
-        <div className="aspect-[2/3] w-[200px] mx-auto rounded-2xl bg-muted/35" />
-        <div className="space-y-4">
-          <div className="h-10 w-3/4 rounded-xl bg-muted/35" />
-          <div className="h-5 w-1/3 rounded-lg bg-muted/30" />
-          <div className="h-32 w-full rounded-2xl bg-muted/25" />
-        </div>
-      </div>
-    </div>
-  )
-}
-
-export default function BooksPage() {
+export default function LyricsPage() {
   return (
     <main className="relative min-h-screen bg-[#faf8f5] dark:bg-[#0a0a0b] overflow-x-clip">
       <div className="pointer-events-none fixed inset-0 -z-10">
-        <div className="absolute top-[-10%] right-[10%] w-[520px] h-[520px] rounded-full bg-violet-400/[0.07] blur-[140px]" />
-        <div className="absolute bottom-[-5%] left-[5%] w-[460px] h-[460px] rounded-full bg-amber-300/[0.06] blur-[120px]" />
+        <div className="absolute top-[-8%] left-[20%] w-[480px] h-[480px] rounded-full bg-violet-400/[0.08] blur-[130px]" />
+        <div className="absolute bottom-[5%] right-[10%] w-[420px] h-[420px] rounded-full bg-rose-300/[0.06] blur-[120px]" />
       </div>
 
       <div className="fixed top-4 inset-x-0 z-[70] flex justify-center px-4 pointer-events-none">
@@ -53,16 +36,14 @@ export default function BooksPage() {
             Back home
           </Link>
           <span className="font-pixel text-[10px] tracking-[0.2em] text-black/50 dark:text-white/50 hidden sm:inline">
-            BOOKS
+            LYRICS
           </span>
           <ThemeToggle />
         </div>
       </div>
 
       <div className="pt-24 md:pt-28">
-        <Suspense fallback={<BookExplorerFallback />}>
-          <BookExplorer />
-        </Suspense>
+        <LyricsFinder />
       </div>
     </main>
   )

@@ -15,9 +15,12 @@ export const POPULAR_SEARCHES = [
   'Dune',
 ]
 
-export function coverUrl(coverId?: number, size: 'S' | 'M' | 'L' = 'L') {
-  if (!coverId) return null
-  return `${OL_COVERS}/b/id/${coverId}-${size}.jpg`
+export function coverUrl(coverId?: number, size: 'S' | 'M' | 'L' = 'L', isbn?: string) {
+  if (!coverId && !isbn) return null
+  const params = new URLSearchParams({ size })
+  if (coverId) params.set('id', String(coverId))
+  else if (isbn) params.set('isbn', isbn)
+  return `/api/covers?${params}`
 }
 
 export function authorPhotoUrl(photoId?: number, size: 'S' | 'M' | 'L' = 'M') {

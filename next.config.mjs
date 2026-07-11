@@ -8,6 +8,10 @@ const nextConfig = {
         new URL('https://www.artic.edu/**'),
         new URL('https://covers.openlibrary.org/**'),
         new URL('https://images.metmuseum.org/**'),
+        new URL('https://i.scdn.co/**'),
+        new URL('https://mosaic.scdn.co/**'),
+        new URL('https://image-cdn-ak.spotifycdn.com/**'),
+        new URL('https://image-cdn-fa.spotifycdn.com/**'),
       ],
     },
 }

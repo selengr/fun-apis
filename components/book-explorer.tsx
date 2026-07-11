@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Search,
@@ -21,6 +22,7 @@ import {
   User,
   ArrowRight,
   Command,
+  Loader2,
 } from 'lucide-react'
 import type { BookCard, BookDetail } from '@/types/openlibrary'
 import {
@@ -64,13 +66,20 @@ function Cover({
   title,
   size = 'lg',
   className,
+  isbn,
 }: {
   id?: number
   title: string
   size?: 'sm' | 'md' | 'lg'
   className?: string
+  isbn?: string
 }) {
-  const src = coverUrl(id, size === 'sm' ? 'M' : 'L')
+  const [failed, setFailed] = useState(false)
+  const src = failed ? null : coverUrl(id, size === 'sm' ? 'M' : 'L', isbn)
+
+  useEffect(() => {
+    setFailed(false)
+  }, [id, isbn])
   const dims =
     size === 'sm'
       ? 'w-12 h-[4.5rem]'
@@ -92,7 +101,13 @@ function Cover({
       >
         {src ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={src} alt={title} className="h-full w-full object-cover" loading="lazy" />
+          <img
+            src={src}
+            alt={title}
+            className="h-full w-full object-cover"
+            loading="lazy"
+            onError={() => setFailed(true)}
+          />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-violet-500/15 to-amber-500/10">
             <BookOpen className="size-8 text-muted-foreground/40" />
@@ -154,6 +169,7 @@ function SkeletonBlock({ className }: { className?: string }) {
 }
 
 export function BookExplorer() {
+  const searchParams = useSearchParams()
   const [query, setQuery] = useState('')
   const [suggestions, setSuggestions] = useState<BookCard[]>([])
   const [showSuggest, setShowSuggest] = useState(false)
@@ -191,14 +207,51 @@ export function BookExplorer() {
     }
   }, [])
 
+  const runSearch = useCallback(async (q: string) => {
+    const term = q.trim()
+    if (!term) return
+    setQuery(term)
+    setRecent(saveRecent(term))
+    setShowSuggest(false)
+    setLoadingBook(true)
+    setError(null)
+    try {
+      const res = await fetch(`/api/books?action=search&q=${encodeURIComponent(term)}&limit=1`, { cache: 'no-store' })
+      const json = await res.json()
+      const first = json.books?.[0] as BookCard | undefined
+      if (!first) {
+        setBook(null)
+        setSimilar([])
+        setError('No books found. Try another keyword.')
+        setLoadingBook(false)
+        return
+      }
+      await openWork(first.workKey)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Search failed')
+      setLoadingBook(false)
+    }
+  }, [openWork])
+
   useEffect(() => {
     setRecent(loadRecent())
     fetch('/api/books?action=trending')
       .then(r => r.json())
       .then(json => setTrending(json.books ?? []))
       .catch(() => {})
-    void openWork('OL17930368W')
-  }, [openWork])
+
+    const q = searchParams.get('q')?.trim()
+    const work = searchParams.get('work')?.trim()
+
+    if (work) {
+      void openWork(work.replace(/^\/works\//, ''))
+    } else if (q) {
+      setQuery(q)
+      void runSearch(q)
+    } else {
+      void openWork('OL17930368W')
+    }
+  }, [openWork, runSearch, searchParams])
 
   useEffect(() => {
     const onDoc = (e: MouseEvent) => {
@@ -234,31 +287,6 @@ export function BookExplorer() {
     setQuery(val)
     if (suggestTimer.current) clearTimeout(suggestTimer.current)
     suggestTimer.current = setTimeout(() => void fetchSuggest(val), 280)
-  }
-
-  const runSearch = async (q: string) => {
-    const term = q.trim()
-    if (!term) return
-    setQuery(term)
-    setRecent(saveRecent(term))
-    setShowSuggest(false)
-    setLoadingBook(true)
-    try {
-      const res = await fetch(`/api/books?action=search&q=${encodeURIComponent(term)}&limit=1`, { cache: 'no-store' })
-      const json = await res.json()
-      const first = json.books?.[0] as BookCard | undefined
-      if (!first) {
-        setBook(null)
-        setSimilar([])
-        setError('No books found. Try another keyword.')
-        setLoadingBook(false)
-        return
-      }
-      await openWork(first.workKey)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Search failed')
-      setLoadingBook(false)
-    }
   }
 
   const onKeyDown = (e: React.KeyboardEvent) => {
@@ -351,9 +379,17 @@ export function BookExplorer() {
             <button
               type="button"
               onClick={() => void runSearch(query)}
-              className="m-1.5 h-11 px-5 rounded-xl bg-stone-900 dark:bg-stone-100 text-stone-50 dark:text-stone-900 text-sm font-medium hover:opacity-90 transition-opacity cursor-pointer shrink-0"
+              disabled={loadingBook}
+              className="m-1.5 h-11 px-5 rounded-xl bg-stone-900 dark:bg-stone-100 text-stone-50 dark:text-stone-900 text-sm font-medium hover:opacity-90 transition-opacity cursor-pointer shrink-0 disabled:opacity-50 disabled:cursor-wait inline-flex items-center gap-2"
             >
-              Search
+              {loadingBook ? (
+                <>
+                  <Loader2 className="size-4 animate-spin" />
+                  Searching…
+                </>
+              ) : (
+                'Search'
+              )}
             </button>
           </div>
 
@@ -390,7 +426,7 @@ export function BookExplorer() {
                               : 'hover:bg-stone-50 dark:hover:bg-stone-900/60',
                           )}
                         >
-                          <Cover id={s.coverId} title={s.title} size="sm" />
+                          <Cover id={s.coverId} title={s.title} size="sm" isbn={s.isbn} />
                           <div className="min-w-0 flex-1">
                             <p className="text-sm font-medium truncate text-foreground">{s.title}</p>
                             <p className="text-xs text-muted-foreground truncate mt-0.5">
@@ -466,7 +502,7 @@ export function BookExplorer() {
             <SkeletonBlock className="w-[200px] sm:w-[220px] aspect-[2/3]" />
           ) : book ? (
             <div className="lg:sticky lg:top-28">
-              <Cover id={book.coverId} title={book.title} size="lg" />
+              <Cover id={book.coverId} title={book.title} size="lg" isbn={book.isbn} />
             </div>
           ) : null}
         </aside>
@@ -725,7 +761,7 @@ export function BookExplorer() {
                         onClick={() => void openWork(t.workKey)}
                         className="w-full flex items-center gap-3 rounded-xl px-1.5 py-2 hover:bg-muted/40 transition-colors text-left cursor-pointer"
                       >
-                        <Cover id={t.coverId} title={t.title} size="sm" className="!w-9 !h-[3.35rem]" />
+                        <Cover id={t.coverId} title={t.title} size="sm" isbn={t.isbn} className="!w-9 !h-[3.35rem]" />
                         <div className="min-w-0">
                           <p className="text-xs font-medium truncate">{t.title}</p>
                           <p className="text-[10px] text-muted-foreground truncate">{t.authors[0]}</p>
@@ -761,7 +797,7 @@ export function BookExplorer() {
                     onClick={() => void openWork(s.workKey)}
                     className="shrink-0 w-32 snap-start text-left group cursor-pointer"
                   >
-                    <Cover id={s.coverId} title={s.title} size="md" className="!w-32 !h-48" />
+                    <Cover id={s.coverId} title={s.title} size="md" isbn={s.isbn} className="!w-32 !h-48" />
                     <p className="mt-3 text-sm font-medium line-clamp-2 leading-snug group-hover:text-violet-600 dark:group-hover:text-violet-300 transition-colors">
                       {s.title}
                     </p>

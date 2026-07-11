@@ -18,7 +18,7 @@ import Banner from "@/components/views/banner/banner";
 import { MarketsBanner } from "@/components/markets-banner";
 import { EnglishSuiteSection } from "@/components/english-suite";
 // import TimeMachine from "@/components/time-machine";
-// import { ArtGallerySlider } from "@/components/art-gallery-slider";
+import { ArtGallerySlider } from "@/components/art-gallery-slider";
 
 // ─── Intersection Observer hook ──────────────────────────────────────────────
 function useInView(threshold = 0.15) {
@@ -186,9 +186,9 @@ export default function AgenticPage() {
       </section>
 
 
-      {/* <div className="h-[50vh] py-20 w-screen overflow-hidden bg-black"> */}
-         {/* <ArtGallerySlider /> */}
-      {/* </div> */}
+      <section className="relative min-h-[520px] h-[55vh] w-screen overflow-hidden bg-black border-y border-border">
+        <ArtGallerySlider variant="books" />
+      </section>
     
       {/* ── TIME MACHINE ──────────────────────────────────────────────────── */}
       {/* <section

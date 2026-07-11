@@ -1,8 +1,10 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { BookOpen } from "lucide-react"
 import type { Artwork } from "@/types/artwork"
+import { cn } from "@/lib/utils"
 
 interface ArtworkCardProps {
   artwork: Artwork
@@ -10,16 +12,33 @@ interface ArtworkCardProps {
   dragOffset: number
   index: number
   currentIndex: number
+  onSelect?: (artwork: Artwork) => void
 }
 
-export function ArtworkCard({ artwork, isActive, dragOffset, index, currentIndex }: ArtworkCardProps) {
+export function ArtworkCard({ artwork, isActive, dragOffset, index, currentIndex, onSelect }: ArtworkCardProps) {
   const [isHovered, setIsHovered] = useState(false)
+  const [imgFailed, setImgFailed] = useState(false)
+
+  useEffect(() => {
+    setImgFailed(false)
+  }, [artwork.image])
   const distance = index - currentIndex
   const parallaxOffset = dragOffset * (0.1 * (distance + 1))
 
   return (
     <motion.div
-      className="relative flex-shrink-0"
+      className={cn('relative flex-shrink-0', onSelect && 'cursor-pointer')}
+      role={onSelect ? 'button' : undefined}
+      tabIndex={onSelect && isActive ? 0 : undefined}
+      onClick={() => {
+        if (onSelect && isActive) onSelect(artwork)
+      }}
+      onKeyDown={e => {
+        if (onSelect && isActive && (e.key === 'Enter' || e.key === ' ')) {
+          e.preventDefault()
+          onSelect(artwork)
+        }
+      }}
       animate={{
         scale: isActive ? 1 : 0.85,
         opacity: isActive ? 1 : 0.5,
@@ -45,17 +64,24 @@ export function ArtworkCard({ artwork, isActive, dragOffset, index, currentIndex
 
         {/* Image container */}
         <div className="relative h-[300px] w-[300px] overflow-hidden rounded-2xl p-3 md:h-[350px] md:w-[350px]">
-          <motion.img
-            src={artwork.image}
-            alt={artwork.title}
-            className="h-full w-full rounded-xl object-cover"
-            animate={{
-              scale: isHovered && isActive ? 1.05 : 1,
-            }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-            crossOrigin="anonymous"
-            draggable={false}
-          />
+          {!imgFailed ? (
+            <motion.img
+              key={artwork.image}
+              src={artwork.image}
+              alt={artwork.title}
+              className="h-full w-full rounded-xl object-cover bg-stone-800"
+              animate={{
+                scale: isHovered && isActive ? 1.05 : 1,
+              }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+              draggable={false}
+              onError={() => setImgFailed(true)}
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center rounded-xl bg-gradient-to-br from-violet-900/40 to-amber-900/30 p-6 text-center">
+              <BookOpen className="size-10 text-white/30 mb-3 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-40" />
+            </div>
+          )}
 
           {/* Gradient overlay for text */}
           <motion.div
@@ -83,7 +109,7 @@ export function ArtworkCard({ artwork, isActive, dragOffset, index, currentIndex
               animate={{ y: isHovered ? -5 : 0 }}
               transition={{ duration: 0.3 }}
             >
-              {artwork.year}
+              {artwork.year > 0 ? artwork.year : "Book"}
             </motion.p>
             <motion.h2
               className="font-serif text-2xl font-bold text-white md:text-3xl"

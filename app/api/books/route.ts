@@ -5,6 +5,7 @@ import {
   mapSearchDoc,
   mapWorkDetail,
 } from '@/lib/openlibrary'
+import { coverIsAvailable } from '@/lib/covers'
 import type { OLAuthor, OLSearchDoc, OLSearchResponse, OLWork } from '@/types/openlibrary'
 
 export const dynamic = 'force-dynamic'
@@ -54,10 +55,32 @@ export async function GET(request: NextRequest) {
     }
 
     if (action === 'trending') {
+      const limit = Math.min(Number(searchParams.get('limit') ?? '15') || 15, 30)
+      const fetchLimit = Math.min(limit * 5, 80)
       const data = (await olFetch(
-        `/search.json?q=subject:fiction&sort=readinglog&limit=12&fields=key,title,author_name,author_key,first_publish_year,cover_i,edition_count,language,subject,number_of_pages_median,ratings_average,ratings_count,want_to_read_count,already_read_count,currently_reading_count`,
+        `/search.json?q=subject:fiction&sort=readinglog&limit=${fetchLimit}&fields=key,title,author_name,author_key,first_publish_year,cover_i,edition_count,language,subject,number_of_pages_median,ratings_average,ratings_count,want_to_read_count,already_read_count,currently_reading_count,isbn`,
       )) as OLSearchResponse
-      return NextResponse.json({ books: (data.docs ?? []).map(mapSearchDoc) })
+
+      const candidates = (data.docs ?? [])
+        .map(mapSearchDoc)
+        .filter(b => b.coverId)
+
+      const verified: ReturnType<typeof mapSearchDoc>[] = []
+
+      for (let i = 0; i < candidates.length && verified.length < limit; i += 8) {
+        const batch = candidates.slice(i, i + 8)
+        const checks = await Promise.all(
+          batch.map(async b => ({
+            b,
+            ok: await coverIsAvailable(b.coverId, b.isbn?.[0]),
+          })),
+        )
+        for (const { b, ok } of checks) {
+          if (ok && verified.length < limit) verified.push(b)
+        }
+      }
+
+      return NextResponse.json({ books: verified })
     }
 
     if (action === 'work') {
