@@ -12,6 +12,7 @@ const nextConfig = {
         new URL('https://mosaic.scdn.co/**'),
         new URL('https://image-cdn-ak.spotifycdn.com/**'),
         new URL('https://image-cdn-fa.spotifycdn.com/**'),
+        new URL('https://images.unsplash.com/**'),
       ],
     },
 }

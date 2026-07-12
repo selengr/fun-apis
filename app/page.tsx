@@ -11,7 +11,7 @@ import {
 import { PixelIcon } from "@/components/pixel-icon";
 import { LiveAgentFeed, LiveAgentCounter } from "@/components/live-agent-feed";
 import { RevealText } from "@/components/reveal-text";
-import { StackingAgentCards } from "@/components/stacking-agent-cards";
+import { PhotoShowcaseStack } from "@/components/photo-showcase-stack";
 import { MobileNav } from "@/components/mobile-nav";
 import { DevExSection } from "@/components/devex-section";
 import Banner from "@/components/views/banner/banner";
@@ -241,29 +241,38 @@ export default function AgenticPage() {
         </div>
       </section>
 
-      {/* ── BUILD YOUR AGENTS (4 cards) ───────────────────────────────────── */}
+      {/* ── PHOTO DISCOVERY (4 cards, live from Unsplash) ─────────────────── */}
       <section
-        id="agents"
+        id="photos"
         className="py-32 px-6 md:px-12 lg:px-20 border-t border-border"
       >
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-16">
             <div>
-              <PixelIcon type="agents" size={40} />
+              <PixelIcon type="platform" size={40} />
               <div className="mt-4">
-                <Tag>AGENT TYPES</Tag>
+                <Tag>PHOTO DISCOVERY</Tag>
               </div>
               <RevealText className="mt-5 text-4xl md:text-5xl font-light tracking-tight leading-[1.05]">
-                {"Plug-and-play agents\nready to deploy."}
+                {"Stunning shots,\nupdated in real time."}
               </RevealText>
             </div>
-            <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
-              Start with a pre-built agent or compose your own from primitives.
-              Every agent is versioned, testable, and observable.
-            </p>
+            <div className="max-w-xs">
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Four live categories pulled straight from Unsplash — nature,
+                architecture, portraits, and space — quietly refreshing every
+                few seconds. Tap a card to dive into the full gallery.
+              </p>
+              <a
+                href="/photos"
+                className="mt-4 inline-flex items-center gap-1.5 text-xs text-foreground/70 hover:text-foreground transition-colors tracking-wide"
+              >
+                Explore all photos →
+              </a>
+            </div>
           </div>
 
-          <StackingAgentCards />
+          <PhotoShowcaseStack />
         </div>
       </section>
 
@@ -783,7 +792,7 @@ export default function AgenticPage() {
           <div className="flex flex-wrap items-center gap-x-8 gap-y-3">
             {[
               { label: "Markets", href: "#markets" },
-              { label: "Agents", href: "#agents" },
+              { label: "Photos", href: "#photos" },
               { label: "English", href: "#english" },
               { label: "Integrations", href: "#integrations" },
               { label: "Live", href: "#live" },

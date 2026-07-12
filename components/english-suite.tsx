@@ -6,10 +6,134 @@ import { BookOpen, Globe2, Sparkles, Volume2, ArrowUpRight, Lock } from 'lucide-
 import { PixelIcon } from '@/components/pixel-icon'
 import { RevealText } from '@/components/reveal-text'
 
-const IMAGE_MASK = {
-  maskImage: 'linear-gradient(to bottom, black 0%, black 35%, transparent 88%)',
-  WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 35%, transparent 88%)',
-} as const
+/* ------------------------------------------------------------------ */
+/*  Card illustrations — one signature line-art SVG per tool           */
+/*  All use currentColor for line work so they inherit the card's      */
+/*  amber/stone text color in both light and dark mode. Accent marks   */
+/*  use a fixed amber-500 (#f59e0b), which reads fine on both themes.  */
+/* ------------------------------------------------------------------ */
+
+function DictionaryArt() {
+  return (
+    <svg viewBox="0 0 400 220" className="absolute inset-0 w-full h-full" fill="none">
+      {/* open book */}
+      <path d="M40 56 Q140 40 196 60 L196 176 Q140 158 40 172 Z" stroke="currentColor" strokeOpacity="0.35" strokeWidth="1.2" />
+      <path d="M360 56 Q260 40 204 60 L204 176 Q260 158 360 172 Z" stroke="currentColor" strokeOpacity="0.35" strokeWidth="1.2" />
+      <path d="M196 60 L204 60" stroke="currentColor" strokeOpacity="0.35" strokeWidth="1.2" />
+
+      {/* left page: headword + phonetic + definition rules */}
+      <text x="56" y="82" fontFamily="Georgia, serif" fontStyle="italic" fontSize="17" fill="currentColor" fillOpacity="0.85">word</text>
+      <text x="100" y="82" fontFamily="Georgia, serif" fontSize="11" fill="currentColor" fillOpacity="0.45">/wɜːrd/</text>
+      <line x1="56" y1="98" x2="182" y2="98" stroke="currentColor" strokeOpacity="0.28" strokeWidth="1" />
+      <line x1="56" y1="112" x2="170" y2="112" stroke="currentColor" strokeOpacity="0.2" strokeWidth="1" />
+      <line x1="56" y1="126" x2="178" y2="126" stroke="currentColor" strokeOpacity="0.2" strokeWidth="1" />
+      <line x1="56" y1="140" x2="150" y2="140" stroke="currentColor" strokeOpacity="0.15" strokeWidth="1" />
+
+      {/* right page: secondary entry */}
+      <text x="222" y="82" fontFamily="Georgia, serif" fontStyle="italic" fontSize="14" fill="currentColor" fillOpacity="0.6">verb</text>
+      <line x1="222" y1="96" x2="340" y2="96" stroke="currentColor" strokeOpacity="0.22" strokeWidth="1" />
+      <line x1="222" y1="110" x2="320" y2="110" stroke="currentColor" strokeOpacity="0.16" strokeWidth="1" />
+      <line x1="222" y1="124" x2="332" y2="124" stroke="currentColor" strokeOpacity="0.16" strokeWidth="1" />
+
+      {/* bookmark ribbon accent */}
+      <path d="M300 40 L322 40 L322 76 L311 66 L300 76 Z" fill="#f59e0b" fillOpacity="0.85" />
+    </svg>
+  )
+}
+
+function WiktionaryArt() {
+  const glyphs = [
+    { ch: 'A', x: 200, y: 26 },
+    { ch: 'あ', x: 300, y: 66 },
+    { ch: 'Я', x: 312, y: 150 },
+    { ch: 'ñ', x: 96, y: 158 },
+    { ch: 'Ω', x: 82, y: 68 },
+  ]
+  return (
+    <svg viewBox="0 0 400 220" className="absolute inset-0 w-full h-full" fill="none">
+      {/* globe */}
+      <circle cx="200" cy="110" r="58" stroke="currentColor" strokeOpacity="0.35" strokeWidth="1.2" />
+      <ellipse cx="200" cy="110" rx="24" ry="58" stroke="currentColor" strokeOpacity="0.22" strokeWidth="1" />
+      <ellipse cx="200" cy="110" rx="58" ry="20" stroke="currentColor" strokeOpacity="0.22" strokeWidth="1" />
+      <line x1="142" y1="110" x2="258" y2="110" stroke="currentColor" strokeOpacity="0.22" strokeWidth="1" />
+      <line x1="200" y1="52" x2="200" y2="168" stroke="currentColor" strokeOpacity="0.22" strokeWidth="1" />
+
+      {/* orbiting translation nodes */}
+      {glyphs.map((g, i) => (
+        <g key={i}>
+          <line
+            x1="200" y1="110" x2={g.x} y2={g.y}
+            stroke="currentColor" strokeOpacity="0.15" strokeWidth="1" strokeDasharray="2 4"
+          />
+          <circle cx={g.x} cy={g.y} r="15" fill="#f59e0b" fillOpacity={i === 0 ? 0.9 : 0.22} stroke="#f59e0b" strokeOpacity="0.5" strokeWidth="1" />
+          <text x={g.x} y={g.y + 5} fontFamily="Georgia, serif" fontSize="13" textAnchor="middle" fill={i === 0 ? '#1c1917' : 'currentColor'} fillOpacity={i === 0 ? 0.85 : 0.75}>
+            {g.ch}
+          </text>
+        </g>
+      ))}
+    </svg>
+  )
+}
+
+function GrammarArt() {
+  return (
+    <svg viewBox="0 0 400 220" className="absolute inset-0 w-full h-full" fill="none">
+      {/* Reed–Kellogg style sentence diagram */}
+      <line x1="70" y1="120" x2="330" y2="120" stroke="currentColor" strokeOpacity="0.4" strokeWidth="1.4" />
+      <line x1="190" y1="98" x2="190" y2="142" stroke="currentColor" strokeOpacity="0.4" strokeWidth="1.4" />
+      <line x1="150" y1="120" x2="150" y2="134" stroke="currentColor" strokeOpacity="0.28" strokeWidth="1.2" />
+      <line x1="260" y1="120" x2="260" y2="134" stroke="currentColor" strokeOpacity="0.28" strokeWidth="1.2" />
+
+      {/* modifier branches */}
+      <line x1="118" y1="120" x2="90" y2="150" stroke="currentColor" strokeOpacity="0.25" strokeWidth="1.1" />
+      <line x1="300" y1="120" x2="330" y2="150" stroke="currentColor" strokeOpacity="0.25" strokeWidth="1.1" />
+      <line x1="220" y1="120" x2="220" y2="146" stroke="currentColor" strokeOpacity="0.2" strokeWidth="1" />
+
+      {/* small labels */}
+      <text x="105" y="112" fontFamily="Georgia, serif" fontSize="10" letterSpacing="1.5" fill="currentColor" fillOpacity="0.45">SUBJ</text>
+      <text x="205" y="112" fontFamily="Georgia, serif" fontSize="10" letterSpacing="1.5" fill="currentColor" fillOpacity="0.45">VERB</text>
+      <text x="285" y="112" fontFamily="Georgia, serif" fontSize="10" letterSpacing="1.5" fill="currentColor" fillOpacity="0.45">OBJ</text>
+
+      {/* nib / pen accent, top-left */}
+      <g transform="translate(52 44) rotate(-28)">
+        <path d="M0 0 L26 0 L13 34 Z" fill="#f59e0b" fillOpacity="0.85" />
+        <line x1="13" y1="6" x2="13" y2="26" stroke="#1c1917" strokeOpacity="0.3" strokeWidth="1" />
+      </g>
+    </svg>
+  )
+}
+
+function PronunciationArt() {
+  const bars = [10, 22, 34, 18, 40, 26, 14, 32, 20, 8]
+  return (
+    <svg viewBox="0 0 400 220" className="absolute inset-0 w-full h-full" fill="none">
+      {/* soundwave rings from a source point */}
+      <circle cx="66" cy="110" r="5" fill="#f59e0b" fillOpacity="0.9" />
+      <circle cx="66" cy="110" r="20" stroke="currentColor" strokeOpacity="0.22" strokeWidth="1" />
+      <circle cx="66" cy="110" r="34" stroke="currentColor" strokeOpacity="0.16" strokeWidth="1" />
+      <circle cx="66" cy="110" r="48" stroke="currentColor" strokeOpacity="0.1" strokeWidth="1" />
+
+      {/* waveform bars */}
+      {bars.map((h, i) => (
+        <rect
+          key={i}
+          x={130 + i * 20}
+          y={110 - h / 2}
+          width="6"
+          rx="3"
+          height={h}
+          fill="currentColor"
+          fillOpacity={0.2 + (h / 40) * 0.4}
+        />
+      ))}
+
+      {/* floating IPA symbols */}
+      <text x="140" y="56" fontFamily="Georgia, serif" fontStyle="italic" fontSize="15" fill="currentColor" fillOpacity="0.4">ə</text>
+      <text x="300" y="70" fontFamily="Georgia, serif" fontStyle="italic" fontSize="15" fill="currentColor" fillOpacity="0.4">ʃ</text>
+      <text x="330" y="150" fontFamily="Georgia, serif" fontStyle="italic" fontSize="15" fill="currentColor" fillOpacity="0.4">θ</text>
+    </svg>
+  )
+}
 
 const ENGLISH_TOOLS = [
   {
@@ -19,8 +143,7 @@ const ENGLISH_TOOLS = [
     href: '/dictionary',
     live: true,
     icon: BookOpen,
-    image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/define-5aafAmGBrxZpOqJ3XLHY3n3qzC2I5K.png',
-    imagePosition: 'object-top',
+    Art: DictionaryArt,
     accent: 'from-amber-500/20 via-stone-500/5 to-transparent',
     border: 'group-hover:border-amber-500/35',
     glow: 'group-hover:shadow-[0_24px_80px_rgba(201,169,98,0.12)]',
@@ -33,8 +156,7 @@ const ENGLISH_TOOLS = [
     href: '/wiktionary',
     live: true,
     icon: Globe2,
-    image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/compose-5RT5VR4f1Y3GoFmovqTKLTG4UXp3g2.png',
-    imagePosition: 'object-top',
+    Art: WiktionaryArt,
     accent: 'from-amber-600/25 via-amber-900/5 to-stone-900/10',
     border: 'group-hover:border-amber-400/40',
     glow: 'group-hover:shadow-[0_28px_90px_rgba(201,169,98,0.18)]',
@@ -47,8 +169,7 @@ const ENGLISH_TOOLS = [
     href: null,
     live: false,
     icon: Sparkles,
-    image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/test-zm8guZwxJHtwWsJ7XO4B0CF7GzlNK8.png',
-    imagePosition: 'object-top',
+    Art: GrammarArt,
     accent: 'from-stone-500/10 to-transparent',
     border: '',
     glow: '',
@@ -61,8 +182,7 @@ const ENGLISH_TOOLS = [
     href: null,
     live: false,
     icon: Volume2,
-    image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/deploy-an8fgHSLzniojkcmRyGGIFQUJF9T5J.png',
-    imagePosition: 'object-top',
+    Art: PronunciationArt,
     accent: 'from-stone-500/10 to-transparent',
     border: '',
     glow: '',
@@ -102,6 +222,7 @@ function EnglishCard({
 }) {
   const { ref, inView } = useInView()
   const Icon = tool.icon
+  const Art = tool.Art
   const inner = (
     <article
       ref={ref}
@@ -128,15 +249,10 @@ function EnglishCard({
         )}
       </div>
 
-      {/* Card image */}
-      <div className="relative h-48 overflow-hidden pointer-events-none">
-        <img
-          src={tool.image}
-          alt=""
-          className={`absolute inset-0 w-full h-full object-cover ${tool.imagePosition} scale-105 group-hover:scale-110 transition-transform duration-700`}
-          style={IMAGE_MASK}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-card via-card/20 to-transparent" />
+      {/* Card illustration */}
+      <div className="relative h-48 overflow-hidden pointer-events-none text-amber-800/70 dark:text-amber-200/55">
+        <Art />
+        <div className="absolute inset-0 bg-gradient-to-t from-card via-card/10 to-transparent" />
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
           <div className="size-14 rounded-2xl border border-amber-500/20 bg-white/60 dark:bg-black/40 backdrop-blur-md flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-500">
             <Icon className="size-6 text-amber-800/70 dark:text-amber-200/60" strokeWidth={1.25} />
