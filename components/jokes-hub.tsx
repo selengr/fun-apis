@@ -18,15 +18,16 @@ import {
 } from 'lucide-react'
 import type { Joke, JokeApiInfo, JokeResponse, StoredFavorite } from '@/types/jokeapi'
 import { Input } from '@/components/ui/input'
+import { cn } from '@/lib/utils'
 
 const CATEGORIES = [
-  { key: 'Any', emoji: '🎲', label: 'Any', accent: 'from-violet-500/20 to-transparent' },
-  { key: 'Programming', emoji: '💻', label: 'Code', accent: 'from-sky-500/20 to-transparent' },
-  { key: 'Pun', emoji: '🎪', label: 'Puns', accent: 'from-amber-500/20 to-transparent' },
-  { key: 'Misc', emoji: '🃏', label: 'Misc', accent: 'from-rose-500/20 to-transparent' },
-  { key: 'Dark', emoji: '🌙', label: 'Dark', accent: 'from-zinc-500/20 to-transparent' },
-  { key: 'Spooky', emoji: '👻', label: 'Spooky', accent: 'from-purple-500/20 to-transparent' },
-  { key: 'Christmas', emoji: '🎄', label: 'Xmas', accent: 'from-emerald-500/20 to-transparent' },
+  { key: 'Any', emoji: '🎲', label: 'Any', accent: 'from-violet-500/20 to-transparent', color: '#8b5cf6' },
+  { key: 'Programming', emoji: '💻', label: 'Code', accent: 'from-sky-500/20 to-transparent', color: '#0ea5e9' },
+  { key: 'Pun', emoji: '🎪', label: 'Puns', accent: 'from-amber-500/20 to-transparent', color: '#f59e0b' },
+  { key: 'Misc', emoji: '🃏', label: 'Misc', accent: 'from-rose-500/20 to-transparent', color: '#f43f5e' },
+  { key: 'Dark', emoji: '🌙', label: 'Dark', accent: 'from-zinc-500/20 to-transparent', color: '#52525b' },
+  { key: 'Spooky', emoji: '👻', label: 'Spooky', accent: 'from-purple-500/20 to-transparent', color: '#a855f7' },
+  { key: 'Christmas', emoji: '🎄', label: 'Xmas', accent: 'from-emerald-500/20 to-transparent', color: '#10b981' },
 ] as const
 
 const FAVORITES_KEY = 'fun-apis-joke-favorites'
@@ -178,56 +179,86 @@ function JokeCard({
   )
 }
 
-function SpinWheel({
+export function SpinWheel({
   spinning,
   landed,
   onSpin,
+  compact,
+  hideButton,
 }: {
   spinning: boolean
   landed: string | null
   onSpin: () => void
+  compact?: boolean
+  hideButton?: boolean
 }) {
   const segments = CATEGORIES.filter(c => c.key !== 'Any')
+  const slice = 360 / segments.length
+  const wheelGradient = `conic-gradient(from -90deg, ${segments
+    .map((seg, i) => `${seg.color} ${i * slice}deg ${(i + 1) * slice}deg`)
+    .join(', ')})`
 
   return (
-    <div className="flex flex-col items-center gap-4">
-      <div className="relative size-44 md:size-52">
+    <div className={cn(
+      'flex items-center',
+      compact ? 'flex-row gap-3' : 'flex-col gap-4',
+    )}>
+      <div className={`relative shrink-0 ${compact ? 'size-24' : 'size-44 md:size-52'}`}>
         <motion.div
-          animate={{ rotate: spinning ? 1080 + Math.random() * 360 : landed ? segments.findIndex(s => s.key === landed) * (360 / segments.length) : 0 }}
+          animate={{
+            rotate: spinning
+              ? 1080 + Math.random() * 360
+              : landed
+                ? segments.findIndex(s => s.key === landed) * slice
+                : 0,
+          }}
           transition={{ duration: spinning ? 2.2 : 0.5, ease: spinning ? [0.2, 0.8, 0.2, 1] : 'easeOut' }}
-          className="absolute inset-0 rounded-full border-4 border-border/40 overflow-hidden"
-          style={{ transformOrigin: 'center' }}
+          className="absolute inset-0 rounded-full border-2 border-white/40 dark:border-white/10 overflow-hidden shadow-inner"
+          style={{ transformOrigin: 'center', background: wheelGradient }}
         >
           {segments.map((seg, i) => {
-            const angle = (360 / segments.length) * i
+            const angle = slice * i + slice / 2
             return (
               <div
                 key={seg.key}
-                className="absolute inset-0 flex items-start justify-center pt-4"
+                className="absolute inset-0 flex items-start justify-center"
                 style={{ transform: `rotate(${angle}deg)` }}
               >
-                <span className="text-lg" style={{ transform: `rotate(${-angle}deg)` }}>
+                <span
+                  className={cn('drop-shadow-sm select-none', compact ? 'text-sm mt-1.5' : 'text-lg mt-3')}
+                >
                   {seg.emoji}
                 </span>
               </div>
             )
           })}
-          <div className="absolute inset-4 rounded-full bg-card/90 border border-border/40 flex items-center justify-center">
-            <span className="text-2xl">{landed ? segments.find(s => s.key === landed)?.emoji ?? '🎲' : '🎲'}</span>
+          <div
+            className={cn(
+              'absolute rounded-full bg-card border border-border/60 flex items-center justify-center shadow-sm',
+              compact ? 'inset-2.5' : 'inset-4',
+            )}
+          >
+            <span className={compact ? 'text-lg' : 'text-2xl'}>
+              {landed ? segments.find(s => s.key === landed)?.emoji ?? '🎲' : '🎲'}
+            </span>
           </div>
         </motion.div>
         <div className="absolute -top-1 left-1/2 -translate-x-1/2 size-0 border-l-[8px] border-r-[8px] border-b-[14px] border-l-transparent border-r-transparent border-b-amber-500 z-10" />
       </div>
 
-      <button
-        type="button"
-        onClick={onSpin}
-        disabled={spinning}
-        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-500/15 to-orange-500/10 text-sm font-medium hover:from-amber-500/25 hover:to-orange-500/15 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        <Dices className={`size-4 ${spinning ? 'animate-spin' : ''}`} />
-        {spinning ? 'Spinning…' : 'Spin for a joke'}
-      </button>
+      {!hideButton && (
+        <button
+          type="button"
+          onClick={onSpin}
+          disabled={spinning}
+          className={`inline-flex items-center gap-2 rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-500/15 to-orange-500/10 font-medium hover:from-amber-500/25 hover:to-orange-500/15 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
+            compact ? 'px-3 py-1.5 text-[11px]' : 'px-5 py-2.5 text-sm'
+          }`}
+        >
+          <Dices className={`size-3.5 ${spinning ? 'animate-spin' : ''}`} />
+          {spinning ? 'Spinning…' : 'Spin for a joke'}
+        </button>
+      )}
     </div>
   )
 }
