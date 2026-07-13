@@ -177,6 +177,9 @@ export function PhotoDiscovery() {
     [activeCategory, filters, page, submittedQuery],
   )
 
+  const loadGalleryRef = useRef(loadGallery)
+  loadGalleryRef.current = loadGallery
+
   // Deep-link support: /photos?category=nature preselects a category,
   // e.g. from the homepage photo showcase cards.
   const initialCategoryHandled = useRef(false)
@@ -187,9 +190,9 @@ export function PhotoDiscovery() {
     if (categoryParam && PHOTO_CATEGORIES.some(c => c.id === categoryParam)) {
       setActiveCategory(categoryParam)
       setPage(1)
-      void loadGallery({ reset: true, category: categoryParam, pageNum: 1 })
+      void loadGalleryRef.current({ reset: true, category: categoryParam, pageNum: 1 })
     }
-  }, [loadGallery, searchParams])
+  }, [searchParams])
 
   const runSearch = (query: string) => {
     const trimmed = query.trim()

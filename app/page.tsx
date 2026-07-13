@@ -24,6 +24,7 @@ import { EnglishSuiteSection } from "@/components/english-suite";
 import { ArtGallerySlider } from "@/components/art-gallery-slider";
 import { QuickQrMaker } from "@/components/quick-qr-maker";
 import { QuickFileConverter } from "@/components/quick-file-converter";
+import { CountriesShowcase } from "@/components/countries-showcase";
 
 // ─── Intersection Observer hook ──────────────────────────────────────────────
 function useInView(threshold = 0.15) {
@@ -350,7 +351,7 @@ export default function AgenticPage() {
       </section>
 
       {/* ── SECURITY & OBSERVABILITY ──────────────────────────────────��──── */}
-      <section
+      {/* <section
         id="security"
         className="py-32 px-6 md:px-12 lg:px-20 border-t border-border"
       >
@@ -365,9 +366,7 @@ export default function AgenticPage() {
             </RevealText>
           </div>
 
-          {/* Asymmetric grid: left text + title, right interactive audit log */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Left side — descriptions */}
             <div className="space-y-6">
               <p className="text-sm text-muted-foreground leading-relaxed">
                 Every action is logged, every decision is traceable. Built for
@@ -399,7 +398,6 @@ export default function AgenticPage() {
                 ))}
               </div>
 
-              {/* Compliance badges — vertical stack */}
               <div className="pt-4 flex flex-col gap-2">
                 {["SOC 2", "GDPR", "HIPAA Ready", "ISO 27001"].map((badge) => (
                   <div
@@ -413,7 +411,6 @@ export default function AgenticPage() {
               </div>
             </div>
 
-            {/* Right side — live audit log visualization */}
             <BentoCard className="p-6 lg:row-span-1" delay={0}>
               <div className="text-xs text-muted-foreground/80 tracking-widest uppercase mb-4">
                 Live Audit Trail
@@ -472,7 +469,7 @@ export default function AgenticPage() {
             </BentoCard>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* ── DEVELOPER EXPERIENCE ──────────────────────────────────────────── */}
       <DevExSection />
@@ -544,7 +541,7 @@ export default function AgenticPage() {
       </section>
 
       {/* ── LIVE AGENTS ��──────────────────────────────────────────────────── */}
-      <section
+      {/* <section
         id="live"
         className="py-32 px-6 md:px-12 lg:px-20 border-t border-border"
       >
@@ -574,118 +571,9 @@ export default function AgenticPage() {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
-      {/* ── PRICING ───────────────────────────────────���────������─────────────── */}
-      <section
-        id="pricing"
-        className="py-32 px-6 md:px-12 lg:px-20 border-t border-border"
-      >
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16 flex flex-col items-center">
-            <PixelIcon type="pricing" size={40} />
-            <div className="mt-4">
-              <Tag>PRICING</Tag>
-            </div>
-            <RevealText className="mt-5 text-4xl md:text-5xl font-light tracking-tight leading-[1.05]">
-              {"Pay as your agents grow."}
-            </RevealText>
-          </div>
-
-          <div
-            className="grid grid-cols-1 md:grid-cols-3 gap-3"
-            onMouseMove={handleMouse}
-          >
-            {[
-              {
-                name: "Sandbox",
-                price: "Free",
-                sub: "Start experimenting",
-                features: [
-                  "5 agents",
-                  "1,000 tasks/mo",
-                  "Community support",
-                  "Basic traces",
-                ],
-                delay: 0,
-              },
-              {
-                name: "Builder",
-                price: "$49",
-                period: "/mo",
-                sub: "For teams shipping fast",
-                features: [
-                  "50 agents",
-                  "100K tasks/mo",
-                  "Priority support",
-                  "Full traces + replay",
-                  "Custom tools",
-                  "REST API",
-                ],
-                highlight: true,
-                delay: 80,
-              },
-              {
-                name: "Enterprise",
-                price: "Custom",
-                sub: "For orgs at scale",
-                features: [
-                  "Unlimited agents",
-                  "Unlimited tasks",
-                  "Dedicated infra",
-                  "SOC 2 / HIPAA",
-                  "SLA guarantees",
-                  "Custom contracts",
-                ],
-                delay: 140,
-              },
-            ].map((plan) => (
-              <BentoCard
-                key={plan.name}
-                className={`p-8 flex flex-col ${plan.highlight ? "border-border bg-secondary dark:bg-secondary" : ""}`}
-                delay={plan.delay}
-              >
-                <div className="mb-8">
-                  <div className="font-pixel text-[11px] tracking-widest text-muted-foreground mb-4">
-                    {plan.name}
-                  </div>
-                  <div className="flex items-baseline gap-1 mb-1">
-                    <span className="text-4xl font-light">{plan.price}</span>
-                    {plan.period && (
-                      <span className="text-muted-foreground text-sm">
-                        {plan.period}
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-xs text-muted-foreground/90 tracking-wide">
-                    {plan.sub}
-                  </p>
-                </div>
-                <ul className="space-y-3 flex-1 mb-8">
-                  {plan.features.map((f) => (
-                    <li
-                      key={f}
-                      className="flex items-center gap-3 text-sm text-foreground/70"
-                    >
-                      <div className="w-1 h-1 rounded-full bg-muted-foreground/40 shrink-0" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <button
-                  className={`w-full py-3 rounded-xl text-sm tracking-widest transition-all duration-200 ${
-                    plan.highlight
-                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                      : "border border-border text-muted-foreground hover:border-border hover:text-foreground hover:bg-muted/60"
-                  }`}
-                >
-                  {plan.name === "Enterprise" ? "CONTACT SALES" : "GET STARTED"}
-                </button>
-              </BentoCard>
-            ))}
-          </div>
-        </div>
-      </section>
+      <CountriesShowcase />
 
       {/* ── CTA ───────────────────────────────────────────────────────────── */}
       <section className="relative py-32 px-6 md:px-12 lg:px-20 border-t border-border overflow-hidden">
@@ -763,7 +651,7 @@ export default function AgenticPage() {
       <footer className="py-10 px-6 md:px-12 lg:px-20 border-t border-border">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
           <span className="font-pixel text-xs tracking-[0.25em] text-muted-foreground/70">
-            AGENTIC
+            REZA KARBAKHSH
           </span>
 
           {/* Nav sections */}
@@ -774,7 +662,7 @@ export default function AgenticPage() {
               { label: "English", href: "#english" },
               { label: "Tools", href: "#tools" },
               { label: "Live", href: "#live" },
-              { label: "Pricing", href: "#pricing" },
+              { label: "World", href: "#countries" },
             ].map((l) => (
               <a
                 key={l.label}
@@ -789,14 +677,12 @@ export default function AgenticPage() {
           {/* Legal links */}
           <div className="flex items-center gap-6">
             {[
-              { label: "Privacy", href: "#" },
-              { label: "Terms", href: "#" },
-              { label: "Docs", href: "#" },
-              { label: "GitHub", href: "#" },
+              { label: "GitHub", href: "https://github.com/selengr" },
             ].map((l) => (
               <a
                 key={l.label}
                 href={l.href}
+                target="_blank"
                 className="text-xs text-muted-foreground/70 hover:text-foreground/70 transition-colors tracking-widest"
               >
                 {l.label}
@@ -806,7 +692,7 @@ export default function AgenticPage() {
         </div>
         <div className="max-w-6xl mx-auto mt-8 pt-6 border-t border-border/60">
           <span className="text-xs text-muted-foreground/60">
-            © 2026 Agentic. All rights reserved.
+             2026. made with love 💕 by @selengr.
           </span>
         </div>
       </footer>

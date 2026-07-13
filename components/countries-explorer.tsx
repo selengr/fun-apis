@@ -64,8 +64,12 @@ function formatArea(km?: number) {
 async function fetchCountries(params: Record<string, string>) {
   const qs = new URLSearchParams(params)
   const res = await fetch(`/api/countries?${qs}`, { cache: 'no-store' })
-  const json: CountriesResponse = await res.json()
-  if (!res.ok) throw new Error(json.errors?.[0]?.message ?? 'Request failed')
+  const json: CountriesResponse & { error?: string } = await res.json()
+  if (!res.ok) {
+    throw new Error(
+      json.errors?.[0]?.message ?? json.error ?? `Request failed (${res.status})`,
+    )
+  }
   return json
 }
 

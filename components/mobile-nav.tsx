@@ -10,7 +10,7 @@ const NAV_LINKS = [
   { label: "Photos",       href: "#photos" },
   { label: "English",      href: "#english" },
   { label: "Tools",        href: "#tools" },
-  { label: "Pricing",      href: "#pricing" },
+  { label: "World",        href: "#countries" },
 ]
 
 const NAV_STYLE = {
