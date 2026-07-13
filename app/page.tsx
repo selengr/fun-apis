@@ -689,9 +689,9 @@ export default function AgenticPage() {
 
       {/* ── CTA ───────────────────────────────────────────────────────────── */}
       <section className="relative py-32 px-6 md:px-12 lg:px-20 border-t border-border overflow-hidden">
-        {/* Glass panels image — anchored to bottom center */}
+        {/* Banner image — same as hero */}
         <img
-          src="/images/footer.png"
+          src="/images/banners/https___west.avif"
           alt=""
           aria-hidden="true"
           className="absolute bottom-0 left-0 w-full object-cover object-bottom pointer-events-none select-none"
@@ -719,15 +719,15 @@ export default function AgenticPage() {
         <div className="absolute inset-0 pointer-events-none hidden dark:block bg-gradient-to-t from-background from-0% via-background/55 via-35% to-transparent to-55%" />
         <div className="relative z-10 max-w-2xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-light tracking-tight leading-[1.05] mb-6">
-            Start building your
+            Come back tomorrow.
             <br />
-            agent workforce.
+            Something new lands daily.
           </h2>
           <p className="text-sm text-muted-foreground leading-relaxed mb-10">
-            Join thousands of teams deploying AI agents that work around the
-            clock, across every timezone.
+            Markets, poems, jokes, tools, and more — this site gets fresh updates
+            every day.
           </p>
-          {!submitted ? (
+          {/* {!submitted ? (
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -747,15 +747,15 @@ export default function AgenticPage() {
                 type="submit"
                 className="px-8 py-3 bg-primary text-primary-foreground text-sm rounded-xl hover:bg-primary/90 transition-colors tracking-widest font-medium"
               >
-                JOIN
+                NOTIFY ME
               </button>
             </form>
           ) : (
-            <div className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-emerald-600/20 bg-emerald-50 text-emerald-700 text-sm">
+            <div className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-emerald-600/20 bg-emerald-50 dark:bg-emerald-950/40 dark:border-emerald-500/20 dark:text-emerald-300 text-emerald-700 text-sm">
               <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              {"You're on the list. We'll be in touch."}
+              {"You're on the list. See you tomorrow."}
             </div>
-          )}
+          )} */}
         </div>
       </section>
 
