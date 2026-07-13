@@ -89,7 +89,7 @@ export function QuickFileConverter() {
           const f = e.dataTransfer.files[0]
           if (f) pickFile(f)
         }}
-        className={`w-full rounded-xl border border-dashed px-3 py-4 transition-all cursor-pointer ${
+        className={`w-full rounded-xl border border-dashed px-3 py-4 transition-all cursor-pointer md:h-[135px] ${
           dragging
             ? 'border-foreground/40 bg-muted/70'
             : 'border-border/70 bg-muted/30 hover:bg-muted/50 hover:border-border'
@@ -122,7 +122,7 @@ export function QuickFileConverter() {
           type="button"
           onClick={convert}
           disabled={!file || working}
-          className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-foreground text-background text-[11px] font-medium tracking-wide hover:opacity-90 disabled:opacity-35 disabled:pointer-events-none transition-opacity cursor-pointer"
+          className="w-full flex items-center justify-center gap-1.5 py-[9px] rounded-lg bg-foreground text-background text-[11px] font-medium tracking-wide hover:opacity-90 disabled:opacity-45 disabled:pointer-events-none transition-opacity cursor-pointer"
         >
           {working ? (
             <>

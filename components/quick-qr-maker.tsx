@@ -41,11 +41,11 @@ export function QuickQrMaker() {
         value={text}
         onChange={(e) => setText(e.target.value)}
         placeholder="paste link or text"
-        className="w-full rounded-lg border border-border/60 bg-muted/50 px-3 py-2.5 text-[11px] text-foreground outline-none placeholder:text-muted-foreground/50 focus:border-border focus:bg-muted/70 transition-colors"
+        className="w-full rounded-lg border border-border/60 bg-muted/50 px-3 py-2 text-[11px] text-foreground outline-none placeholder:text-muted-foreground/50 focus:border-border focus:bg-muted/70 transition-colors"
         aria-label="QR content"
       />
 
-      <div className="flex items-center justify-center py-1.5 min-h-[80px] rounded-lg border border-border/50 bg-muted/40">
+      <div className="flex items-center justify-center py-1 min-h-[80px] md:min-h-[90px] rounded-lg border border-border/50 bg-muted/40">
         {png ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={png} alt="QR preview" className="size-[65px] rounded-sm bg-white" />

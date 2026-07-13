@@ -303,7 +303,7 @@ export default function AgenticPage() {
             className="rounded-2xl overflow-hidden border border-border flex flex-col md:block md:relative"
             onMouseMove={handleMouse}
           >
-            <div className="relative w-full h-[285px] md:h-[525px] shrink-0">
+            <div className="relative w-full h-[240px] md:h-[340px] shrink-0">
               <img
                 src="/images/banners/https___west.avif"
                 alt="Quick tools"
@@ -311,39 +311,36 @@ export default function AgenticPage() {
               />
             </div>
 
-            <div className="flex flex-col gap-3 p-4 md:absolute md:bottom-4 md:right-4 md:p-0 md:w-72">
-              <div className="rounded-xl border border-border/50 p-6 bg-card/60 backdrop-blur-xl">
-                {/* <Tag>QR</Tag> */}
-              <div className="flex justify-between w-full">
-                <h3 className="text-lg font-light mb-2">Make a QR</h3>
-
-                <Link
-        href="/qr"
-        className="inline-flex items-center gap-0.5 text-[10px] text-muted-foreground/70 hover:text-foreground transition-colors tracking-wide"
-      >
-        More details
-        <ArrowUpRight className="size-3" />
-      </Link>
-
-</div>
+            <div className="flex flex-col md:flex-row gap-3 p-4 md:absolute md:bottom-4 md:right-4 md:p-0 md:w-auto">
+              <div className="rounded-xl border border-border/50 p-6 pt-4 bg-card/60 backdrop-blur-xl md:w-72">
+                <div className="flex items-start justify-between gap-3 mb-2">
+                  <h3 className="text-lg font-light">Make a QR</h3>
+                  <Link
+                    href="/qr"
+                    className="inline-flex items-center gap-0.5 text-[10px] text-muted-foreground/70 hover:text-foreground transition-colors tracking-wide shrink-0 mt-1"
+                  >
+                    More details
+                    <ArrowUpRight className="size-3" />
+                  </Link>
+                </div>
                 <QuickQrMaker />
               </div>
 
-              <div className="rounded-xl border border-border/50 p-6 bg-card/60 backdrop-blur-xl">
+              <div className="rounded-xl border border-border/50 p-6 bg-card/60 backdrop-blur-xl md:w-72">
                 <div className="flex items-center gap-2 mb-3">
-                  <div className="w-2 h-2 rounded-full bg-emerald-500/80 animate-pulse" />
-                    <div className="flex justify-between w-full">
-                      <span className="text-xs text-muted-foreground tracking-widest">
-                        CONVERT
-                      </span>
-                      <Link
-        href="/convert"
-        className="inline-flex items-center gap-0.5 text-[10px] text-muted-foreground/70 hover:text-foreground transition-colors tracking-wide"
-      >
-        More details
-        <ArrowUpRight className="size-3" />
-      </Link>
-                    </div>
+                  <div className="w-2 h-2 rounded-full bg-emerald-500/80 animate-pulse shrink-0" />
+                  <div className="flex items-center justify-between w-full gap-3">
+                    <span className="text-xs text-muted-foreground tracking-widest">
+                      CONVERT
+                    </span>
+                    <Link
+                      href="/convert"
+                      className="inline-flex items-center gap-0.5 text-[10px] text-muted-foreground/70 hover:text-foreground transition-colors tracking-wide shrink-0"
+                    >
+                      More details
+                      <ArrowUpRight className="size-3" />
+                    </Link>
+                  </div>
                 </div>
                 <QuickFileConverter />
               </div>
@@ -489,16 +486,16 @@ export default function AgenticPage() {
           {[...Array(3)].map((_, rep) => (
             <div key={rep} className="flex shrink-0">
               {[
-                "Web Research",
-                "Code Generation",
-                "Email Drafting",
-                "Data Analysis",
-                "PR Reviews",
-                "Scheduling",
-                "SQL Queries",
-                "API Calls",
-                "File Processing",
-                "Monitoring",
+                "QR Codes",
+                "File Convert",
+                "Cat Facts",
+                "Dog Facts",
+                "Daily Poetry",
+                "Joke Spinner",
+                "Live Markets",
+                "Crypto Prices",
+                "Forex Rates",
+                "Photo Discovery",
               ].map((cap) => (
                 <div
                   key={cap}
@@ -520,16 +517,16 @@ export default function AgenticPage() {
           {[...Array(3)].map((_, rep) => (
             <div key={rep} className="flex shrink-0">
               {[
-                "Report Writing",
-                "Slack Summaries",
-                "Lead Scoring",
-                "Image Tagging",
-                "Test Running",
-                "Deployment",
-                "Log Parsing",
-                "Invoice Processing",
-                "Meeting Notes",
-                "Sentiment Analysis",
+                "English Suite",
+                "Dictionary",
+                "Book Explorer",
+                "Art Gallery",
+                "Lyrics Finder",
+                "Music Browse",
+                "Country Explorer",
+                "Where Am I",
+                "Notion Notes",
+                "Barcode Maker",
               ].map((cap) => (
                 <div
                   key={cap}
