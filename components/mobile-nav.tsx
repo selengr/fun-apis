@@ -8,8 +8,8 @@ import { ThemeToggle } from "./theme-toggle"
 const NAV_LINKS = [
   { label: "Markets",      href: "#markets" },
   { label: "Photos",       href: "#photos" },
-  { label: "English",     href: "#english" },
-  { label: "Integrations", href: "#integrations" },
+  { label: "English",      href: "#english" },
+  { label: "Tools",        href: "#tools" },
   { label: "Pricing",      href: "#pricing" },
 ]
 

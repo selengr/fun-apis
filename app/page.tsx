@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import React, { useRef, useEffect, useState, useCallback } from "react";
+import { ArrowUpRight } from 'lucide-react'
+
 import {
   IntroAnimation,
   INTRO_DURATION_MS,
@@ -20,6 +22,8 @@ import { MarketsBentoCards } from "@/components/markets-bento-cards";
 import { EnglishSuiteSection } from "@/components/english-suite";
 // import TimeMachine from "@/components/time-machine";
 import { ArtGallerySlider } from "@/components/art-gallery-slider";
+import { QuickQrMaker } from "@/components/quick-qr-maker";
+import { QuickFileConverter } from "@/components/quick-file-converter";
 
 // ─── Intersection Observer hook ──────────────────────────────────────────────
 function useInView(threshold = 0.15) {
@@ -278,93 +282,70 @@ export default function AgenticPage() {
 
       <EnglishSuiteSection />
 
-      {/* ── INTEGRATIONS ──────────────────────────────────────────────────── */}
+      {/* ── QUICK TOOLS ───────────────────────────────────────────────────── */}
       <section
-        id="integrations"
+        id="tools"
         className="py-32 px-6 md:px-12 lg:px-20 border-t border-border"
       >
         <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-16">
-            <div>
-              <PixelIcon type="integrations" size={40} />
-              <div className="mt-4">
-                <Tag>INTEGRATIONS</Tag>
-              </div>
-              <RevealText className="mt-5 text-4xl md:text-5xl font-light tracking-tight leading-[1.05]">
-                {"Connect any tool.\nControl any system."}
-              </RevealText>
+          <div className="mb-16">
+            <PixelIcon type="integrations" size={40} />
+            <div className="mt-4">
+              <Tag>TOOLS</Tag>
             </div>
-            <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
-              200+ native connectors. Everything from Slack to your internal
-              database. Build custom tools with our SDK in minutes.
-            </p>
+            <RevealText className="mt-5 text-4xl md:text-5xl font-light tracking-tight leading-[1.05]">
+              {"Quick tools.\nWhen you need them."}
+            </RevealText>
           </div>
 
           {/* Full-width image block with glass cards */}
-          {/* Mobile: flex-col, image + cards stacked. Desktop: image fills block, cards absolute */}
           <div
             className="rounded-2xl overflow-hidden border border-border flex flex-col md:block md:relative"
             onMouseMove={handleMouse}
           >
-            {/* Image */}
-            <div className="relative w-full h-[280px] md:h-[480px] shrink-0">
+            <div className="relative w-full h-[285px] md:h-[525px] shrink-0">
               <img
                 src="/images/banners/https___west.avif"
-                // src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Org%20Arc%20-%20Upscaled-Sk90jShfu7nltLnhoQbaMJC1YaQKuU.png"
-                alt="Agent orchestration architecture"
+                alt="Quick tools"
                 className="absolute inset-0 w-full h-full object-cover object-center"
               />
             </div>
 
-            {/* Cards — flex row on mobile (equal spacing), absolute on desktop */}
             <div className="flex flex-col gap-3 p-4 md:absolute md:bottom-4 md:right-4 md:p-0 md:w-72">
-              <div
-                className="rounded-xl border border-border/50 p-6 bg-card/60 backdrop-blur-xl"
-              >
-                <Tag>SDK</Tag>
-                <h3 className="mt-3 text-lg font-light mb-2">
-                  Build custom tools
-                </h3>
-                <p className="text-xs text-muted-foreground leading-relaxed mb-4">
-                  Define any function as a tool your agents can call. TypeScript
-                  and Python.
-                </p>
-                <div className="bg-muted/60 rounded-lg border border-border p-3 font-mono text-[11px] text-muted-foreground/70 leading-relaxed">
-                  <span className="text-muted-foreground/70">// tool definition</span>
-                  <br />
-                  <span className="text-blue-600/70">defineTool</span>
-                  {"({"}
-                  <br />
-                  {"  "}
-                  <span className="text-amber-700/70">name</span>:{" "}
-                  <span className="text-green-700/70">
-                    &apos;fetchPrice&apos;
-                  </span>
-                  ,<br />
-                  {"  "}
-                  <span className="text-amber-700/70">run</span>:{" "}
-                  <span className="text-muted-foreground/90">async (q) </span>={">"}
-                  <br />
-                  {"    "}
-                  <span className="text-blue-600/70">api</span>.get(q)
-                  <br />
-                  {"})"}
-                </div>
+              <div className="rounded-xl border border-border/50 p-6 bg-card/60 backdrop-blur-xl">
+                {/* <Tag>QR</Tag> */}
+              <div className="flex justify-between w-full">
+                <h3 className="text-lg font-light mb-2">Make a QR</h3>
+
+                <Link
+        href="/qr"
+        className="inline-flex items-center gap-0.5 text-[10px] text-muted-foreground/70 hover:text-foreground transition-colors tracking-wide"
+      >
+        More details
+        <ArrowUpRight className="size-3" />
+      </Link>
+
+</div>
+                <QuickQrMaker />
               </div>
 
-              <div
-                className="rounded-xl border border-border/50 p-6 bg-card/60 backdrop-blur-xl"
-              >
-                <div className="flex items-center gap-2 mb-2">
+              <div className="rounded-xl border border-border/50 p-6 bg-card/60 backdrop-blur-xl">
+                <div className="flex items-center gap-2 mb-3">
                   <div className="w-2 h-2 rounded-full bg-emerald-500/80 animate-pulse" />
-                  <span className="text-xs text-muted-foreground tracking-widest">
-                    LIVE API
-                  </span>
+                    <div className="flex justify-between w-full">
+                      <span className="text-xs text-muted-foreground tracking-widest">
+                        CONVERT
+                      </span>
+                      <Link
+        href="/convert"
+        className="inline-flex items-center gap-0.5 text-[10px] text-muted-foreground/70 hover:text-foreground transition-colors tracking-wide"
+      >
+        More details
+        <ArrowUpRight className="size-3" />
+      </Link>
+                    </div>
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  Full REST + WebSocket API. Stream agent outputs directly into
-                  your product.
-                </p>
+                <QuickFileConverter />
               </div>
             </div>
           </div>
@@ -794,7 +775,7 @@ export default function AgenticPage() {
               { label: "Markets", href: "#markets" },
               { label: "Photos", href: "#photos" },
               { label: "English", href: "#english" },
-              { label: "Integrations", href: "#integrations" },
+              { label: "Tools", href: "#tools" },
               { label: "Live", href: "#live" },
               { label: "Pricing", href: "#pricing" },
             ].map((l) => (
