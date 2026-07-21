@@ -13,21 +13,39 @@ const _courierPrime = Courier_Prime({ weight: ["400", "700"], subsets: ["latin"]
 const _ibmPlexSans = IBM_Plex_Sans({ weight: ["300", "400", "500", "600"], subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Agentic — Autonomous AI Agents at Scale',
-  description: 'Deploy autonomous AI agents that think, act, and execute across any workflow. Connect 200+ integrations, run agents in parallel, and ship faster with the Agentic platform.',
-  keywords: ['AI agents', 'autonomous agents', 'LLM orchestration', 'AI automation', 'multi-agent platform'],
-  authors: [{ name: 'Agentic' }],
+  title: {
+    default: 'Fun APIs — Live playground of useful tools',
+    template: '%s · Fun APIs',
+  },
+  description:
+    'A personal playground of live APIs and explorers — books, dictionary, Wiktionary, world atlas, markets, forex, photos, poetry, IP location, QR codes, and more.',
+  keywords: [
+    'fun APIs',
+    'dictionary',
+    'Wiktionary',
+    'Open Library',
+    'crypto markets',
+    'forex',
+    'world atlas',
+    'countries',
+    'IP location',
+    'poetry',
+    'QR code',
+    'photo gallery',
+  ],
+  authors: [{ name: 'Fun APIs' }],
   openGraph: {
-    title: 'Agentic — Autonomous AI Agents at Scale',
-    description: 'Deploy autonomous AI agents that think, act, and execute across any workflow.',
+    title: 'Fun APIs — Live playground of useful tools',
+    description:
+      'Explore books, language tools, world countries, markets, photos, poetry, and more — all powered by live APIs.',
     type: 'website',
-    url: 'https://agentic.ai',
-    siteName: 'Agentic',
+    siteName: 'Fun APIs',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Agentic — Autonomous AI Agents at Scale',
-    description: 'Deploy autonomous AI agents that think, act, and execute across any workflow.',
+    title: 'Fun APIs — Live playground of useful tools',
+    description:
+      'Explore books, language tools, world countries, markets, photos, poetry, and more — all powered by live APIs.',
   },
   icons: {
     icon: [
