@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import type { IpstackData, IpstackError } from '@/types/ipstack'
 
 const IPSTACK_BASE = 'https://api.ipstack.com'
+const FREE_BASE = 'https://ipwho.is'
 
 // Always run fresh — otherwise a VPN switch keeps showing the old IP
 export const dynamic = 'force-dynamic'
@@ -16,53 +17,213 @@ function getClientIp(request: NextRequest): string | null {
   return null
 }
 
-export async function GET(request: NextRequest) {
-  const accessKey = process.env.IPSTACK_ACCESS_KEY
+function isLocalIp(ip: string | null): boolean {
+  if (!ip) return true
+  return (
+    ip === '::1' ||
+    ip === '127.0.0.1' ||
+    ip.startsWith('192.168.') ||
+    ip.startsWith('10.') ||
+    ip.startsWith('172.16.')
+  )
+}
 
-  if (!accessKey) {
-    return NextResponse.json(
-      { error: 'IPSTACK_ACCESS_KEY is not configured' },
-      { status: 500 },
-    )
+/** Country code → flag emoji (works without ipstack location block) */
+function flagEmoji(countryCode: string): string {
+  const cc = countryCode.toUpperCase()
+  if (cc.length !== 2) return '🌐'
+  return String.fromCodePoint(
+    ...[...cc].map(c => 0x1f1e6 - 65 + c.charCodeAt(0)),
+  )
+}
+
+type IpwhoResponse = {
+  success?: boolean
+  message?: string
+  ip?: string
+  type?: string
+  continent?: string
+  continent_code?: string
+  country?: string
+  country_code?: string
+  region?: string
+  region_code?: string
+  city?: string
+  latitude?: number
+  longitude?: number
+  is_eu?: boolean
+  postal?: string
+  calling_code?: string
+  capital?: string
+  flag?: {
+    img?: string
+    emoji?: string
+    emoji_unicode?: string
+  }
+  connection?: {
+    asn?: number
+    org?: string
+    isp?: string
+    domain?: string
+  }
+  timezone?: {
+    id?: string
+    abbr?: string
+    is_dst?: boolean
+    offset?: number
+    current_time?: string
+  }
+  currency?: {
+    name?: string
+    code?: string
+    symbol?: string
+    plural?: string
+  }
+  security?: {
+    anonymous?: boolean
+    proxy?: boolean
+    vpn?: boolean
+    tor?: boolean
+    hosting?: boolean
+  }
+}
+
+function mapIpwho(raw: IpwhoResponse): IpstackData {
+  const code = raw.country_code ?? ''
+  const emoji = raw.flag?.emoji || flagEmoji(code)
+  const isp = raw.connection?.isp || raw.connection?.org || 'Unknown ISP'
+
+  return {
+    ip: raw.ip ?? '',
+    type: (raw.type ?? 'ipv4').toLowerCase().includes('6') ? 'ipv6' : 'ipv4',
+    continent_code: raw.continent_code ?? '',
+    continent_name: raw.continent ?? '',
+    country_code: code,
+    country_name: raw.country ?? '',
+    region_code: raw.region_code ?? '',
+    region_name: raw.region ?? '',
+    city: raw.city ?? 'Unknown',
+    zip: raw.postal ?? '',
+    latitude: raw.latitude ?? 0,
+    longitude: raw.longitude ?? 0,
+    location: {
+      geoname_id: 0,
+      capital: raw.capital ?? '',
+      languages: [],
+      country_flag: raw.flag?.img ?? '',
+      country_flag_emoji: emoji,
+      country_flag_emoji_unicode: raw.flag?.emoji_unicode ?? '',
+      calling_code: raw.calling_code ?? '',
+      is_eu: !!raw.is_eu,
+    },
+    time_zone: {
+      id: raw.timezone?.id ?? '',
+      current_time: raw.timezone?.current_time ?? new Date().toISOString(),
+      gmt_offset: raw.timezone?.offset ?? 0,
+      code: raw.timezone?.abbr ?? '',
+      is_daylight_saving: !!raw.timezone?.is_dst,
+    },
+    currency: {
+      code: raw.currency?.code ?? '',
+      name: raw.currency?.name ?? '',
+      plural: raw.currency?.plural ?? '',
+      symbol: raw.currency?.symbol ?? '',
+      symbol_native: raw.currency?.symbol ?? '',
+    },
+    connection: {
+      asn: raw.connection?.asn ?? 0,
+      isp,
+      sld: raw.connection?.domain ?? null,
+      tld: null,
+      carrier: null,
+      home: null,
+      organization_type: null,
+    },
+    security: raw.security
+      ? {
+          is_proxy: !!raw.security.proxy,
+          proxy_type: null,
+          is_crawler: false,
+          crawler_name: null,
+          crawler_type: null,
+          is_tor: !!raw.security.tor,
+          threat_level: null,
+          threat_types: null,
+          proxy_last_detected: null,
+          proxy_level: null,
+          vpn_service: raw.security.vpn ? 'Detected' : null,
+          anonymizer_status: raw.security.anonymous ? 'anonymous' : null,
+          hosting_facility: !!raw.security.hosting,
+        }
+      : undefined,
+  }
+}
+
+async function fetchIpwho(ip: string | null): Promise<IpstackData> {
+  // Empty path = detect caller's IP from this server request
+  const path = ip && !isLocalIp(ip) ? `/${encodeURIComponent(ip)}` : '/'
+  const res = await fetch(`${FREE_BASE}${path}`, {
+    cache: 'no-store',
+    headers: { Accept: 'application/json' },
+  })
+  const raw = (await res.json()) as IpwhoResponse
+
+  if (!res.ok || raw.success === false) {
+    throw new Error(raw.message || 'Free geo lookup failed')
   }
 
-  const ipParam = request.nextUrl.searchParams.get('ip')
-  const clientIp = getClientIp(request)
+  return mapIpwho(raw)
+}
 
-  const isLocal =
-    !clientIp || clientIp === '::1' || clientIp === '127.0.0.1' || clientIp.startsWith('192.168.')
+async function fetchIpstack(
+  accessKey: string,
+  ipParam: string | null,
+  clientIp: string | null,
+): Promise<IpstackData> {
+  const isLocal = isLocalIp(clientIp)
 
-  // Local dev: use /check (ipstack detects request IP) or explicit ?ip= override
-  const endpoint =
-    ipParam
-      ? `${IPSTACK_BASE}/${ipParam}`
-      : isLocal
-        ? `${IPSTACK_BASE}/check`
-        : `${IPSTACK_BASE}/${clientIp}`
+  const endpoint = ipParam
+    ? `${IPSTACK_BASE}/${ipParam}`
+    : isLocal
+      ? `${IPSTACK_BASE}/check`
+      : `${IPSTACK_BASE}/${clientIp}`
 
   // security=1 → proxy/VPN/Tor/threat data; hostname=1 → reverse DNS
   const url = `${endpoint}?access_key=${accessKey}&security=1&hostname=1`
+  const res = await fetch(url, { cache: 'no-store' })
+  const data: IpstackData | IpstackError = await res.json()
+
+  if ('success' in data && data.success === false) {
+    throw Object.assign(new Error(data.error.info), { status: 400 })
+  }
+
+  return data as IpstackData
+}
+
+export async function GET(request: NextRequest) {
+  const accessKey = process.env.IPSTACK_ACCESS_KEY?.trim()
+  const ipParam = request.nextUrl.searchParams.get('ip')
+  const clientIp = getClientIp(request)
 
   try {
-    const res = await fetch(url, { cache: 'no-store' })
-    const data: IpstackData | IpstackError = await res.json()
-
-    if ('success' in data && data.success === false) {
-      return NextResponse.json(
-        { error: data.error.info },
-        { status: 400 },
-      )
-    }
+    // Prefer ipstack when a real key is set; otherwise free ipwho.is
+    const data = accessKey
+      ? await fetchIpstack(accessKey, ipParam, clientIp)
+      : await fetchIpwho(ipParam || (isLocalIp(clientIp) ? null : clientIp))
 
     return NextResponse.json(data, {
       headers: {
         'Cache-Control': 'no-store, no-cache, must-revalidate',
       },
     })
-  } catch {
-    return NextResponse.json(
-      { error: 'Failed to fetch location data' },
-      { status: 502 },
-    )
+  } catch (err) {
+    const message =
+      err instanceof Error ? err.message : 'Failed to fetch location data'
+    const status =
+      err instanceof Error && 'status' in err && typeof (err as { status: unknown }).status === 'number'
+        ? (err as { status: number }).status
+        : 502
+
+    return NextResponse.json({ error: message }, { status })
   }
 }
