@@ -15,7 +15,7 @@ function buildHorizon(prices: number[], w = 1200, h = 320) {
   const range = max - min || 1
   const pts = prices.map((v, i) => {
     const x = (i / (prices.length - 1)) * w
-    const y = h - ((v - min) / range) * (h * 0.72) - h * 0.08
+    const y = h - ((v - min) / range) * (h * 0.68) - h * 0.1
     return [x, y] as const
   })
   const line = pts.map(([x, y], i) => `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`).join(' ')
@@ -54,33 +54,32 @@ export function MarketsBanner() {
 
   const change24h = btc?.price_change_percentage_24h ?? 0
   const up = change24h >= 0
-  const ink = up ? '#34d399' : '#fb7185'
+  const ink = up ? '#059669' : '#e11d48'
   const prices = btc?.sparkline_in_7d?.price ?? []
   const horizon = useMemo(() => buildHorizon(prices), [prices])
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-border bg-[#0c0c0c] text-white min-h-[300px] md:min-h-[340px]">
-      {/* Living price horizon — the whole card is the chart */}
+    <div className="relative overflow-hidden rounded-2xl border border-border bg-card min-h-[280px] md:min-h-[320px]">
+      {/* Soft chart horizon */}
       <svg
-        className="absolute inset-0 w-full h-full"
+        className="absolute inset-0 w-full h-full opacity-90"
         viewBox="0 0 1200 320"
         preserveAspectRatio="none"
         aria-hidden
       >
         <defs>
           <linearGradient id={`fill-${gradId}`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={ink} stopOpacity="0.28" />
-            <stop offset="55%" stopColor={ink} stopOpacity="0.06" />
+            <stop offset="0%" stopColor={ink} stopOpacity="0.16" />
+            <stop offset="60%" stopColor={ink} stopOpacity="0.04" />
             <stop offset="100%" stopColor={ink} stopOpacity="0" />
           </linearGradient>
           <linearGradient id={`veil-${gradId}`} x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#0c0c0c" stopOpacity="0.92" />
-            <stop offset="45%" stopColor="#0c0c0c" stopOpacity="0.35" />
-            <stop offset="100%" stopColor="#0c0c0c" stopOpacity="0.05" />
+            <stop offset="0%" stopColor="var(--card)" stopOpacity="0.95" />
+            <stop offset="40%" stopColor="var(--card)" stopOpacity="0.55" />
+            <stop offset="100%" stopColor="var(--card)" stopOpacity="0.08" />
           </linearGradient>
         </defs>
 
-        {/* faint ledger lines */}
         {[80, 140, 200, 260].map(y => (
           <line
             key={y}
@@ -88,9 +87,10 @@ export function MarketsBanner() {
             y1={y}
             x2="1200"
             y2={y}
-            stroke="white"
-            strokeOpacity="0.04"
+            stroke="currentColor"
+            strokeOpacity="0.06"
             strokeWidth="1"
+            className="text-foreground"
           />
         ))}
 
@@ -101,27 +101,22 @@ export function MarketsBanner() {
               d={horizon.line}
               fill="none"
               stroke={ink}
-              strokeWidth="2.5"
+              strokeWidth="2.25"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="animate-[marketsDraw_1.4s_cubic-bezier(0.16,1,0.3,1)_both]"
-              style={{ strokeDasharray: 2400, strokeDashoffset: 0 }}
             />
-            <circle cx={horizon.lastX} cy={horizon.lastY} r="5" fill={ink} />
-            <circle cx={horizon.lastX} cy={horizon.lastY} r="14" fill={ink} opacity="0.18">
-              <animate attributeName="r" values="10;18;10" dur="2.4s" repeatCount="indefinite" />
-              <animate attributeName="opacity" values="0.28;0.08;0.28" dur="2.4s" repeatCount="indefinite" />
-            </circle>
+            <circle cx={horizon.lastX} cy={horizon.lastY} r="4.5" fill={ink} />
+            <circle cx={horizon.lastX} cy={horizon.lastY} r="12" fill={ink} opacity="0.12" />
           </>
         ) : null}
 
         <rect width="1200" height="320" fill={`url(#veil-${gradId})`} />
       </svg>
 
-      {/* Scrolling market tape */}
-      <div className="relative z-10 border-b border-white/8 overflow-hidden">
+      {/* Tape */}
+      <div className="relative z-10 border-b border-border overflow-hidden bg-muted/40">
         <div
-          className="flex whitespace-nowrap py-2.5 text-[10px] tracking-[0.22em] uppercase text-white/40"
+          className="flex whitespace-nowrap py-2.5 text-[10px] tracking-[0.2em] uppercase text-muted-foreground"
           style={{ animation: 'marketsTape 28s linear infinite' }}
         >
           {Array.from({ length: 2 }).map((_, rep) => (
@@ -134,11 +129,10 @@ export function MarketsBanner() {
                 `MCap ${btc ? formatUsd(btc.market_cap, true) : '—'}`,
                 `Vol ${btc ? formatUsd(btc.total_volume, true) : '—'}`,
                 'Live · every 30s',
-                'Markets hub',
               ].map((item, i) => (
                 <span key={`${rep}-${i}`} className="px-6 flex items-center gap-6">
                   {item}
-                  <span className="size-1 rounded-full bg-white/20" />
+                  <span className="size-1 rounded-full bg-muted-foreground/30" />
                 </span>
               ))}
             </div>
@@ -146,35 +140,30 @@ export function MarketsBanner() {
         </div>
       </div>
 
-      <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-8 p-7 md:p-10 pt-8 md:pt-12">
+      <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-8 p-7 md:p-10">
         <div className="min-w-0">
-          <p className="text-[11px] tracking-[0.28em] uppercase text-white/40 mb-4">
+          <p className="text-[11px] tracking-[0.22em] uppercase text-muted-foreground mb-3">
             BTC / USD · seven-day pulse
           </p>
 
           {loading && !btc ? (
-            <div className="h-16 md:h-20 w-64 md:w-80 bg-white/10 rounded animate-pulse" />
+            <div className="h-14 md:h-16 w-56 md:w-72 bg-muted rounded animate-pulse" />
           ) : (
-            <p
-              className="font-light tracking-tight tabular-nums leading-none text-[clamp(2.75rem,8vw,5.5rem)]"
-              style={{ fontVariantNumeric: 'tabular-nums' }}
-            >
+            <p className="font-light tracking-tight tabular-nums leading-none text-foreground text-[clamp(2.5rem,7vw,4.75rem)]">
               {btc ? formatUsd(btc.current_price) : '—'}
             </p>
           )}
 
-          <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/55">
+          <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground">
             <span
-              className="inline-flex items-center gap-2 font-mono text-base tabular-nums"
+              className="inline-flex items-center gap-1.5 font-mono text-[15px] tabular-nums font-medium"
               style={{ color: ink }}
             >
-              <span className="text-lg leading-none">{up ? '↑' : '↓'}</span>
+              <span>{up ? '↑' : '↓'}</span>
               {formatPct(change24h)} today
             </span>
-            <span className="text-white/25">·</span>
+            <span className="text-border">·</span>
             <span>Rank #{btc?.market_cap_rank ?? '—'}</span>
-            <span className="text-white/25">·</span>
-            <span>The number the room watches</span>
           </div>
         </div>
 
@@ -182,17 +171,13 @@ export function MarketsBanner() {
           <div className="flex items-center gap-3">
             {btc?.image ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={btc.image}
-                alt=""
-                className="size-10 rounded-full grayscale contrast-125 opacity-90"
-              />
+              <img src={btc.image} alt="" className="size-10 rounded-full border border-border" />
             ) : (
-              <div className="size-10 rounded-full bg-white/10" />
+              <div className="size-10 rounded-full bg-muted" />
             )}
             <div className="md:text-right">
-              <p className="text-sm text-white/85">{btc?.name ?? 'Bitcoin'}</p>
-              <p className="text-[11px] font-mono uppercase tracking-widest text-white/35">
+              <p className="text-sm text-foreground">{btc?.name ?? 'Bitcoin'}</p>
+              <p className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
                 {btc?.symbol ?? 'btc'}
               </p>
             </div>
@@ -200,7 +185,7 @@ export function MarketsBanner() {
 
           <Link
             href="/crypto"
-            className="inline-flex items-center gap-1.5 text-[12px] tracking-wide text-white/55 hover:text-white transition-colors border-b border-white/20 hover:border-white/60 pb-0.5"
+            className="inline-flex items-center gap-1.5 text-[12px] tracking-wide text-muted-foreground hover:text-foreground transition-colors"
           >
             Open the live board
             <ArrowUpRight className="size-3.5" />
@@ -212,10 +197,6 @@ export function MarketsBanner() {
         @keyframes marketsTape {
           from { transform: translateX(0); }
           to { transform: translateX(-50%); }
-        }
-        @keyframes marketsDraw {
-          from { stroke-dashoffset: 2400; opacity: 0.2; }
-          to { stroke-dashoffset: 0; opacity: 1; }
         }
       `}</style>
     </div>

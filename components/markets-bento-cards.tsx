@@ -131,10 +131,10 @@ function PriceLabel({
   const change = parseFloat(pct)
   return (
     <>
-      <text x={x} y="24" fill={pairColor} fontSize="8.5" fontFamily="monospace" opacity=".7">
+      <text x={x} y="24" fill={pairColor} fontSize="8.5" fontFamily="monospace" opacity=".75">
         {pairLabel}
       </text>
-      <text x={priceX} y="40" fill="#ffffff" fontSize="13" fontFamily="monospace" fontWeight="700">
+      <text x={priceX} y="40" fill="currentColor" className="text-foreground" fontSize="13" fontFamily="monospace" fontWeight="700">
         {price}
       </text>
       <text x={pctX} y="40" fill={pctColor(change)} fontSize="9" fontFamily="monospace">
