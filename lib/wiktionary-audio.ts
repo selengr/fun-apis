@@ -1,37 +1,6 @@
 import type { WiktionaryTranslation, LanguageSection } from '@/types/wiktionary'
 
-const UA = 'fun-apis/1.0 (Wiktionary dictionary; contact: github.com)'
-
-/** Native Wiktionary hosts for pronunciation lookups */
-export const NATIVE_WIKI: Record<string, string> = {
-  de: 'de.wiktionary.org',
-  fr: 'fr.wiktionary.org',
-  es: 'es.wiktionary.org',
-  it: 'it.wiktionary.org',
-  pt: 'pt.wiktionary.org',
-  ru: 'ru.wiktionary.org',
-  ja: 'ja.wiktionary.org',
-  nl: 'nl.wiktionary.org',
-  pl: 'pl.wiktionary.org',
-  sv: 'sv.wiktionary.org',
-  no: 'no.wiktionary.org',
-  da: 'da.wiktionary.org',
-  fi: 'fi.wiktionary.org',
-  el: 'el.wiktionary.org',
-  he: 'he.wiktionary.org',
-  uk: 'uk.wiktionary.org',
-  vi: 'vi.wiktionary.org',
-  id: 'id.wiktionary.org',
-  cs: 'cs.wiktionary.org',
-  ro: 'ro.wiktionary.org',
-  hu: 'hu.wiktionary.org',
-  tr: 'tr.wiktionary.org',
-  ko: 'ko.wiktionary.org',
-  fa: 'fa.wiktionary.org',
-  hi: 'hi.wiktionary.org',
-  ar: 'ar.wiktionary.org',
-  zh: 'zh.wiktionary.org',
-}
+const UA = 'fun-apis/1.0 (Wiktionary dictionary; contact: local-dev)'
 
 const LANG_NAME_TO_CODE: Record<string, string> = {
   English: 'en',
@@ -66,7 +35,7 @@ const LANG_NAME_TO_CODE: Record<string, string> = {
   Hungarian: 'hu',
 }
 
-const LANG_NAME_TO_CODE: Record<string, string> = {
+async function wikiFetch(host: string, params: Record<string, string>) {
   const url = new URL(`https://${host}/w/api.php`)
   url.searchParams.set('format', 'json')
   url.searchParams.set('origin', '*')
@@ -77,6 +46,7 @@ const LANG_NAME_TO_CODE: Record<string, string> = {
       headers: { 'User-Agent': UA, Accept: 'application/json' },
       cache: 'no-store',
     })
+    if (res.status === 429 || !res.ok) return null
     const text = await res.text()
     const json = JSON.parse(text)
     if (json.error) return null
@@ -108,7 +78,6 @@ export function extractIpaFromWikitext(wikitext: string): string | undefined {
     /\{\{IPA\|[a-z]{2,3}\|(\/[^}|]+(?:\/[^}|]*)?)/,
     /\{\{IPA\|(\/[^}|]+(?:\/[^}|]*)?)/,
     /\{\{Lautschrift\|([^}|]+)/,
-    /\{\{Lautschrift\}\}\s*\{\{Lautschrift\|([^}|]+)/,
   ]
   for (const re of patterns) {
     const m = wikitext.match(re)
@@ -140,7 +109,13 @@ export function extractLanguageSections(wikitext: string): LanguageSection[] {
 
   for (let i = 0; i < headers.length; i++) {
     const name = headers[i].name
-    if (['English', 'References', 'Further reading', 'Anagrams', 'Pronunciation', 'Noun', 'Verb'].includes(name)) continue
+    if (
+      ['English', 'References', 'Further reading', 'Anagrams', 'Pronunciation', 'Noun', 'Verb'].includes(
+        name,
+      )
+    ) {
+      continue
+    }
     if (name.length > 24) continue
 
     const start = headers[i].index
@@ -163,12 +138,8 @@ export function extractLanguageSections(wikitext: string): LanguageSection[] {
       ipa: extractIpaFromWikitext(body),
       gloss: defs[0],
       definitions: defs.slice(0, 3),
-      audio: undefined,
+      audio: audioFiles[0],
     })
-
-    if (audioFiles[0]) {
-      sections[sections.length - 1].audio = audioFiles[0]
-    }
   }
 
   return sections
@@ -185,10 +156,12 @@ export async function resolveAudioFileUrls(filenames: string[]): Promise<Map<str
   }
 
   for (const batch of batches) {
-    const titles = batch.map(f => {
-      const orig = filenames.find(x => x.toLowerCase() === f) ?? f
-      return `File:${orig}`
-    }).join('|')
+    const titles = batch
+      .map(f => {
+        const orig = filenames.find(x => x.toLowerCase() === f) ?? f
+        return `File:${orig}`
+      })
+      .join('|')
 
     const json = await wikiFetch('en.wiktionary.org', {
       action: 'query',
@@ -210,16 +183,6 @@ export async function resolveAudioFileUrls(filenames: string[]): Promise<Map<str
   }
 
   return map
-}
-
-async function fetchNativeWikitext(host: string, term: string): Promise<string | null> {
-  const json = await wikiFetch(host, {
-    action: 'parse',
-    page: term,
-    prop: 'wikitext',
-    redirects: '1',
-  })
-  return json?.parse?.wikitext?.['*'] ?? null
 }
 
 export async function enrichTranslationsWithAudio(
