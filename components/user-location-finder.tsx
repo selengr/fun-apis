@@ -107,8 +107,14 @@ async function forwardGeocode(query: string): Promise<PreciseLocation | null> {
 function RadarRing() {
   return (
     <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden" aria-hidden>
-      <div className="absolute size-[120vmax] rounded-full border border-emerald-400/10 animate-[spin_60s_linear_infinite]" />
-      <div className="absolute size-[80vmax] rounded-full border border-dashed border-emerald-400/[0.07] animate-[spin_90s_linear_infinite_reverse]" />
+      <div
+        className="absolute size-[120vmax] rounded-full border border-emerald-400/10"
+        style={{ animation: 'spin 60s linear infinite' }}
+      />
+      <div
+        className="absolute size-[80vmax] rounded-full border border-dashed border-emerald-400/[0.07]"
+        style={{ animation: 'spin 90s linear infinite reverse' }}
+      />
       <div className="absolute size-[42vmax] rounded-full border border-emerald-400/[0.08]" />
       <div className="absolute size-3 rounded-full bg-emerald-400/80 shadow-[0_0_40px_12px_rgba(52,211,153,0.35)]" />
       <div className="absolute size-24 rounded-full border border-emerald-400/30 animate-ping opacity-40" />
