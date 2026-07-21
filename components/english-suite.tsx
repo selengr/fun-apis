@@ -313,7 +313,6 @@ export function EnglishSuiteSection() {
           </RevealText>
           <p className="mt-6 text-sm md:text-base text-muted-foreground leading-relaxed max-w-lg">
             A curated collection of language tools — from a classic dictionary to Wiktionary.
-            Native pronunciation and an experience worthy of the language.
           </p>
           <div className="mt-8 h-px w-20 bg-gradient-to-r from-amber-500/60 to-transparent" />
         </div>
