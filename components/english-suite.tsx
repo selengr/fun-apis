@@ -26,7 +26,9 @@ type Tool = {
   glyph: string
   phonetic: string
   ink: string
-  span: string
+  grid: string
+  height: string
+  tall?: boolean
 }
 
 const ENGLISH_TOOLS: Tool[] = [
@@ -43,7 +45,9 @@ const ENGLISH_TOOLS: Tool[] = [
     glyph: 'Aa',
     phonetic: '/ˈwɜːrd/',
     ink: 'from-[#1a1410]/25 via-[#1a1410]/55 to-[#1a1410]/95',
-    span: 'md:col-span-7 md:row-span-2 min-h-[420px] md:min-h-[520px]',
+    grid: 'md:col-span-7 md:row-span-2',
+    height: 'min-h-[420px] md:min-h-full',
+    tall: true,
   },
   {
     n: '02',
@@ -58,7 +62,8 @@ const ENGLISH_TOOLS: Tool[] = [
     glyph: '文',
     phonetic: 'あ · Ω · ñ',
     ink: 'from-[#0e1418]/30 via-[#0e1418]/60 to-[#0e1418]/96',
-    span: 'md:col-span-5 min-h-[260px] md:min-h-[250px]',
+    grid: 'md:col-span-5',
+    height: 'min-h-[260px]',
   },
   {
     n: '03',
@@ -73,7 +78,8 @@ const ENGLISH_TOOLS: Tool[] = [
     glyph: 'S—V',
     phonetic: 'subject · verb',
     ink: 'from-[#141210]/35 via-[#141210]/65 to-[#141210]/96',
-    span: 'md:col-span-5 min-h-[240px]',
+    grid: 'md:col-span-5',
+    height: 'min-h-[240px]',
   },
   {
     n: '04',
@@ -88,7 +94,8 @@ const ENGLISH_TOOLS: Tool[] = [
     glyph: 'ə',
     phonetic: '/ʃ/ · /θ/ · /æ/',
     ink: 'from-[#101018]/30 via-[#101018]/60 to-[#101018]/96',
-    span: 'md:col-span-7 min-h-[240px] md:min-h-[250px]',
+    grid: 'md:col-span-7',
+    height: 'min-h-[240px] md:min-h-[250px]',
   },
 ]
 
@@ -101,7 +108,7 @@ function Tag({ children }: { children: React.ReactNode }) {
 }
 
 function useInView(threshold = 0.12) {
-  const ref = useRef<HTMLDivElement>(null)
+  const ref = useRef<HTMLElement>(null)
   const [inView, setInView] = useState(false)
   useEffect(() => {
     const el = ref.current
@@ -120,15 +127,14 @@ function useInView(threshold = 0.12) {
 
 function EnglishCard({ tool, delay }: { tool: Tool; delay: number }) {
   const { ref, inView } = useInView()
-  const tall = tool.span.includes('row-span')
 
-  const inner = (
+  const card = (
     <article
       ref={ref}
       className={cn(
         'group relative overflow-hidden rounded-[1.35rem] border border-white/10 h-full',
-        tool.span,
-        tool.live ? 'cursor-pointer' : 'opacity-90',
+        tool.height,
+        !tool.live && 'opacity-90',
       )}
       style={{
         opacity: inView ? 1 : 0,
@@ -145,11 +151,10 @@ function EnglishCard({ tool, delay }: { tool: Tool; delay: number }) {
       <div className={`absolute inset-0 bg-gradient-to-t ${tool.ink}`} />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.12),transparent_55%)]" />
 
-      {/* Giant typographic watermark */}
       <div
         className={cn(
           'pointer-events-none absolute select-none text-white/[0.12] leading-none transition-all duration-700 ease-out group-hover:text-white/[0.18] group-hover:-translate-y-2 group-hover:translate-x-1',
-          tall
+          tool.tall
             ? 'right-[-4%] top-[8%] text-[11rem] md:text-[14rem]'
             : 'right-[-2%] top-[4%] text-[7rem] md:text-[8.5rem]',
         )}
@@ -173,7 +178,7 @@ function EnglishCard({ tool, delay }: { tool: Tool; delay: number }) {
           )}
         </div>
 
-        <div className={cn('mt-auto', tall && 'max-w-md')}>
+        <div className={cn('mt-auto', tool.tall && 'max-w-md')}>
           <p
             className="mb-3 text-sm italic text-white/55 transition-all duration-500 group-hover:text-white/80"
             style={{ fontFamily: display.style.fontFamily }}
@@ -183,7 +188,7 @@ function EnglishCard({ tool, delay }: { tool: Tool; delay: number }) {
           <h3
             className={cn(
               'font-light tracking-tight text-white leading-[1.05]',
-              tall ? 'text-4xl md:text-5xl' : 'text-2xl md:text-3xl',
+              tool.tall ? 'text-4xl md:text-5xl' : 'text-2xl md:text-3xl',
             )}
             style={{ fontFamily: display.style.fontFamily }}
           >
@@ -192,7 +197,7 @@ function EnglishCard({ tool, delay }: { tool: Tool; delay: number }) {
           <p
             className={cn(
               'mt-3 text-sm text-white/55 leading-relaxed',
-              tall ? 'max-w-sm' : 'line-clamp-2',
+              tool.tall ? 'max-w-sm' : 'line-clamp-2',
             )}
           >
             {tool.desc}
@@ -211,97 +216,18 @@ function EnglishCard({ tool, delay }: { tool: Tool; delay: number }) {
     return (
       <Link
         href={tool.href}
-        className={cn('block focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 rounded-[1.35rem]', tool.span)}
+        className={cn(
+          'block focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 rounded-[1.35rem]',
+          tool.grid,
+          tool.height,
+        )}
       >
-        <div className="h-full [&>article]:min-h-[inherit] [&>article]:md:min-h-[inherit]">
-          {/* reset span on inner so grid placement stays on Link */}
-          {(() => {
-            const { span: _s, ...rest } = { span: tool.span }
-            void _s
-            void rest
-            return null
-          })()}
-          <article
-            ref={ref}
-            className={cn(
-              'group relative overflow-hidden rounded-[1.35rem] border border-white/10 h-full min-h-[inherit]',
-              tool.live ? 'cursor-pointer' : 'opacity-90',
-              tool.span.includes('420') && 'min-h-[420px] md:min-h-[520px]',
-              tool.span.includes('260') && 'min-h-[260px] md:min-h-[250px]',
-              tool.n === '03' && 'min-h-[240px]',
-              tool.n === '04' && 'min-h-[240px] md:min-h-[250px]',
-            )}
-            style={{
-              opacity: inView ? 1 : 0,
-              transform: inView ? 'translateY(0)' : 'translateY(28px)',
-              transition: `opacity 0.85s ease ${delay}ms, transform 0.85s ease ${delay}ms`,
-            }}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={tool.image}
-              alt={tool.imageAlt}
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-[900ms] ease-out group-hover:scale-[1.06]"
-            />
-            <div className={`absolute inset-0 bg-gradient-to-t ${tool.ink}`} />
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.12),transparent_55%)]" />
-            <div
-              className={cn(
-                'pointer-events-none absolute select-none text-white/[0.12] leading-none transition-all duration-700 ease-out group-hover:text-white/[0.18] group-hover:-translate-y-2 group-hover:translate-x-1',
-                tall
-                  ? 'right-[-4%] top-[8%] text-[11rem] md:text-[14rem]'
-                  : 'right-[-2%] top-[4%] text-[7rem] md:text-[8.5rem]',
-              )}
-              style={{ fontFamily: display.style.fontFamily }}
-              aria-hidden
-            >
-              {tool.glyph}
-            </div>
-            <div className="relative z-10 flex h-full flex-col justify-between p-6 md:p-8">
-              <div className="flex items-start justify-between gap-3">
-                <span className="text-[10px] tracking-[0.35em] uppercase text-white/45">
-                  {tool.n} · {tool.whisper}
-                </span>
-                <span className="inline-flex size-8 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white/80 backdrop-blur-sm transition-all duration-500 group-hover:bg-white group-hover:text-stone-900">
-                  <ArrowUpRight className="size-3.5" />
-                </span>
-              </div>
-              <div className={cn('mt-auto', tall && 'max-w-md')}>
-                <p
-                  className="mb-3 text-sm italic text-white/55 transition-all duration-500 group-hover:text-white/80"
-                  style={{ fontFamily: display.style.fontFamily }}
-                >
-                  {tool.phonetic}
-                </p>
-                <h3
-                  className={cn(
-                    'font-light tracking-tight text-white leading-[1.05]',
-                    tall ? 'text-4xl md:text-5xl' : 'text-2xl md:text-3xl',
-                  )}
-                  style={{ fontFamily: display.style.fontFamily }}
-                >
-                  {tool.title}
-                </h3>
-                <p
-                  className={cn(
-                    'mt-3 text-sm text-white/55 leading-relaxed',
-                    tall ? 'max-w-sm' : 'line-clamp-2',
-                  )}
-                >
-                  {tool.desc}
-                </p>
-                <p className="mt-5 text-[10px] tracking-[0.28em] uppercase text-white/70 opacity-0 translate-y-2 transition-all duration-500 group-hover:opacity-100 group-hover:translate-y-0">
-                  Open tool
-                </p>
-              </div>
-            </div>
-          </article>
-        </div>
+        {card}
       </Link>
     )
   }
 
-  return inner
+  return <div className={cn(tool.grid, tool.height)}>{card}</div>
 }
 
 export function EnglishSuiteSection() {
@@ -338,7 +264,7 @@ export function EnglishSuiteSection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-5 auto-rows-fr">
+        <div className="grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 gap-4 md:gap-5 md:auto-rows-[minmax(250px,1fr)]">
           {ENGLISH_TOOLS.map((tool, i) => (
             <EnglishCard key={tool.n} tool={tool} delay={i * 90} />
           ))}
