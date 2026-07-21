@@ -1,198 +1,100 @@
 'use client'
 
 import Link from 'next/link'
+import { Cormorant_Garamond } from 'next/font/google'
 import { useEffect, useRef, useState } from 'react'
-import { BookOpen, Globe2, Sparkles, Volume2, ArrowUpRight, Lock } from 'lucide-react'
+import { ArrowUpRight } from 'lucide-react'
 import { PixelIcon } from '@/components/pixel-icon'
 import { RevealText } from '@/components/reveal-text'
+import { cn } from '@/lib/utils'
 
-/* ------------------------------------------------------------------ */
-/*  Card illustrations — one signature line-art SVG per tool           */
-/*  All use currentColor for line work so they inherit the card's      */
-/*  amber/stone text color in both light and dark mode. Accent marks   */
-/*  use a fixed amber-500 (#f59e0b), which reads fine on both themes.  */
-/* ------------------------------------------------------------------ */
+const display = Cormorant_Garamond({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600'],
+  style: ['normal', 'italic'],
+})
 
-function DictionaryArt() {
-  return (
-    <svg viewBox="0 0 400 220" className="absolute inset-0 w-full h-full" fill="none">
-      {/* open book */}
-      <path d="M40 56 Q140 40 196 60 L196 176 Q140 158 40 172 Z" stroke="currentColor" strokeOpacity="0.35" strokeWidth="1.2" />
-      <path d="M360 56 Q260 40 204 60 L204 176 Q260 158 360 172 Z" stroke="currentColor" strokeOpacity="0.35" strokeWidth="1.2" />
-      <path d="M196 60 L204 60" stroke="currentColor" strokeOpacity="0.35" strokeWidth="1.2" />
-
-      {/* left page: headword + phonetic + definition rules */}
-      <text x="56" y="82" fontFamily="Georgia, serif" fontStyle="italic" fontSize="17" fill="currentColor" fillOpacity="0.85">word</text>
-      <text x="100" y="82" fontFamily="Georgia, serif" fontSize="11" fill="currentColor" fillOpacity="0.45">/wɜːrd/</text>
-      <line x1="56" y1="98" x2="182" y2="98" stroke="currentColor" strokeOpacity="0.28" strokeWidth="1" />
-      <line x1="56" y1="112" x2="170" y2="112" stroke="currentColor" strokeOpacity="0.2" strokeWidth="1" />
-      <line x1="56" y1="126" x2="178" y2="126" stroke="currentColor" strokeOpacity="0.2" strokeWidth="1" />
-      <line x1="56" y1="140" x2="150" y2="140" stroke="currentColor" strokeOpacity="0.15" strokeWidth="1" />
-
-      {/* right page: secondary entry */}
-      <text x="222" y="82" fontFamily="Georgia, serif" fontStyle="italic" fontSize="14" fill="currentColor" fillOpacity="0.6">verb</text>
-      <line x1="222" y1="96" x2="340" y2="96" stroke="currentColor" strokeOpacity="0.22" strokeWidth="1" />
-      <line x1="222" y1="110" x2="320" y2="110" stroke="currentColor" strokeOpacity="0.16" strokeWidth="1" />
-      <line x1="222" y1="124" x2="332" y2="124" stroke="currentColor" strokeOpacity="0.16" strokeWidth="1" />
-
-      {/* bookmark ribbon accent */}
-      <path d="M300 40 L322 40 L322 76 L311 66 L300 76 Z" fill="#f59e0b" fillOpacity="0.85" />
-    </svg>
-  )
+type Tool = {
+  n: string
+  title: string
+  whisper: string
+  desc: string
+  href: string | null
+  live: boolean
+  image: string
+  imageAlt: string
+  glyph: string
+  phonetic: string
+  ink: string
+  span: string
 }
 
-function WiktionaryArt() {
-  const glyphs = [
-    { ch: 'A', x: 200, y: 26 },
-    { ch: 'あ', x: 300, y: 66 },
-    { ch: 'Я', x: 312, y: 150 },
-    { ch: 'ñ', x: 96, y: 158 },
-    { ch: 'Ω', x: 82, y: 68 },
-  ]
-  return (
-    <svg viewBox="0 0 400 220" className="absolute inset-0 w-full h-full" fill="none">
-      {/* globe */}
-      <circle cx="200" cy="110" r="58" stroke="currentColor" strokeOpacity="0.35" strokeWidth="1.2" />
-      <ellipse cx="200" cy="110" rx="24" ry="58" stroke="currentColor" strokeOpacity="0.22" strokeWidth="1" />
-      <ellipse cx="200" cy="110" rx="58" ry="20" stroke="currentColor" strokeOpacity="0.22" strokeWidth="1" />
-      <line x1="142" y1="110" x2="258" y2="110" stroke="currentColor" strokeOpacity="0.22" strokeWidth="1" />
-      <line x1="200" y1="52" x2="200" y2="168" stroke="currentColor" strokeOpacity="0.22" strokeWidth="1" />
-
-      {/* orbiting translation nodes */}
-      {glyphs.map((g, i) => (
-        <g key={i}>
-          <line
-            x1="200" y1="110" x2={g.x} y2={g.y}
-            stroke="currentColor" strokeOpacity="0.15" strokeWidth="1" strokeDasharray="2 4"
-          />
-          <circle cx={g.x} cy={g.y} r="15" fill="#f59e0b" fillOpacity={i === 0 ? 0.9 : 0.22} stroke="#f59e0b" strokeOpacity="0.5" strokeWidth="1" />
-          <text x={g.x} y={g.y + 5} fontFamily="Georgia, serif" fontSize="13" textAnchor="middle" fill={i === 0 ? '#1c1917' : 'currentColor'} fillOpacity={i === 0 ? 0.85 : 0.75}>
-            {g.ch}
-          </text>
-        </g>
-      ))}
-    </svg>
-  )
-}
-
-function GrammarArt() {
-  return (
-    <svg viewBox="0 0 400 220" className="absolute inset-0 w-full h-full" fill="none">
-      {/* Reed–Kellogg style sentence diagram */}
-      <line x1="70" y1="120" x2="330" y2="120" stroke="currentColor" strokeOpacity="0.4" strokeWidth="1.4" />
-      <line x1="190" y1="98" x2="190" y2="142" stroke="currentColor" strokeOpacity="0.4" strokeWidth="1.4" />
-      <line x1="150" y1="120" x2="150" y2="134" stroke="currentColor" strokeOpacity="0.28" strokeWidth="1.2" />
-      <line x1="260" y1="120" x2="260" y2="134" stroke="currentColor" strokeOpacity="0.28" strokeWidth="1.2" />
-
-      {/* modifier branches */}
-      <line x1="118" y1="120" x2="90" y2="150" stroke="currentColor" strokeOpacity="0.25" strokeWidth="1.1" />
-      <line x1="300" y1="120" x2="330" y2="150" stroke="currentColor" strokeOpacity="0.25" strokeWidth="1.1" />
-      <line x1="220" y1="120" x2="220" y2="146" stroke="currentColor" strokeOpacity="0.2" strokeWidth="1" />
-
-      {/* small labels */}
-      <text x="105" y="112" fontFamily="Georgia, serif" fontSize="10" letterSpacing="1.5" fill="currentColor" fillOpacity="0.45">SUBJ</text>
-      <text x="205" y="112" fontFamily="Georgia, serif" fontSize="10" letterSpacing="1.5" fill="currentColor" fillOpacity="0.45">VERB</text>
-      <text x="285" y="112" fontFamily="Georgia, serif" fontSize="10" letterSpacing="1.5" fill="currentColor" fillOpacity="0.45">OBJ</text>
-
-      {/* nib / pen accent, top-left */}
-      <g transform="translate(52 44) rotate(-28)">
-        <path d="M0 0 L26 0 L13 34 Z" fill="#f59e0b" fillOpacity="0.85" />
-        <line x1="13" y1="6" x2="13" y2="26" stroke="#1c1917" strokeOpacity="0.3" strokeWidth="1" />
-      </g>
-    </svg>
-  )
-}
-
-function PronunciationArt() {
-  const bars = [10, 22, 34, 18, 40, 26, 14, 32, 20, 8]
-  return (
-    <svg viewBox="0 0 400 220" className="absolute inset-0 w-full h-full" fill="none">
-      {/* soundwave rings from a source point */}
-      <circle cx="66" cy="110" r="5" fill="#f59e0b" fillOpacity="0.9" />
-      <circle cx="66" cy="110" r="20" stroke="currentColor" strokeOpacity="0.22" strokeWidth="1" />
-      <circle cx="66" cy="110" r="34" stroke="currentColor" strokeOpacity="0.16" strokeWidth="1" />
-      <circle cx="66" cy="110" r="48" stroke="currentColor" strokeOpacity="0.1" strokeWidth="1" />
-
-      {/* waveform bars */}
-      {bars.map((h, i) => (
-        <rect
-          key={i}
-          x={130 + i * 20}
-          y={110 - h / 2}
-          width="6"
-          rx="3"
-          height={h}
-          fill="currentColor"
-          fillOpacity={0.2 + (h / 40) * 0.4}
-        />
-      ))}
-
-      {/* floating IPA symbols */}
-      <text x="140" y="56" fontFamily="Georgia, serif" fontStyle="italic" fontSize="15" fill="currentColor" fillOpacity="0.4">ə</text>
-      <text x="300" y="70" fontFamily="Georgia, serif" fontStyle="italic" fontSize="15" fill="currentColor" fillOpacity="0.4">ʃ</text>
-      <text x="330" y="150" fontFamily="Georgia, serif" fontStyle="italic" fontSize="15" fill="currentColor" fillOpacity="0.4">θ</text>
-    </svg>
-  )
-}
-
-const ENGLISH_TOOLS = [
+const ENGLISH_TOOLS: Tool[] = [
   {
     n: '01',
     title: 'Classic Dictionary',
-    desc: 'Definitions, phonetics, and examples in a refined reading experience.',
+    whisper: 'Look up',
+    desc: 'Definitions, phonetics, and examples — a quiet reading room for every word.',
     href: '/dictionary',
     live: true,
-    icon: BookOpen,
-    Art: DictionaryArt,
-    accent: 'from-amber-500/20 via-stone-500/5 to-transparent',
-    border: 'group-hover:border-amber-500/35',
-    glow: 'group-hover:shadow-[0_24px_80px_rgba(201,169,98,0.12)]',
-    badge: 'Open',
+    image:
+      'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=1400&q=80',
+    imageAlt: 'Open book with printed pages',
+    glyph: 'Aa',
+    phonetic: '/ˈwɜːrd/',
+    ink: 'from-[#1a1410]/25 via-[#1a1410]/55 to-[#1a1410]/95',
+    span: 'md:col-span-7 md:row-span-2 min-h-[420px] md:min-h-[520px]',
   },
   {
     n: '02',
     title: 'Wiktionary',
-    desc: 'Multilingual translations, native audio, etymology, and Wikipedia context.',
+    whisper: 'Translate',
+    desc: 'Etymology, native audio, and meanings across languages.',
     href: '/wiktionary',
     live: true,
-    icon: Globe2,
-    Art: WiktionaryArt,
-    accent: 'from-amber-600/25 via-amber-900/5 to-stone-900/10',
-    border: 'group-hover:border-amber-400/40',
-    glow: 'group-hover:shadow-[0_28px_90px_rgba(201,169,98,0.18)]',
-    badge: 'Premium',
+    image:
+      'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80',
+    imageAlt: 'People learning together',
+    glyph: '文',
+    phonetic: 'あ · Ω · ñ',
+    ink: 'from-[#0e1418]/30 via-[#0e1418]/60 to-[#0e1418]/96',
+    span: 'md:col-span-5 min-h-[260px] md:min-h-[250px]',
   },
   {
     n: '03',
     title: 'Grammar Atelier',
-    desc: 'Elegant grammar guidance, tense maps, and sentence refinement.',
+    whisper: 'Soon',
+    desc: 'Tense maps and sentence refinement.',
     href: null,
     live: false,
-    icon: Sparkles,
-    Art: GrammarArt,
-    accent: 'from-stone-500/10 to-transparent',
-    border: '',
-    glow: '',
-    badge: 'Soon',
+    image:
+      'https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1000&q=80',
+    imageAlt: 'Handwriting on paper',
+    glyph: 'S—V',
+    phonetic: 'subject · verb',
+    ink: 'from-[#141210]/35 via-[#141210]/65 to-[#141210]/96',
+    span: 'md:col-span-5 min-h-[240px]',
   },
   {
     n: '04',
-    title: 'Pronunciation Studio',
-    desc: 'Immersive accent training with studio-quality voice comparisons.',
+    title: 'Pronunciation',
+    whisper: 'Soon',
+    desc: 'Accent training with studio voice comparisons.',
     href: null,
     live: false,
-    icon: Volume2,
-    Art: PronunciationArt,
-    accent: 'from-stone-500/10 to-transparent',
-    border: '',
-    glow: '',
-    badge: 'Soon',
+    image:
+      'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=1000&q=80',
+    imageAlt: 'Studio microphone',
+    glyph: 'ə',
+    phonetic: '/ʃ/ · /θ/ · /æ/',
+    ink: 'from-[#101018]/30 via-[#101018]/60 to-[#101018]/96',
+    span: 'md:col-span-7 min-h-[240px] md:min-h-[250px]',
   },
-] as const
+]
 
 function Tag({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] tracking-[0.28em] uppercase font-sans text-amber-800/70 dark:text-amber-200/50 bg-amber-500/10 border border-amber-500/15">
+    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] tracking-[0.28em] uppercase font-sans text-foreground/55 bg-foreground/[0.04] border border-foreground/10">
       {children}
     </span>
   )
@@ -204,77 +106,102 @@ function useInView(threshold = 0.12) {
   useEffect(() => {
     const el = ref.current
     if (!el) return
-    const obs = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) setInView(true)
-    }, { threshold })
+    const obs = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) setInView(true)
+      },
+      { threshold },
+    )
     obs.observe(el)
     return () => obs.disconnect()
   }, [threshold])
   return { ref, inView }
 }
 
-function EnglishCard({
-  tool,
-  delay,
-}: {
-  tool: (typeof ENGLISH_TOOLS)[number]
-  delay: number
-}) {
+function EnglishCard({ tool, delay }: { tool: Tool; delay: number }) {
   const { ref, inView } = useInView()
-  const Icon = tool.icon
-  const Art = tool.Art
+  const tall = tool.span.includes('row-span')
+
   const inner = (
     <article
       ref={ref}
-      className={`group relative flex flex-col min-h-[340px] overflow-hidden rounded-2xl border border-amber-900/10 dark:border-amber-100/10 bg-gradient-to-b from-white/80 to-stone-50/60 dark:from-white/[0.04] dark:to-black/40 backdrop-blur-sm transition-all duration-500 ${tool.border} ${tool.glow} ${tool.live ? 'cursor-pointer' : 'opacity-75'}`}
+      className={cn(
+        'group relative overflow-hidden rounded-[1.35rem] border border-white/10 h-full',
+        tool.span,
+        tool.live ? 'cursor-pointer' : 'opacity-90',
+      )}
       style={{
         opacity: inView ? 1 : 0,
-        transform: inView ? 'translateY(0)' : 'translateY(24px)',
-        transition: `opacity 0.8s ease ${delay}ms, transform 0.8s ease ${delay}ms, box-shadow 0.4s ease, border-color 0.4s ease`,
+        transform: inView ? 'translateY(0)' : 'translateY(28px)',
+        transition: `opacity 0.85s ease ${delay}ms, transform 0.85s ease ${delay}ms`,
       }}
     >
-      <div className={`absolute inset-0 bg-gradient-to-br ${tool.accent} opacity-60 pointer-events-none`} />
-      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-amber-500/40 to-transparent" />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={tool.image}
+        alt={tool.imageAlt}
+        className="absolute inset-0 w-full h-full object-cover transition-transform duration-[900ms] ease-out group-hover:scale-[1.06]"
+      />
+      <div className={`absolute inset-0 bg-gradient-to-t ${tool.ink}`} />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.12),transparent_55%)]" />
 
-      <div className="absolute top-5 right-5 z-20 flex items-center gap-2">
-        {tool.live ? (
-          <span className="text-[9px] uppercase tracking-[0.25em] text-amber-700/80 dark:text-amber-300/70 px-2.5 py-1 rounded-full border border-amber-500/25 bg-amber-500/10 backdrop-blur-sm">
-            {tool.badge}
-          </span>
-        ) : (
-          <span className="inline-flex items-center gap-1 text-[9px] uppercase tracking-[0.25em] text-muted-foreground/70 px-2.5 py-1 rounded-full border border-border/60 bg-muted/30 backdrop-blur-sm">
-            <Lock className="size-2.5" />
-            {tool.badge}
-          </span>
+      {/* Giant typographic watermark */}
+      <div
+        className={cn(
+          'pointer-events-none absolute select-none text-white/[0.12] leading-none transition-all duration-700 ease-out group-hover:text-white/[0.18] group-hover:-translate-y-2 group-hover:translate-x-1',
+          tall
+            ? 'right-[-4%] top-[8%] text-[11rem] md:text-[14rem]'
+            : 'right-[-2%] top-[4%] text-[7rem] md:text-[8.5rem]',
         )}
+        style={{ fontFamily: display.style.fontFamily }}
+        aria-hidden
+      >
+        {tool.glyph}
       </div>
 
-      {/* Card illustration */}
-      <div className="relative h-48 overflow-hidden pointer-events-none text-amber-800/70 dark:text-amber-200/55">
-        <Art />
-        <div className="absolute inset-0 bg-gradient-to-t from-card via-card/10 to-transparent" />
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
-          <div className="size-14 rounded-2xl border border-amber-500/20 bg-white/60 dark:bg-black/40 backdrop-blur-md flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-500">
-            <Icon className="size-6 text-amber-800/70 dark:text-amber-200/60" strokeWidth={1.25} />
-          </div>
-        </div>
-      </div>
-
-      <div className="relative flex-1 flex flex-col px-7 pb-7 pt-3">
-        <span className="font-pixel text-[10px] text-muted-foreground/50 tracking-[0.35em]">{tool.n}</span>
-        <h3 className="mt-3 text-2xl font-light text-foreground tracking-tight leading-tight">
-          {tool.title}
-        </h3>
-        <p className="mt-3 text-sm text-muted-foreground leading-relaxed flex-1">{tool.desc}</p>
-        <div className="mt-5 flex items-center gap-2 text-[10px] uppercase tracking-[0.22em]">
+      <div className="relative z-10 flex h-full flex-col justify-between p-6 md:p-8">
+        <div className="flex items-start justify-between gap-3">
+          <span className="text-[10px] tracking-[0.35em] uppercase text-white/45">
+            {tool.n} · {tool.whisper}
+          </span>
           {tool.live ? (
-            <span className="text-amber-800/80 dark:text-amber-200/70 group-hover:translate-x-0.5 transition-transform inline-flex items-center gap-1.5">
-              Enter
-              <ArrowUpRight className="size-3.5 opacity-60 group-hover:opacity-100 transition-opacity" />
+            <span className="inline-flex size-8 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white/80 backdrop-blur-sm transition-all duration-500 group-hover:bg-white group-hover:text-stone-900">
+              <ArrowUpRight className="size-3.5" />
             </span>
           ) : (
-            <span className="text-muted-foreground/50">Coming soon</span>
+            <span className="text-[9px] tracking-[0.3em] uppercase text-white/35">Locked</span>
           )}
+        </div>
+
+        <div className={cn('mt-auto', tall && 'max-w-md')}>
+          <p
+            className="mb-3 text-sm italic text-white/55 transition-all duration-500 group-hover:text-white/80"
+            style={{ fontFamily: display.style.fontFamily }}
+          >
+            {tool.phonetic}
+          </p>
+          <h3
+            className={cn(
+              'font-light tracking-tight text-white leading-[1.05]',
+              tall ? 'text-4xl md:text-5xl' : 'text-2xl md:text-3xl',
+            )}
+            style={{ fontFamily: display.style.fontFamily }}
+          >
+            {tool.title}
+          </h3>
+          <p
+            className={cn(
+              'mt-3 text-sm text-white/55 leading-relaxed',
+              tall ? 'max-w-sm' : 'line-clamp-2',
+            )}
+          >
+            {tool.desc}
+          </p>
+          {tool.live ? (
+            <p className="mt-5 text-[10px] tracking-[0.28em] uppercase text-white/70 opacity-0 translate-y-2 transition-all duration-500 group-hover:opacity-100 group-hover:translate-y-0">
+              Open tool
+            </p>
+          ) : null}
         </div>
       </div>
     </article>
@@ -282,8 +209,94 @@ function EnglishCard({
 
   if (tool.href) {
     return (
-      <Link href={tool.href} className="block h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/40 rounded-2xl">
-        {inner}
+      <Link
+        href={tool.href}
+        className={cn('block focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 rounded-[1.35rem]', tool.span)}
+      >
+        <div className="h-full [&>article]:min-h-[inherit] [&>article]:md:min-h-[inherit]">
+          {/* reset span on inner so grid placement stays on Link */}
+          {(() => {
+            const { span: _s, ...rest } = { span: tool.span }
+            void _s
+            void rest
+            return null
+          })()}
+          <article
+            ref={ref}
+            className={cn(
+              'group relative overflow-hidden rounded-[1.35rem] border border-white/10 h-full min-h-[inherit]',
+              tool.live ? 'cursor-pointer' : 'opacity-90',
+              tool.span.includes('420') && 'min-h-[420px] md:min-h-[520px]',
+              tool.span.includes('260') && 'min-h-[260px] md:min-h-[250px]',
+              tool.n === '03' && 'min-h-[240px]',
+              tool.n === '04' && 'min-h-[240px] md:min-h-[250px]',
+            )}
+            style={{
+              opacity: inView ? 1 : 0,
+              transform: inView ? 'translateY(0)' : 'translateY(28px)',
+              transition: `opacity 0.85s ease ${delay}ms, transform 0.85s ease ${delay}ms`,
+            }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={tool.image}
+              alt={tool.imageAlt}
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-[900ms] ease-out group-hover:scale-[1.06]"
+            />
+            <div className={`absolute inset-0 bg-gradient-to-t ${tool.ink}`} />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.12),transparent_55%)]" />
+            <div
+              className={cn(
+                'pointer-events-none absolute select-none text-white/[0.12] leading-none transition-all duration-700 ease-out group-hover:text-white/[0.18] group-hover:-translate-y-2 group-hover:translate-x-1',
+                tall
+                  ? 'right-[-4%] top-[8%] text-[11rem] md:text-[14rem]'
+                  : 'right-[-2%] top-[4%] text-[7rem] md:text-[8.5rem]',
+              )}
+              style={{ fontFamily: display.style.fontFamily }}
+              aria-hidden
+            >
+              {tool.glyph}
+            </div>
+            <div className="relative z-10 flex h-full flex-col justify-between p-6 md:p-8">
+              <div className="flex items-start justify-between gap-3">
+                <span className="text-[10px] tracking-[0.35em] uppercase text-white/45">
+                  {tool.n} · {tool.whisper}
+                </span>
+                <span className="inline-flex size-8 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white/80 backdrop-blur-sm transition-all duration-500 group-hover:bg-white group-hover:text-stone-900">
+                  <ArrowUpRight className="size-3.5" />
+                </span>
+              </div>
+              <div className={cn('mt-auto', tall && 'max-w-md')}>
+                <p
+                  className="mb-3 text-sm italic text-white/55 transition-all duration-500 group-hover:text-white/80"
+                  style={{ fontFamily: display.style.fontFamily }}
+                >
+                  {tool.phonetic}
+                </p>
+                <h3
+                  className={cn(
+                    'font-light tracking-tight text-white leading-[1.05]',
+                    tall ? 'text-4xl md:text-5xl' : 'text-2xl md:text-3xl',
+                  )}
+                  style={{ fontFamily: display.style.fontFamily }}
+                >
+                  {tool.title}
+                </h3>
+                <p
+                  className={cn(
+                    'mt-3 text-sm text-white/55 leading-relaxed',
+                    tall ? 'max-w-sm' : 'line-clamp-2',
+                  )}
+                >
+                  {tool.desc}
+                </p>
+                <p className="mt-5 text-[10px] tracking-[0.28em] uppercase text-white/70 opacity-0 translate-y-2 transition-all duration-500 group-hover:opacity-100 group-hover:translate-y-0">
+                  Open tool
+                </p>
+              </div>
+            </div>
+          </article>
+        </div>
       </Link>
     )
   }
@@ -295,34 +308,41 @@ export function EnglishSuiteSection() {
   return (
     <section
       id="english"
-      className="relative py-32 px-6 md:px-12 lg:px-20 border-t border-amber-900/10 dark:border-amber-100/10 overflow-hidden"
+      className="relative py-32 px-6 md:px-12 lg:px-20 border-t border-border overflow-hidden"
     >
       <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute top-0 left-1/4 w-[600px] h-[400px] rounded-full bg-amber-200/15 dark:bg-amber-900/10 blur-[120px]" />
-        <div className="absolute bottom-0 right-0 w-[500px] h-[350px] rounded-full bg-stone-300/20 dark:bg-stone-800/15 blur-[100px]" />
+        <div className="absolute top-24 left-0 w-[420px] h-[420px] rounded-full bg-stone-400/10 dark:bg-white/[0.03] blur-[110px]" />
+        <div className="absolute bottom-0 right-10 w-[380px] h-[300px] rounded-full bg-sky-900/5 dark:bg-sky-400/[0.04] blur-[100px]" />
       </div>
 
       <div className="max-w-6xl mx-auto">
-        <div className="mb-16 md:mb-20">
-          <PixelIcon type="workflow" size={40} />
-          <div className="mt-4">
-            <Tag>English Suite</Tag>
+        <div className="mb-14 md:mb-16 flex flex-col md:flex-row md:items-end md:justify-between gap-8">
+          <div>
+            <PixelIcon type="workflow" size={40} />
+            <div className="mt-4">
+              <Tag>English Suite</Tag>
+            </div>
+            <RevealText className="mt-5 text-4xl md:text-5xl lg:text-[3.4rem] font-light tracking-tight leading-[1.08]">
+              {'Enjoy English.'}
+            </RevealText>
+            <p className="mt-5 text-sm md:text-base text-muted-foreground leading-relaxed max-w-md">
+              Language tools dressed like posters — dictionary and Wiktionary live now.
+            </p>
           </div>
-          <RevealText className="mt-5 text-4xl md:text-5xl lg:text-[3.25rem] font-light tracking-tight leading-[1.08]">
-            {'Enjoy English.'}
-          </RevealText>
-          <p className="mt-6 text-sm md:text-base text-muted-foreground leading-relaxed max-w-lg">
-            A curated collection of language tools — from a classic dictionary to Wiktionary.
+          <p
+            className="hidden md:block text-6xl lg:text-7xl italic text-foreground/[0.07] leading-none select-none"
+            style={{ fontFamily: display.style.fontFamily }}
+            aria-hidden
+          >
+            lexicon
           </p>
-          <div className="mt-8 h-px w-20 bg-gradient-to-r from-amber-500/60 to-transparent" />
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-5 auto-rows-fr">
           {ENGLISH_TOOLS.map((tool, i) => (
-            <EnglishCard key={tool.n} tool={tool} delay={i * 80} />
+            <EnglishCard key={tool.n} tool={tool} delay={i * 90} />
           ))}
         </div>
-
       </div>
     </section>
   )
