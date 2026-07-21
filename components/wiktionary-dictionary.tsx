@@ -57,6 +57,7 @@ function flagEmojiFromCc(cc: string): string {
 function langBadge(language: string, code?: string) {
   const cc = countryCode(language, code)
   return {
+    flag: cc ? `https://flagcdn.com/w160/${cc}.png` : null,
     emoji: cc ? flagEmojiFromCc(cc) : '🌐',
     short: (code ?? cc ?? language.slice(0, 2)).toUpperCase().slice(0, 3),
   }
@@ -166,17 +167,24 @@ function TranslationRail({
         if (t.audio) onPlay(audioId, t.audio)
       }}
       className={cn(
-        'group relative w-full text-left grid grid-cols-[3.5rem_1fr_auto] sm:grid-cols-[4.5rem_1fr_auto] items-center gap-3 sm:gap-5 py-4 sm:py-5 border-b border-border transition-colors',
+        'group relative w-full text-left grid grid-cols-[4.5rem_1fr_auto] sm:grid-cols-[5.5rem_1fr_auto] items-center gap-3 sm:gap-5 py-4 sm:py-5 border-b border-border transition-colors',
         active ? 'bg-muted/40' : 'hover:bg-muted/25',
       )}
     >
-      <div className="flex flex-col items-start gap-0.5 pl-1">
-        <span className="text-lg leading-none" aria-hidden>
-          {badge.emoji}
-        </span>
-        <span className="text-[10px] font-mono tracking-[0.12em] text-muted-foreground uppercase">
-          {badge.short}
-        </span>
+      <div className="relative size-14 sm:size-16 shrink-0 overflow-hidden rounded-xl border border-border bg-muted shadow-sm">
+        {badge.flag ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={badge.flag}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover"
+            loading="lazy"
+          />
+        ) : (
+          <span className="absolute inset-0 flex items-center justify-center text-2xl" aria-hidden>
+            {badge.emoji}
+          </span>
+        )}
       </div>
 
       <div className="min-w-0 relative">
@@ -188,6 +196,7 @@ function TranslationRail({
           {badge.short}
         </span>
         <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground mb-1">
+          <span className="font-mono mr-2 opacity-70">{badge.short}</span>
           {t.language}
         </p>
         <p
