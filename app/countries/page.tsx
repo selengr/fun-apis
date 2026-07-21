@@ -1,13 +1,23 @@
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
+import { Instrument_Serif } from 'next/font/google'
 import { CountriesExplorer } from '@/components/countries-explorer'
-import { PageHeader } from '@/components/page-header'
 import { ThemeToggle } from '@/components/theme-toggle'
 
+const display = Instrument_Serif({
+  subsets: ['latin'],
+  weight: '400',
+  style: ['normal', 'italic'],
+  variable: '--font-atlas-display',
+})
+
 export const metadata = {
-  title: 'World Atlas — Country Explorer',
-  description: 'Explore every country on Earth with REST Countries',
+  title: 'World Atlas — Countries',
+  description: 'Browse every country — flags, capitals, people, and place',
 }
+
+const EARTH =
+  'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=2000&q=80'
 
 const NAV_GLASS = {
   backdropFilter: 'blur(16px)',
@@ -18,19 +28,19 @@ const NAV_GLASS = {
 
 export default function CountriesPage() {
   return (
-    <main className="relative min-h-screen bg-background overflow-hidden">
+    <main className={`${display.variable} relative min-h-screen bg-background overflow-hidden`}>
+      {/* Earth atmosphere */}
       <div className="pointer-events-none fixed inset-0 -z-10">
-        <div className="absolute top-0 right-1/4 w-[500px] h-[500px] rounded-full bg-sky-400/[0.08] blur-[120px]" />
-        <div className="absolute bottom-0 left-1/4 w-[480px] h-[480px] rounded-full bg-emerald-400/[0.07] blur-[110px]" />
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full bg-violet-400/[0.05] blur-[140px]" />
-        <div
-          className="absolute inset-0 opacity-[0.02] dark:opacity-[0.04]"
-          style={{
-            backgroundImage:
-              'linear-gradient(var(--foreground) 1px, transparent 1px), linear-gradient(90deg, var(--foreground) 1px, transparent 1px)',
-            backgroundSize: '56px 56px',
-          }}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={EARTH}
+          alt=""
+          aria-hidden
+          className="absolute inset-0 w-full h-full object-cover object-center opacity-[0.18] dark:opacity-[0.32]"
         />
+        <div className="absolute inset-0 bg-background/75 dark:bg-background/60" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-transparent to-background" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,transparent_15%,var(--background)_90%)]" />
       </div>
 
       <div className="fixed top-4 inset-x-0 z-50 flex justify-center px-4 pointer-events-none">
@@ -47,14 +57,13 @@ export default function CountriesPage() {
             Back home
           </Link>
           <span className="font-pixel text-[10px] tracking-[0.2em] text-black/50 dark:text-white/50 hidden sm:inline">
-            WORLD ATLAS
+            ATLAS
           </span>
           <ThemeToggle />
         </div>
       </div>
 
-      <div className="pt-24 pb-6 md:pt-28">
-        <PageHeader title="Explore the world" />
+      <div className="pt-24 pb-20 md:pt-28">
         <CountriesExplorer />
       </div>
     </main>

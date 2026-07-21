@@ -16,44 +16,38 @@ import {
   Mountain,
   Car,
   Phone,
-  Shield,
-  Landmark,
-  Hash,
 } from 'lucide-react'
 import type { Country, CountriesResponse } from '@/types/restcountries'
-import { Input } from '@/components/ui/input'
+import { cn } from '@/lib/utils'
 
 type SearchMode = 'name' | 'capital' | 'code' | 'all'
 
 const REGIONS = ['Africa', 'Americas', 'Asia', 'Europe', 'Oceania'] as const
 
-const REGION_STYLES: Record<string, { bg: string; ring: string; dot: string }> = {
-  Africa: { bg: 'from-amber-500/15 to-orange-600/5', ring: 'ring-amber-500/20', dot: 'bg-amber-500' },
-  Americas: { bg: 'from-sky-500/15 to-blue-600/5', ring: 'ring-sky-500/20', dot: 'bg-sky-500' },
-  Asia: { bg: 'from-rose-500/15 to-pink-600/5', ring: 'ring-rose-500/20', dot: 'bg-rose-500' },
-  Europe: { bg: 'from-violet-500/15 to-indigo-600/5', ring: 'ring-violet-500/20', dot: 'bg-violet-500' },
-  Oceania: { bg: 'from-emerald-500/15 to-teal-600/5', ring: 'ring-emerald-500/20', dot: 'bg-emerald-500' },
+/** Region atmosphere — scenic Unsplash plates behind posters */
+const REGION_SCENES: Record<string, string> = {
+  Africa:
+    'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?auto=format&fit=crop&w=900&q=70',
+  Americas:
+    'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=900&q=70',
+  Asia:
+    'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=900&q=70',
+  Europe:
+    'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=900&q=70',
+  Oceania:
+    'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=900&q=70',
+  Other:
+    'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=900&q=70',
 }
 
-const MEMBERSHIP_LABELS: { key: keyof NonNullable<Country['memberships']>; label: string }[] = [
-  { key: 'un', label: 'UN' },
-  { key: 'eu', label: 'EU' },
-  { key: 'nato', label: 'NATO' },
-  { key: 'g7', label: 'G7' },
-  { key: 'g20', label: 'G20' },
-  { key: 'commonwealth', label: 'Commonwealth' },
-  { key: 'schengen', label: 'Schengen' },
-  { key: 'eurozone', label: 'Eurozone' },
-  { key: 'oecd', label: 'OECD' },
-  { key: 'brics', label: 'BRICS' },
-  { key: 'asean', label: 'ASEAN' },
-]
-
-const PAGE_SIZE = 24
+const PAGE_SIZE = 18
 
 function formatPopulation(n?: number) {
   if (!n) return '—'
-  return new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 }).format(n)
+  return new Intl.NumberFormat('en-US', {
+    notation: 'compact',
+    maximumFractionDigits: 1,
+  }).format(n)
 }
 
 function formatArea(km?: number) {
@@ -73,78 +67,87 @@ async function fetchCountries(params: Record<string, string>) {
   return json
 }
 
-function MembershipBadges({ memberships }: { memberships?: Country['memberships'] }) {
-  if (!memberships) return null
-  const active = MEMBERSHIP_LABELS.filter(m => memberships[m.key])
-  if (!active.length) return null
-  return (
-    <div className="flex flex-wrap gap-1.5">
-      {active.map(m => (
-        <span
-          key={m.key}
-          className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full border border-border/60 bg-muted/40 text-muted-foreground"
-        >
-          {m.label}
-        </span>
-      ))}
-    </div>
-  )
-}
-
-function CountryCard({
+function CountryPoster({
   country,
   selected,
   onSelect,
+  index,
 }: {
   country: Country
   selected: boolean
   onSelect: () => void
+  index: number
 }) {
   const region = country.region ?? 'Other'
-  const style = REGION_STYLES[region] ?? REGION_STYLES.Europe
+  const scene = REGION_SCENES[region] ?? REGION_SCENES.Other
+  const name = country.names?.common ?? '—'
+  const capital = country.capitals?.[0]?.name
 
   return (
     <motion.button
-      layout
       type="button"
+      layout
+      initial={{ opacity: 0, y: 18 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.96 }}
+      transition={{ delay: Math.min(index * 0.03, 0.25), duration: 0.45 }}
       onClick={onSelect}
-      className={`group relative text-left w-full rounded-2xl border overflow-hidden transition-all duration-300 ${
+      className={cn(
+        'group relative aspect-[3/4] w-full overflow-hidden rounded-[1.25rem] border text-left transition-all duration-500',
         selected
-          ? `border-foreground/30 shadow-lg scale-[1.02] ring-2 ${style.ring}`
-          : 'border-border/50 hover:border-border hover:scale-[1.02] hover:shadow-md'
-      }`}
+          ? 'border-foreground/40 ring-2 ring-foreground/20 scale-[1.01]'
+          : 'border-white/10 dark:border-white/10 hover:border-foreground/25',
+      )}
     >
-      {/* Large flag image */}
-      <div className="relative aspect-[3/2] overflow-hidden bg-muted/30">
+      {/* Scenic region plate */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={scene}
+        alt=""
+        aria-hidden
+        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.06]"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/55 to-black/20" />
+
+      {/* Flag as vertical ribbon */}
+      <div className="absolute top-0 bottom-0 left-0 w-[28%] overflow-hidden border-r border-white/10">
         {country.flag?.url_png ? (
+          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={country.flag.url_png}
-            alt={`${country.names?.common} flag`}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover scale-110 opacity-90"
             loading="lazy"
-            className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
         ) : (
-          <span className="absolute inset-0 flex items-center justify-center text-5xl">
+          <div className="absolute inset-0 flex items-center justify-center bg-black/40 text-4xl">
             {country.flag?.emoji ?? '🏳️'}
-          </span>
+          </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-        <span className="absolute top-2 right-2 text-[10px] font-mono text-white/90 bg-black/40 backdrop-blur-sm px-1.5 py-0.5 rounded-md tabular-nums">
-          {country.codes?.alpha_2}
-        </span>
-        <span className="absolute bottom-2 left-2 text-2xl drop-shadow">{country.flag?.emoji}</span>
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/40" />
       </div>
 
-      {/* Meta */}
-      <div className="relative p-3 bg-card/70 backdrop-blur-sm">
-        <div className={`absolute top-0 left-0 w-full h-0.5 ${style.dot} opacity-70`} />
-        <p className="font-medium text-sm text-foreground truncate">{country.names?.common}</p>
-        <div className="flex items-center justify-between mt-1">
-          <p className="text-[11px] text-muted-foreground truncate">{country.subregion ?? country.region}</p>
-          <p className="text-[11px] font-mono text-muted-foreground/80 tabular-nums shrink-0 ml-2">
-            {formatPopulation(country.population)}
-          </p>
-        </div>
+      <div className="absolute top-3 right-3">
+        <span className="font-mono text-[10px] tracking-[0.2em] text-white/70 bg-black/35 backdrop-blur-sm px-2 py-1 rounded-md">
+          {country.codes?.alpha_2}
+        </span>
+      </div>
+
+      <div className="absolute inset-x-0 bottom-0 p-4 pl-[32%] sm:p-5 sm:pl-[32%]">
+        <p className="text-[9px] uppercase tracking-[0.28em] text-white/50 mb-1.5">
+          {region}
+        </p>
+        <h3
+          className="text-xl sm:text-2xl font-light text-white leading-tight tracking-tight line-clamp-2"
+          style={{ fontFamily: 'var(--font-atlas-display), Georgia, serif' }}
+        >
+          {name}
+        </h3>
+        <p className="mt-2 text-xs text-white/55 truncate">
+          {capital ? capital : '—'}
+          <span className="mx-1.5 text-white/25">·</span>
+          {formatPopulation(country.population)}
+        </p>
       </div>
     </motion.button>
   )
@@ -152,7 +155,7 @@ function CountryCard({
 
 function CountryDetail({ country, onClose }: { country: Country; onClose: () => void }) {
   const region = country.region ?? 'Other'
-  const style = REGION_STYLES[region] ?? REGION_STYLES.Europe
+  const scene = REGION_SCENES[region] ?? REGION_SCENES.Other
   const capital = country.capitals?.[0]?.name
   const demonym = country.demonyms?.eng?.m ?? country.demonyms?.eng?.f
 
@@ -161,72 +164,96 @@ function CountryDetail({ country, onClose }: { country: Country; onClose: () => 
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 16 }}
-      className={`relative rounded-3xl border border-border/50 overflow-hidden bg-gradient-to-br ${style.bg} via-card/90 to-card/80 backdrop-blur-xl`}
+      className="relative overflow-hidden rounded-[1.5rem] border border-border"
     >
-      <div
-        className="absolute inset-0 opacity-[0.03]"
-        style={{
-          backgroundImage:
-            'linear-gradient(var(--foreground) 1px, transparent 1px), linear-gradient(90deg, var(--foreground) 1px, transparent 1px)',
-          backgroundSize: '24px 24px',
-        }}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={scene}
+        alt=""
+        aria-hidden
+        className="absolute inset-0 w-full h-full object-cover opacity-40 dark:opacity-50"
       />
+      <div className="absolute inset-0 bg-background/80 dark:bg-background/75 backdrop-blur-md" />
 
       <button
         type="button"
         onClick={onClose}
-        className="absolute top-4 right-4 z-10 size-8 rounded-full border border-border/60 bg-card/80 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+        className="absolute top-4 right-4 z-20 size-9 rounded-full border border-border bg-card/80 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
         aria-label="Close"
       >
         <X className="size-4" />
       </button>
 
-      <div className="relative p-6 md:p-8">
+      <div className="relative z-10 p-6 md:p-8">
         <div className="flex flex-col md:flex-row gap-6 md:gap-10">
-          <div className="flex flex-col items-center md:items-start shrink-0">
-            {country.flag?.url_png ? (
-              <img
-                src={country.flag.url_png}
-                alt={`${country.names?.common} flag`}
-                className="w-48 h-32 md:w-56 md:h-36 object-cover rounded-2xl border border-border/40 shadow-lg"
-              />
-            ) : (
-              <span className="text-7xl">{country.flag?.emoji ?? '🏳️'}</span>
-            )}
+          <div className="shrink-0 w-full md:w-56">
+            <div className="relative aspect-[3/2] overflow-hidden rounded-2xl border border-border shadow-lg">
+              {country.flag?.url_png ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={country.flag.url_png}
+                  alt={`${country.names?.common} flag`}
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+              ) : (
+                <span className="absolute inset-0 flex items-center justify-center text-6xl bg-muted">
+                  {country.flag?.emoji ?? '🏳️'}
+                </span>
+              )}
+            </div>
           </div>
 
           <div className="flex-1 min-w-0">
-            <div className="flex flex-wrap items-center gap-2 mb-2">
-              <span className={`size-2 rounded-full ${style.dot}`} />
-              <span className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-                {country.region} · {country.subregion}
+            <p className="text-[10px] uppercase tracking-[0.28em] text-muted-foreground mb-2">
+              {country.region}
+              {country.subregion ? ` · ${country.subregion}` : ''}
+            </p>
+            <div className="flex items-baseline gap-3 flex-wrap">
+              <span className="text-3xl" aria-hidden>
+                {country.flag?.emoji}
               </span>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <span className="text-4xl">{country.flag?.emoji}</span>
-              <h2 className="text-3xl md:text-4xl font-light tracking-tight text-foreground">
+              <h2
+                className="text-3xl md:text-5xl font-light tracking-tight text-foreground leading-none"
+                style={{ fontFamily: 'var(--font-atlas-display), Georgia, serif' }}
+              >
                 {country.names?.common}
               </h2>
             </div>
-            {country.names?.official && country.names.official !== country.names.common && (
-              <p className="text-sm text-muted-foreground mt-1 italic">{country.names.official}</p>
-            )}
-
-            {demonym && (
-              <p className="text-sm text-muted-foreground mt-2">
-                People here are called <span className="text-foreground">{demonym}</span>
+            {country.names?.official &&
+            country.names.official !== country.names.common ? (
+              <p className="mt-2 text-sm italic text-muted-foreground">{country.names.official}</p>
+            ) : null}
+            {demonym ? (
+              <p className="mt-2 text-sm text-muted-foreground">
+                People here are called{' '}
+                <span className="text-foreground">{demonym}</span>
               </p>
-            )}
+            ) : null}
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6">
+            <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-px rounded-xl overflow-hidden border border-border bg-border">
               {[
                 { icon: MapPin, label: 'Capital', value: capital ?? '—' },
-                { icon: Users, label: 'Population', value: formatPopulation(country.population) },
-                { icon: Mountain, label: 'Area', value: formatArea(country.area?.kilometers) },
-                { icon: Globe2, label: 'Borders', value: country.borders?.length ? `${country.borders.length} countries` : country.landlocked ? 'Landlocked' : '—' },
+                {
+                  icon: Users,
+                  label: 'Population',
+                  value: formatPopulation(country.population),
+                },
+                {
+                  icon: Mountain,
+                  label: 'Area',
+                  value: formatArea(country.area?.kilometers),
+                },
+                {
+                  icon: Globe2,
+                  label: 'Borders',
+                  value: country.borders?.length
+                    ? `${country.borders.length}`
+                    : country.landlocked
+                      ? 'Landlocked'
+                      : '—',
+                },
               ].map(s => (
-                <div key={s.label} className="rounded-xl border border-border/50 bg-card/50 p-3">
+                <div key={s.label} className="bg-card/90 p-3">
                   <div className="flex items-center gap-1.5 text-muted-foreground mb-1">
                     <s.icon className="size-3" />
                     <span className="text-[10px] uppercase tracking-wider">{s.label}</span>
@@ -237,39 +264,33 @@ function CountryDetail({ country, onClose }: { country: Country; onClose: () => 
             </div>
 
             <div className="mt-6 space-y-4">
-              {country.languages && country.languages.length > 0 && (
+              {country.languages && country.languages.length > 0 ? (
                 <div>
                   <div className="flex items-center gap-1.5 text-muted-foreground mb-2">
                     <Languages className="size-3.5" />
                     <span className="text-[10px] uppercase tracking-wider">Languages</span>
                   </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {country.languages.map(l => (
-                      <span key={l.name} className="text-xs px-2.5 py-1 rounded-full bg-muted/50 border border-border/40">
-                        {l.name}
-                      </span>
-                    ))}
-                  </div>
+                  <p className="text-sm text-foreground/80 leading-relaxed">
+                    {country.languages.map(l => l.name).filter(Boolean).join(' · ')}
+                  </p>
                 </div>
-              )}
+              ) : null}
 
-              {country.currencies && country.currencies.length > 0 && (
+              {country.currencies && country.currencies.length > 0 ? (
                 <div>
                   <div className="flex items-center gap-1.5 text-muted-foreground mb-2">
                     <Coins className="size-3.5" />
                     <span className="text-[10px] uppercase tracking-wider">Currency</span>
                   </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {country.currencies.map(c => (
-                      <span key={c.code} className="text-xs px-2.5 py-1 rounded-full bg-muted/50 border border-border/40 font-mono">
-                        {c.symbol} {c.code} — {c.name}
-                      </span>
-                    ))}
-                  </div>
+                  <p className="text-sm font-mono text-foreground/80">
+                    {country.currencies
+                      .map(c => `${c.symbol ?? ''} ${c.code}`.trim())
+                      .join(' · ')}
+                  </p>
                 </div>
-              )}
+              ) : null}
 
-              {country.timezones && country.timezones.length > 0 && (
+              {country.timezones && country.timezones.length > 0 ? (
                 <div>
                   <div className="flex items-center gap-1.5 text-muted-foreground mb-2">
                     <Clock className="size-3.5" />
@@ -277,56 +298,47 @@ function CountryDetail({ country, onClose }: { country: Country; onClose: () => 
                   </div>
                   <p className="text-xs text-muted-foreground leading-relaxed">
                     {country.timezones.slice(0, 4).join(' · ')}
-                    {country.timezones.length > 4 && ` · +${country.timezones.length - 4} more`}
+                    {country.timezones.length > 4
+                      ? ` · +${country.timezones.length - 4} more`
+                      : ''}
                   </p>
                 </div>
-              )}
+              ) : null}
 
-              <div>
-                <div className="flex items-center gap-1.5 text-muted-foreground mb-2">
-                  <Shield className="size-3.5" />
-                  <span className="text-[10px] uppercase tracking-wider">Memberships</span>
-                </div>
-                <MembershipBadges memberships={country.memberships} />
-              </div>
-
-              <div className="flex flex-wrap gap-4 text-xs text-muted-foreground pt-2">
-                {country.cars?.driving_side && (
+              <div className="flex flex-wrap gap-4 text-xs text-muted-foreground pt-1">
+                {country.cars?.driving_side ? (
                   <span className="inline-flex items-center gap-1">
                     <Car className="size-3" /> Drives on the {country.cars.driving_side}
                   </span>
-                )}
-                {country.calling_codes?.[0] && (
+                ) : null}
+                {country.calling_codes?.[0] ? (
                   <span className="inline-flex items-center gap-1">
                     <Phone className="size-3" /> +{country.calling_codes[0]}
                   </span>
-                )}
-                {country.units?.measurement_system && (
-                  <span>{country.units.measurement_system} · {country.units.temperature_scale ?? '°C'}</span>
-                )}
+                ) : null}
               </div>
 
-              <div className="flex flex-wrap gap-2 pt-2">
-                {country.links?.wikipedia && (
+              <div className="flex flex-wrap gap-2 pt-1">
+                {country.links?.wikipedia ? (
                   <a
                     href={country.links.wikipedia}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border border-border/60 hover:bg-muted/40 transition-colors"
+                    className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border border-border hover:bg-muted/50 transition-colors"
                   >
                     Wikipedia <ExternalLink className="size-3" />
                   </a>
-                )}
-                {country.links?.google_maps && (
+                ) : null}
+                {country.links?.google_maps ? (
                   <a
                     href={country.links.google_maps}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border border-border/60 hover:bg-muted/40 transition-colors"
+                    className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border border-border hover:bg-muted/50 transition-colors"
                   >
-                    Google Maps <ExternalLink className="size-3" />
+                    Maps <ExternalLink className="size-3" />
                   </a>
-                )}
+                ) : null}
               </div>
             </div>
           </div>
@@ -337,10 +349,10 @@ function CountryDetail({ country, onClose }: { country: Country; onClose: () => 
 }
 
 const MODE_OPTIONS: { key: SearchMode; label: string; placeholder: string }[] = [
-  { key: 'name', label: 'Name', placeholder: 'Search a country — Canada, Japan, ger…' },
-  { key: 'capital', label: 'Capital', placeholder: 'Search a capital — Tokyo, Paris…' },
-  { key: 'code', label: 'Code', placeholder: 'Search a code — CA, USA, JP…' },
-  { key: 'all', label: 'Anything', placeholder: 'Free text across every field…' },
+  { key: 'name', label: 'Name', placeholder: 'Find a country…' },
+  { key: 'capital', label: 'Capital', placeholder: 'Find a capital…' },
+  { key: 'code', label: 'Code', placeholder: 'CA, JP, BR…' },
+  { key: 'all', label: 'Anything', placeholder: 'Search anything…' },
 ]
 
 export function CountriesExplorer() {
@@ -354,7 +366,6 @@ export function CountriesExplorer() {
   const [selected, setSelected] = useState<Country | null>(null)
   const [page, setPage] = useState(0)
 
-  // Build request params from current state
   const buildParams = useCallback(
     (pageIndex: number): Record<string, string> => {
       const params: Record<string, string> = {
@@ -374,36 +385,36 @@ export function CountriesExplorer() {
       if (mode === 'name') params.path = 'name'
       else if (mode === 'code') params.path = 'code'
       else if (mode === 'capital') params.path = 'capitals'
-      // 'all' → free text on base endpoint (no path)
       params.q = q
       return params
     },
     [query, mode, region],
   )
 
-  // Single source of truth for fetching, guarded against races
   const reqId = useRef(0)
-  const runFetch = useCallback(async (pageIndex: number) => {
-    const id = ++reqId.current
-    setLoading(true)
-    setError(null)
-    try {
-      const json = await fetchCountries(buildParams(pageIndex))
-      if (id !== reqId.current) return // stale response, ignore
-      const list = json.data?.objects ?? []
-      setCountries(list)
-      setTotal(json.data?.meta?.total ?? list.length)
-    } catch (err) {
-      if (id !== reqId.current) return
-      setError(err instanceof Error ? err.message : 'Something went wrong')
-      setCountries([])
-      setTotal(0)
-    } finally {
-      if (id === reqId.current) setLoading(false)
-    }
-  }, [buildParams])
+  const runFetch = useCallback(
+    async (pageIndex: number) => {
+      const id = ++reqId.current
+      setLoading(true)
+      setError(null)
+      try {
+        const json = await fetchCountries(buildParams(pageIndex))
+        if (id !== reqId.current) return
+        const list = json.data?.objects ?? []
+        setCountries(list)
+        setTotal(json.data?.meta?.total ?? list.length)
+      } catch (err) {
+        if (id !== reqId.current) return
+        setError(err instanceof Error ? err.message : 'Something went wrong')
+        setCountries([])
+        setTotal(0)
+      } finally {
+        if (id === reqId.current) setLoading(false)
+      }
+    },
+    [buildParams],
+  )
 
-  // Reset to first page whenever the query/mode/region changes, with debounce
   useEffect(() => {
     const delay = query ? 350 : 0
     const t = setTimeout(() => {
@@ -438,117 +449,101 @@ export function CountriesExplorer() {
   }, [])
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
-  const currentPlaceholder = MODE_OPTIONS.find(m => m.key === mode)?.placeholder ?? ''
+  const currentPlaceholder =
+    MODE_OPTIONS.find(m => m.key === mode)?.placeholder ?? ''
 
   const subtitle = useMemo(() => {
-    if (loading) return 'Loading the atlas…'
+    if (loading) return 'Opening the atlas…'
     if (error) return ''
-    if (region && query.trim()) return `${total} in ${region} matching "${query.trim()}"`
+    if (region && query.trim()) return `${total} in ${region} matching “${query.trim()}”`
     if (region) return `${total} countries in ${region}`
-    if (query.trim()) return `${total} matches for "${query.trim()}"`
-    return `${total} countries · browse or search`
+    if (query.trim()) return `${total} matches for “${query.trim()}”`
+    return `${total} countries`
   }, [loading, error, total, region, query])
 
   return (
-    <div className="max-w-6xl mx-auto px-4 pb-16 space-y-6">
-      {/* Global stats strip — crypto-style */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
+    <div className="max-w-5xl mx-auto px-5 md:px-6 space-y-10">
+      {/* Hero + search */}
+      <motion.header
+        initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
-        className="grid grid-cols-2 lg:grid-cols-4 gap-3"
+        className="text-center pt-2"
       >
-        {[
-          { icon: Globe2, label: 'Countries', value: total ? String(total) : '249', sub: 'in the dataset', accent: 'from-sky-500/20 to-transparent' },
-          { icon: MapPin, label: 'Regions', value: '5', sub: 'Africa → Oceania', accent: 'from-emerald-500/20 to-transparent' },
-          { icon: Languages, label: 'Languages', value: '7k+', sub: 'spoken worldwide', accent: 'from-rose-500/20 to-transparent' },
-          { icon: Hash, label: 'Fields', value: '90+', sub: 'per country', accent: 'from-violet-500/20 to-transparent' },
-        ].map((s, i) => (
-          <motion.div
-            key={s.label}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.06 }}
-            className="group relative overflow-hidden rounded-2xl border border-border/50 bg-card/40 backdrop-blur-xl p-4 hover:border-border transition-colors"
-          >
-            <div className={`absolute inset-0 bg-gradient-to-br ${s.accent} opacity-60 group-hover:opacity-100 transition-opacity`} />
-            <div className="relative">
-              <div className="flex items-center gap-2 text-muted-foreground mb-2">
-                <s.icon className="size-3.5" />
-                <span className="text-[10px] uppercase tracking-[0.15em]">{s.label}</span>
-              </div>
-              <p className="text-xl md:text-2xl font-semibold tabular-nums tracking-tight text-foreground">
-                {s.value}
-              </p>
-              <p className="text-[11px] text-muted-foreground mt-1">{s.sub}</p>
-            </div>
-          </motion.div>
-        ))}
-      </motion.div>
+        <p className="text-[10px] uppercase tracking-[0.35em] text-muted-foreground mb-3">
+          World atlas
+        </p>
+        <h1
+          className="text-[clamp(2.75rem,10vw,5rem)] font-light tracking-tight text-foreground leading-none"
+          style={{ fontFamily: 'var(--font-atlas-display), Georgia, serif' }}
+        >
+          Explore the world
+        </h1>
+        <p className="mt-4 text-sm text-muted-foreground max-w-md mx-auto">
+          Travel-poster countries — search, filter by region, or surprise yourself.
+        </p>
+      </motion.header>
 
-      {/* Search toolbar */}
-      <div className="rounded-2xl border border-border/50 bg-card/30 backdrop-blur-xl p-4 md:p-5 space-y-4">
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-            <Input
-              value={query}
-              onChange={e => setQuery(e.target.value)}
-              placeholder={currentPlaceholder}
-              className="pl-10 h-11 rounded-2xl bg-card/50 border-border/60"
-            />
-            {query && (
-              <button
-                type="button"
-                onClick={() => setQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                aria-label="Clear"
-              >
-                <X className="size-4" />
-              </button>
-            )}
-          </div>
+      <div className="max-w-2xl mx-auto space-y-5">
+        <form
+          onSubmit={e => e.preventDefault()}
+          className="relative flex items-center gap-3 border-b-2 border-foreground/15 focus-within:border-foreground transition-colors pb-3"
+        >
+          <Search className="size-5 text-muted-foreground shrink-0" />
+          <input
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            placeholder={currentPlaceholder}
+            className="flex-1 bg-transparent text-xl md:text-2xl font-light tracking-tight text-foreground placeholder:text-muted-foreground/45 outline-none min-w-0"
+            style={{ fontFamily: 'var(--font-atlas-display), Georgia, serif' }}
+          />
+          {query ? (
+            <button
+              type="button"
+              onClick={() => setQuery('')}
+              className="size-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              aria-label="Clear"
+            >
+              <X className="size-4" />
+            </button>
+          ) : null}
           <button
             type="button"
             onClick={surpriseMe}
-            className="inline-flex items-center justify-center gap-2 h-11 px-4 rounded-2xl border border-border/60 bg-card/50 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-all shrink-0"
+            className="shrink-0 inline-flex items-center gap-1.5 h-9 px-3 rounded-full border border-border text-[11px] uppercase tracking-[0.15em] text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
           >
             <Shuffle className="size-3.5" />
-            Surprise me
+            Surprise
           </button>
+        </form>
+
+        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+          {MODE_OPTIONS.map(opt => (
+            <button
+              key={opt.key}
+              type="button"
+              onClick={() => setMode(opt.key)}
+              className={cn(
+                'text-xs tracking-wide transition-colors',
+                mode === opt.key
+                  ? 'text-foreground underline underline-offset-4'
+                  : 'text-muted-foreground hover:text-foreground',
+              )}
+            >
+              {opt.label}
+            </button>
+          ))}
         </div>
 
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-          <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="text-[10px] uppercase tracking-wider text-muted-foreground/70 mr-1">Search by</span>
-            {MODE_OPTIONS.map(opt => (
-              <button
-                key={opt.key}
-                type="button"
-                onClick={() => setMode(opt.key)}
-                className={`text-[11px] px-3 py-1.5 rounded-full border transition-all ${
-                  mode === opt.key
-                    ? 'bg-foreground text-background border-foreground font-medium'
-                    : 'bg-card/40 text-muted-foreground border-border/60 hover:text-foreground'
-                }`}
-              >
-                {opt.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="flex flex-wrap gap-1.5">
-          <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider text-muted-foreground/70 mr-1">
-            <Landmark className="size-3" /> Region
-          </span>
+        <div className="flex flex-wrap items-center justify-center gap-2">
           <button
             type="button"
             onClick={() => setRegion(null)}
-            className={`text-[11px] px-3 py-1.5 rounded-full border transition-all ${
+            className={cn(
+              'text-[11px] px-3 py-1.5 rounded-full border transition-all',
               !region
                 ? 'bg-foreground text-background border-foreground'
-                : 'bg-card/40 text-muted-foreground border-border/60 hover:text-foreground'
-            }`}
+                : 'border-border text-muted-foreground hover:text-foreground',
+            )}
           >
             All
           </button>
@@ -557,38 +552,44 @@ export function CountriesExplorer() {
               key={r}
               type="button"
               onClick={() => setRegion(r === region ? null : r)}
-              className={`text-[11px] px-3 py-1.5 rounded-full border transition-all ${
+              className={cn(
+                'text-[11px] px-3 py-1.5 rounded-full border transition-all',
                 region === r
                   ? 'bg-foreground text-background border-foreground'
-                  : 'bg-card/40 text-muted-foreground border-border/60 hover:text-foreground'
-              }`}
+                  : 'border-border text-muted-foreground hover:text-foreground',
+              )}
             >
               {r}
             </button>
           ))}
         </div>
 
-        <p className="text-[11px] text-muted-foreground">{subtitle}</p>
+        <p className="text-center text-[11px] text-muted-foreground">{subtitle}</p>
       </div>
 
-      {error && (
-        <p className="text-sm text-red-400 text-center rounded-xl border border-red-500/20 bg-red-500/10 py-2 px-4">
+      {error ? (
+        <p className="text-sm text-destructive text-center rounded-xl border border-destructive/20 bg-destructive/10 py-2 px-4">
           {error}
         </p>
-      )}
+      ) : null}
 
-      {/* Selected country detail */}
       <AnimatePresence mode="wait">
-        {selected && (
-          <CountryDetail key={selected.codes?.alpha_3} country={selected} onClose={() => setSelected(null)} />
-        )}
+        {selected ? (
+          <CountryDetail
+            key={selected.codes?.alpha_3}
+            country={selected}
+            onClose={() => setSelected(null)}
+          />
+        ) : null}
       </AnimatePresence>
 
-      {/* Country grid */}
       {loading && countries.length === 0 ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-          {Array.from({ length: 12 }).map((_, i) => (
-            <div key={i} className="aspect-[3/2] rounded-2xl bg-muted/30 animate-pulse" />
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-5">
+          {Array.from({ length: 9 }).map((_, i) => (
+            <div
+              key={i}
+              className="aspect-[3/4] rounded-[1.25rem] bg-muted/50 animate-pulse"
+            />
           ))}
         </div>
       ) : countries.length === 0 ? (
@@ -597,52 +598,44 @@ export function CountriesExplorer() {
           <p className="text-sm">No countries found. Try a different search.</p>
         </div>
       ) : (
-        <motion.div layout className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-5">
           <AnimatePresence mode="popLayout">
             {countries.map((c, i) => (
-              <motion.div
+              <CountryPoster
                 key={c.codes?.alpha_3 ?? c.names?.common ?? i}
-                layout
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ delay: Math.min(i * 0.02, 0.2) }}
-              >
-                <CountryCard
-                  country={c}
-                  selected={selected?.codes?.alpha_3 === c.codes?.alpha_3}
-                  onSelect={() => setSelected(c)}
-                />
-              </motion.div>
+                country={c}
+                index={i}
+                selected={selected?.codes?.alpha_3 === c.codes?.alpha_3}
+                onSelect={() => setSelected(c)}
+              />
             ))}
           </AnimatePresence>
-        </motion.div>
+        </div>
       )}
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2 pt-4">
+      {totalPages > 1 ? (
+        <div className="flex items-center justify-center gap-3 pt-2">
           <button
             type="button"
             disabled={page === 0 || loading}
             onClick={() => goToPage(page - 1)}
-            className="text-xs px-4 py-2 rounded-full border border-border/60 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-muted/30 transition-colors"
+            className="text-xs px-4 py-2 rounded-full border border-border disabled:opacity-40 hover:bg-muted/40 transition-colors"
           >
             ← Prev
           </button>
-          <span className="text-xs text-muted-foreground tabular-nums px-2">
-            Page {page + 1} of {totalPages}
+          <span className="text-xs text-muted-foreground tabular-nums">
+            {page + 1} / {totalPages}
           </span>
           <button
             type="button"
             disabled={page + 1 >= totalPages || loading}
             onClick={() => goToPage(page + 1)}
-            className="text-xs px-4 py-2 rounded-full border border-border/60 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-muted/30 transition-colors"
+            className="text-xs px-4 py-2 rounded-full border border-border disabled:opacity-40 hover:bg-muted/40 transition-colors"
           >
             Next →
           </button>
         </div>
-      )}
+      ) : null}
     </div>
   )
 }
