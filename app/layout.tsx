@@ -14,13 +14,14 @@ const _ibmPlexSans = IBM_Plex_Sans({ weight: ["300", "400", "500", "600"], subse
 
 export const metadata: Metadata = {
   title: {
-    default: 'Fun APIs — Live playground of useful tools',
-    template: '%s · Fun APIs',
+    default: 'Reza Karbakhsh — Live playground of useful tools',
+    template: '%s · Reza',
   },
   description:
-    'A personal playground of live APIs and explorers — books, dictionary, Wiktionary, world atlas, markets, forex, photos, poetry, IP location, QR codes, and more.',
+    'Reza Karbakhsh’s personal playground of live APIs and explorers — books, dictionary, Wiktionary, world atlas, markets, forex, photos, poetry, IP location, QR codes, and more.',
   keywords: [
-    'fun APIs',
+    'Reza Karbakhsh',
+    'Reza',
     'dictionary',
     'Wiktionary',
     'Open Library',
@@ -33,20 +34,21 @@ export const metadata: Metadata = {
     'QR code',
     'photo gallery',
   ],
-  authors: [{ name: 'Fun APIs' }],
+  authors: [{ name: 'Reza Karbakhsh' }],
   openGraph: {
-    title: 'Fun APIs — Live playground of useful tools',
+    title: 'Reza Karbakhsh — Live playground of useful tools',
     description:
-      'Explore books, language tools, world countries, markets, photos, poetry, and more — all powered by live APIs.',
+      'Explore books, language tools, world countries, markets, photos, poetry, and more — built by Reza.',
     type: 'website',
-    siteName: 'Fun APIs',
+    siteName: 'Reza Karbakhsh',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Fun APIs — Live playground of useful tools',
+    title: 'Reza Karbakhsh — Live playground of useful tools',
     description:
-      'Explore books, language tools, world countries, markets, photos, poetry, and more — all powered by live APIs.',
+      'Explore books, language tools, world countries, markets, photos, poetry, and more — built by Reza.',
   },
+
   icons: {
     icon: [
       {
