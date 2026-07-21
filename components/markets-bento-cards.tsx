@@ -273,7 +273,7 @@ export function MarketsBentoCards() {
       <Link href="/forex" className="col-span-12 md:col-span-4 block">
         <MarketBentoCard
           className="p-0 min-h-[200px] h-full cursor-pointer overflow-hidden relative"
-          style={{ background: '#050e0a', borderColor: 'rgba(16,185,129,0.15)' }}
+          style={{ background: '#0f1714', borderColor: 'rgba(16,185,129,0.18)' }}
           delay={160}
         >
           <svg
@@ -287,9 +287,9 @@ export function MarketsBentoCards() {
                 <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
               </linearGradient>
               <linearGradient id="fd" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#050e0a" stopOpacity="0" />
-                <stop offset="55%" stopColor="#050e0a" stopOpacity=".7" />
-                <stop offset="100%" stopColor="#050e0a" stopOpacity="1" />
+                <stop offset="0%" stopColor="#0f1714" stopOpacity="0" />
+                <stop offset="55%" stopColor="#0f1714" stopOpacity=".65" />
+                <stop offset="100%" stopColor="#0f1714" stopOpacity="1" />
               </linearGradient>
             </defs>
             <line x1="0" y1="60" x2="300" y2="60" stroke="#10b981" strokeWidth=".3" opacity=".12" />
@@ -340,7 +340,7 @@ export function MarketsBentoCards() {
       {/* Coming soon */}
       <MarketBentoCard
         className="col-span-12 md:col-span-4 p-0 min-h-[200px] overflow-hidden relative"
-        style={{ background: '#111110', borderColor: 'rgba(255,255,255,0.08)' }}
+        style={{ background: '#161513', borderColor: 'rgba(255,255,255,0.1)' }}
         delay={200}
       >
         <svg className="absolute inset-0 w-full h-full" viewBox="0 0 300 240" preserveAspectRatio="none">
