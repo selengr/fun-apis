@@ -1,39 +1,40 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState, type ElementType } from 'react'
-import { motion } from 'framer-motion'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Instrument_Serif, Space_Grotesk } from 'next/font/google'
 import {
-  Globe,
-  MapPin,
-  Clock,
-  Wifi,
-  Coins,
   RefreshCw,
-  Sparkles,
-  Navigation,
-  Building2,
-  Languages,
-  Shield,
   Crosshair,
-  Satellite,
-  LocateFixed,
   Search,
-  ShieldAlert,
-  ShieldCheck,
-  Server,
-  Bot,
   Copy,
   Check,
+  Globe,
+  ArrowLeft,
 } from 'lucide-react'
+import Link from 'next/link'
 import type { IpstackData } from '@/types/ipstack'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
+import { ThemeToggle } from '@/components/theme-toggle'
+import { cn } from '@/lib/utils'
+
+const serif = Instrument_Serif({
+  subsets: ['latin'],
+  weight: '400',
+  style: ['normal', 'italic'],
+})
+
+const grotesk = Space_Grotesk({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+})
+
+const ATMOSPHERE =
+  'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=2000&q=80'
 
 function formatLocalTime(iso: string) {
   try {
     return new Intl.DateTimeFormat(undefined, {
-      weekday: 'long',
+      weekday: 'short',
       hour: 'numeric',
       minute: '2-digit',
       timeZoneName: 'short',
@@ -53,10 +54,6 @@ interface PreciseLocation {
   countryName?: string
 }
 
-/**
- * Reverse-geocode GPS coords to a human place name.
- * OpenStreetMap Nominatim is free, needs no API key, and is CORS-enabled.
- */
 async function reverseGeocode(
   latitude: number,
   longitude: number,
@@ -80,10 +77,6 @@ async function reverseGeocode(
   }
 }
 
-/**
- * Forward-geocode a place name (e.g. "Kerman, Iran") to coordinates.
- * Definitive accuracy fix when browser GPS can't get a fix.
- */
 async function forwardGeocode(query: string): Promise<PreciseLocation | null> {
   try {
     const res = await fetch(
@@ -111,45 +104,15 @@ async function forwardGeocode(query: string): Promise<PreciseLocation | null> {
   }
 }
 
-function getFunHeadline(data: IpstackData): string {
-  const lines = [
-    `Plot twist: you're in ${data.city}, not on the moon 🌙`,
-    `${data.location.country_flag_emoji} ${data.city} called — they want their tourist back`,
-    `Your packets are vacationing in ${data.region_name}`,
-    `Somewhere between ${data.latitude.toFixed(2)}° and chaos`,
-    `The internet thinks you're near ${data.zip || data.city}`,
-    `${data.connection.isp} is carrying your vibes today`,
-  ]
-  return lines[Math.floor(Math.random() * lines.length)]
-}
-
-function StatCard({
-  icon: Icon,
-  label,
-  value,
-  sub,
-  delay = 0,
-}: {
-  icon: ElementType
-  label: string
-  value: string
-  sub?: string
-  delay?: number
-}) {
+function RadarRing() {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-      className="rounded-2xl border border-border/80 bg-card/80 backdrop-blur-sm p-4 hover:border-border transition-colors"
-    >
-      <div className="flex items-center gap-2 text-muted-foreground mb-2">
-        <Icon className="size-4" />
-        <span className="text-[11px] uppercase tracking-widest">{label}</span>
-      </div>
-      <p className="text-sm font-medium text-foreground leading-snug">{value}</p>
-      {sub && <p className="text-xs text-muted-foreground mt-1">{sub}</p>}
-    </motion.div>
+    <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden" aria-hidden>
+      <div className="absolute size-[120vmax] rounded-full border border-emerald-400/10 animate-[spin_60s_linear_infinite]" />
+      <div className="absolute size-[80vmax] rounded-full border border-dashed border-emerald-400/[0.07] animate-[spin_90s_linear_infinite_reverse]" />
+      <div className="absolute size-[42vmax] rounded-full border border-emerald-400/[0.08]" />
+      <div className="absolute size-3 rounded-full bg-emerald-400/80 shadow-[0_0_40px_12px_rgba(52,211,153,0.35)]" />
+      <div className="absolute size-24 rounded-full border border-emerald-400/30 animate-ping opacity-40" />
+    </div>
   )
 }
 
@@ -157,16 +120,13 @@ export function UserLocationFinder() {
   const [data, setData] = useState<IpstackData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [headline, setHeadline] = useState('')
   const [copied, setCopied] = useState(false)
 
-  // Precise (GPS) location — optional, user-permitted
   const [precise, setPrecise] = useState<PreciseLocation | null>(null)
   const [geoLoading, setGeoLoading] = useState(false)
   const [geoError, setGeoError] = useState<string | null>(null)
   const [usePrecise, setUsePrecise] = useState(false)
 
-  // Manual city search — definitive fix when GPS can't get a fix
   const [showSearch, setShowSearch] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [searching, setSearching] = useState(false)
@@ -184,7 +144,7 @@ export function UserLocationFinder() {
       setGeoError(null)
       setShowSearch(false)
     } else {
-      setSearchError(`Couldn't find "${q}". Try "City, Country".`)
+      setSearchError(`No fix for “${q}”. Try City, Country.`)
     }
     setSearching(false)
   }, [searchQuery])
@@ -193,14 +153,10 @@ export function UserLocationFinder() {
     setLoading(true)
     setError(null)
     try {
-      // Cache-bust so a VPN switch reflects immediately
-      const res = await fetch(`/api/location?t=${Date.now()}`, {
-        cache: 'no-store',
-      })
+      const res = await fetch(`/api/location?t=${Date.now()}`, { cache: 'no-store' })
       const json = await res.json()
       if (!res.ok) throw new Error(json.error ?? 'Failed to load location')
       setData(json as IpstackData)
-      setHeadline(getFunHeadline(json))
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong')
     } finally {
@@ -210,7 +166,7 @@ export function UserLocationFinder() {
 
   const requestPrecise = useCallback(() => {
     if (typeof window === 'undefined' || !('geolocation' in navigator)) {
-      setGeoError('Your browser does not support geolocation.')
+      setGeoError('Geolocation is not available in this browser.')
       return
     }
 
@@ -227,20 +183,18 @@ export function UserLocationFinder() {
 
     const onFinalError = (err: GeolocationPositionError) => {
       const messages: Record<number, string> = {
-        1: 'Permission denied. Enable location access for this site (and check your OS Location Services), then try again — or just type your city below. 👇',
-        2: 'Your device couldn’t get a GPS fix (super common on desktops & some regions). No worries — just type your city below. 👇',
-        3: 'GPS timed out. Type your city below instead — faster anyway. 👇',
+        1: 'Permission denied. Allow location for this site, or type your city.',
+        2: 'No GPS fix (common on desktop). Type your city instead.',
+        3: 'GPS timed out. Type your city — usually faster.',
       }
-      setGeoError(messages[err.code] ?? 'Could not get your precise location. Type your city below instead.')
+      setGeoError(messages[err.code] ?? 'Could not get a precise fix. Type your city.')
       setShowSearch(true)
       setGeoLoading(false)
     }
 
-    // First try high-accuracy (GPS). If the device can't get a fix
-    // (common on desktops), retry with network/Wi-Fi positioning.
     navigator.geolocation.getCurrentPosition(
       onSuccess,
-      (err) => {
+      err => {
         if (err.code === 1) {
           onFinalError(err)
           return
@@ -270,11 +224,22 @@ export function UserLocationFinder() {
   const mapSrc = useMemo(() => {
     if (!activeCoords) return ''
     const { latitude, longitude } = activeCoords
-    const zoom = usePrecise && precise ? 15 : 13
+    const zoom = usePrecise && precise ? 15 : 12
     return `https://maps.google.com/maps?q=${latitude},${longitude}&z=${zoom}&output=embed`
   }, [activeCoords, usePrecise, precise])
 
-  const language = data?.location.languages[0]
+  const placeTitle = usePrecise && precise
+    ? (precise.city ?? precise.locality ?? 'Your spot')
+    : (data?.city ?? '…')
+
+  const placeSub = usePrecise && precise
+    ? [precise.principalSubdivision, precise.countryName ?? data?.country_name]
+        .filter(Boolean)
+        .join(' · ')
+    : [data?.region_name, data?.country_name, data?.continent_name]
+        .filter(Boolean)
+        .join(' · ')
+
   const gmtHours = data ? data.time_zone.gmt_offset / 3600 : 0
   const gmtLabel = gmtHours >= 0 ? `GMT+${gmtHours}` : `GMT${gmtHours}`
 
@@ -284,301 +249,323 @@ export function UserLocationFinder() {
     (sec.is_proxy || sec.is_tor || sec.vpn_service || sec.hosting_facility)
   )
 
-  if (loading) {
-    return (
-      <div className="max-w-5xl mx-auto p-6 space-y-4">
-        <div className="h-48 rounded-3xl bg-muted/60 animate-pulse" />
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="h-24 rounded-2xl bg-muted/50 animate-pulse" />
-          ))}
-        </div>
-        <div className="h-72 rounded-3xl bg-muted/40 animate-pulse" />
-      </div>
-    )
-  }
-
-  if (error || !data) {
-    return (
-      <div className="max-w-lg mx-auto p-8 text-center rounded-3xl border border-border bg-card">
-        <Globe className="size-10 mx-auto mb-4 text-muted-foreground" />
-        <p className="text-sm text-muted-foreground mb-4">{error ?? 'No data'}</p>
-        <Button onClick={fetchLocation} variant="outline" className="gap-2">
-          <RefreshCw className="size-4" /> Try again
-        </Button>
-      </div>
-    )
-  }
-
   return (
-    <div className="max-w-5xl mx-auto p-6 md:p-8 space-y-6">
+    <div className={cn(grotesk.className, 'relative min-h-screen text-white bg-[#070a0e]')}>
+      {/* Full-bleed atmosphere */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={ATMOSPHERE}
+        alt=""
+        aria-hidden
+        className="pointer-events-none fixed inset-0 w-full h-full object-cover opacity-50"
+      />
+      <div className="pointer-events-none fixed inset-0 bg-[#070a0e]/55" />
+      <div className="pointer-events-none fixed inset-0 bg-gradient-to-b from-[#070a0e]/30 via-transparent to-[#070a0e]" />
+      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_50%_20%,rgba(52,211,153,0.08),transparent_50%)]" />
 
+      {/* Nav */}
+      <header className="relative z-50 flex items-center justify-between px-5 md:px-10 pt-6">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-[11px] tracking-[0.2em] uppercase text-white/55 hover:text-white transition-colors"
+        >
+          <ArrowLeft className="size-3.5" />
+          Home
+        </Link>
+        <p className="text-[10px] tracking-[0.4em] uppercase text-emerald-300/70">
+          Signal · Geo
+        </p>
+        <ThemeToggle />
+      </header>
 
+      <div className="relative z-10 px-5 md:px-10 pb-16">
+        {/* Hero composition */}
+        <section className="relative min-h-[72vh] flex flex-col justify-end pt-16 md:pt-20 pb-10 overflow-hidden">
+          <RadarRing />
 
-      {/* Bold IP banner */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.05 }}
-        className="relative overflow-hidden rounded-3xl border border-border bg-foreground text-background p-6 md:p-7"
-      >
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2 text-background/60 mb-2">
-              <MapPin className="size-4" />
-              <span className="text-[11px] uppercase tracking-[0.2em]">Your IP Address</span>
+          {loading ? (
+            <div className="relative space-y-6 max-w-3xl animate-pulse">
+              <div className="h-3 w-40 bg-white/10 rounded" />
+              <div className="h-20 w-full max-w-xl bg-white/10 rounded" />
+              <div className="h-4 w-72 bg-white/10 rounded" />
+              <div className="h-10 w-64 bg-white/10 rounded" />
             </div>
-            <p className="font-mono text-3xl md:text-5xl font-bold tracking-tight break-all">
-              {data.ip}
-            </p>
-            <p className="mt-2 text-xs text-background/60">
-              {data.type.toUpperCase()} · Yes, we see you 👀 (it&apos;s public info)
-            </p>
-          </div>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => {
-              navigator.clipboard?.writeText(data.ip)
-              setCopied(true)
-              setTimeout(() => setCopied(false), 1500)
-            }}
-            className="shrink-0 gap-2 self-start"
-          >
-            {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
-            {copied ? 'Copied!' : 'Copy IP'}
-          </Button>
-        </div>
-      </motion.div>
+          ) : error || !data ? (
+            <div className="relative max-w-md">
+              <p className="text-[11px] tracking-[0.3em] uppercase text-rose-300/80 mb-3">
+                Signal lost
+              </p>
+              <h1
+                className="text-4xl md:text-5xl text-white leading-none mb-4"
+                style={{ fontFamily: serif.style.fontFamily }}
+              >
+                No fix
+              </h1>
+              <p className="text-sm text-white/55 mb-6">{error ?? 'Could not read your IP zone.'}</p>
+              <button
+                type="button"
+                onClick={fetchLocation}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/20 bg-white/5 text-sm text-white hover:bg-white/10 transition-colors"
+              >
+                <RefreshCw className="size-4" /> Rescan
+              </button>
+            </div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              className="relative max-w-4xl"
+            >
+              <div className="flex flex-wrap items-center gap-3 mb-5">
+                <span className="text-3xl leading-none" aria-hidden>
+                  {data.location.country_flag_emoji}
+                </span>
+                <span className="text-[10px] tracking-[0.35em] uppercase text-emerald-300/75">
+                  {usePrecise ? 'Device lock' : 'IP intercept'}
+                  {data.location.is_eu ? ' · EU' : ''}
+                  {sneaky ? ' · masked path' : ''}
+                </span>
+              </div>
 
+              <h1
+                className="text-[clamp(3.2rem,12vw,7.5rem)] leading-[0.9] tracking-tight text-white"
+                style={{ fontFamily: serif.style.fontFamily }}
+              >
+                {placeTitle}
+              </h1>
+              <p className="mt-4 text-base md:text-lg text-white/55 max-w-xl">
+                {placeSub}
+              </p>
 
-      {/* Hero */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-violet-500/10 via-card to-sky-500/10 p-6 md:p-8"
-      >
-        <div className="absolute -right-8 -top-8 size-40 rounded-full bg-violet-500/10 blur-3xl" />
-        <div className="absolute -left-8 bottom-0 size-32 rounded-full bg-sky-500/10 blur-3xl" />
+              {/* IP stamp */}
+              <div className="mt-8 flex flex-col sm:flex-row sm:items-end gap-4 sm:gap-8">
+                <div>
+                  <p className="text-[10px] tracking-[0.3em] uppercase text-white/40 mb-2">
+                    Public address
+                  </p>
+                  <p className="font-mono text-xl md:text-3xl tracking-tight text-emerald-200 break-all">
+                    {data.ip}
+                  </p>
+                  <p className="mt-1.5 text-xs text-white/35">
+                    {data.type.toUpperCase()}
+                    {activeCoords
+                      ? ` · ${activeCoords.latitude.toFixed(4)}, ${activeCoords.longitude.toFixed(4)}`
+                      : ''}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard?.writeText(data.ip)
+                    setCopied(true)
+                    setTimeout(() => setCopied(false), 1500)
+                  }}
+                  className="inline-flex items-center gap-2 self-start px-4 py-2 rounded-full border border-white/15 bg-white/5 text-[11px] tracking-[0.2em] uppercase text-white/70 hover:bg-white hover:text-[#070a0e] transition-all"
+                >
+                  {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
+                  {copied ? 'Copied' : 'Copy'}
+                </button>
+              </div>
 
-        <div className="relative flex flex-col md:flex-row md:items-center gap-6">
-          <div className="text-6xl md:text-7xl leading-none select-none">
-            {data.location.country_flag_emoji}
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex flex-wrap items-center gap-2 mb-3">
+              {/* Actions */}
+              <div className="mt-8 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={requestPrecise}
+                  disabled={geoLoading}
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-emerald-400 text-[#070a0e] text-[11px] tracking-[0.18em] uppercase font-medium hover:bg-emerald-300 disabled:opacity-60 transition-colors"
+                >
+                  {geoLoading ? (
+                    <RefreshCw className="size-3.5 animate-spin" />
+                  ) : (
+                    <Crosshair className="size-3.5" />
+                  )}
+                  {geoLoading ? 'Locking…' : 'Precise lock'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowSearch(v => !v)}
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full border border-white/20 text-[11px] tracking-[0.18em] uppercase text-white/75 hover:bg-white/10 transition-colors"
+                >
+                  <Search className="size-3.5" /> Type city
+                </button>
+                {usePrecise ? (
+                  <button
+                    type="button"
+                    onClick={() => setUsePrecise(false)}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full border border-white/10 text-[11px] tracking-[0.18em] uppercase text-white/45 hover:text-white/80 transition-colors"
+                  >
+                    <Globe className="size-3.5" /> IP view
+                  </button>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={fetchLocation}
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full border border-white/10 text-[11px] tracking-[0.18em] uppercase text-white/45 hover:text-white/80 transition-colors"
+                >
+                  <RefreshCw className="size-3.5" /> Rescan
+                </button>
+              </div>
+
+              <AnimatePresence>
+                {geoError ? (
+                  <motion.p
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    className="mt-4 text-xs text-amber-200/80 max-w-lg"
+                  >
+                    {geoError}
+                  </motion.p>
+                ) : null}
+              </AnimatePresence>
+
+              <AnimatePresence>
+                {showSearch ? (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="mt-5 overflow-hidden"
+                  >
+                    <div className="flex flex-col sm:flex-row gap-2 max-w-xl">
+                      <input
+                        value={searchQuery}
+                        onChange={e => setSearchQuery(e.target.value)}
+                        onKeyDown={e => e.key === 'Enter' && handleManualSearch()}
+                        placeholder="City, Country"
+                        className="flex-1 h-11 px-4 rounded-full bg-white/5 border border-white/15 text-sm text-white placeholder:text-white/30 outline-none focus:border-emerald-400/50"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleManualSearch}
+                        disabled={searching || !searchQuery.trim()}
+                        className="h-11 px-5 rounded-full bg-white text-[#070a0e] text-[11px] tracking-[0.18em] uppercase font-medium disabled:opacity-50"
+                      >
+                        {searching ? '…' : 'Pin'}
+                      </button>
+                    </div>
+                    {searchError ? (
+                      <p className="mt-2 text-xs text-rose-300/80">{searchError}</p>
+                    ) : null}
+                  </motion.div>
+                ) : null}
+              </AnimatePresence>
+
               {usePrecise && precise ? (
-                <Badge className="gap-1 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/20">
-                  <Satellite className="size-3" /> GPS-precise
-                </Badge>
-              ) : (
-                <Badge variant="secondary" className="gap-1">
-                  <Sparkles className="size-3" /> IP-detected
-                </Badge>
-              )}
-              <Badge variant="outline">{data.type.toUpperCase()}</Badge>
-              {data.location.is_eu && (
-                <Badge className="bg-blue-500/15 text-blue-700 dark:text-blue-300 border-blue-500/20">
-                  EU 🇪🇺
-                </Badge>
-              )}
-            </div>
-            <h1 className="text-3xl md:text-4xl font-light tracking-tight text-foreground mb-1">
-              {usePrecise && precise
-                ? `${precise.city ?? precise.locality ?? 'Your spot'}, ${precise.countryName ?? data.country_name}`
-                : `${data.city}, ${data.country_name}`}
-            </h1>
-            <p className="text-muted-foreground text-sm md:text-base">
-              {usePrecise && precise
-                ? `${precise.principalSubdivision ?? data.region_name} · pinpointed by your device`
-                : `${data.region_name} · ${data.continent_name}`}
-            </p>
-            <p className="mt-3 text-sm text-foreground/80 italic">&ldquo;{headline}&rdquo;</p>
-          </div>
-          <div className="flex flex-col gap-2 shrink-0 self-start md:self-center">
-            <Button
-              size="sm"
-              onClick={requestPrecise}
-              disabled={geoLoading}
-              className="gap-2"
-            >
-              {geoLoading ? (
-                <RefreshCw className="size-4 animate-spin" />
-              ) : (
-                <Crosshair className="size-4" />
-              )}
-              {geoLoading ? 'Locating…' : 'Use my precise location'}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowSearch(v => !v)}
-              className="gap-2"
-            >
-              <Search className="size-4" /> Type my city
-            </Button>
-            {usePrecise && precise && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setUsePrecise(false)}
-                className="gap-2 text-muted-foreground"
-              >
-                <Globe className="size-4" /> Back to IP view
-              </Button>
-            )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={fetchLocation}
-              className="gap-2 text-muted-foreground"
-            >
-              <RefreshCw className="size-4" /> Re-scan IP
-            </Button>
-          </div>
-        </div>
+                <p className="mt-5 text-xs text-white/40 max-w-lg">
+                  {precise.accuracy > 0
+                    ? `Device fix · ~${Math.round(precise.accuracy)} m accuracy. Dossier below still reads from your IP.`
+                    : 'Pinned from your search. Dossier below still reads from your IP.'}
+                </p>
+              ) : null}
+            </motion.div>
+          )}
+        </section>
 
-        {geoError && (
-          <div className="relative mt-4 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2.5 text-xs text-amber-700 dark:text-amber-300">
-            {geoError}
-          </div>
-        )}
-
-        {showSearch && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            className="relative mt-4"
+        {/* Map — full visual plane */}
+        {data && mapSrc ? (
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15, duration: 0.6 }}
+            className="relative -mx-5 md:mx-0 md:rounded-2xl overflow-hidden border-y md:border border-white/10"
           >
-            <div className="flex flex-col sm:flex-row gap-2">
-              <Input
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && handleManualSearch()}
-                placeholder="Type your city — e.g. “Kerman, Iran”"
-                className="h-10"
-              />
-              <Button
-                onClick={handleManualSearch}
-                disabled={searching || !searchQuery.trim()}
-                className="h-10 gap-2 shrink-0"
-              >
-                {searching ? (
-                  <RefreshCw className="size-4 animate-spin" />
-                ) : (
-                  <Search className="size-4" />
-                )}
-                Pin it
-              </Button>
+            <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-5 py-3 bg-gradient-to-b from-[#070a0e]/80 to-transparent">
+              <p className="text-[10px] tracking-[0.28em] uppercase text-white/60">
+                {usePrecise ? 'Ground truth' : 'Approximate fix'}
+              </p>
+              <p className="font-mono text-[10px] text-emerald-200/70">
+                {activeCoords
+                  ? `${activeCoords.latitude.toFixed(4)} · ${activeCoords.longitude.toFixed(4)}`
+                  : '—'}
+              </p>
             </div>
-            {searchError && (
-              <p className="mt-2 text-xs text-red-600 dark:text-red-400">{searchError}</p>
-            )}
-          </motion.div>
-        )}
+            <iframe
+              title={`Map of ${placeTitle}`}
+              src={mapSrc}
+              className="w-full h-[360px] md:h-[440px] border-0 grayscale-[30%] contrast-110"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              allowFullScreen
+            />
+          </motion.section>
+        ) : null}
 
-        {usePrecise && precise && (
-          <div className="relative mt-4 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-            <LocateFixed className="size-3.5 text-emerald-500" />
-            {precise.accuracy > 0 ? (
-              <>
-                Accurate to within{' '}
-                <strong className="text-foreground">~{Math.round(precise.accuracy)} m</strong>{' '}
-                — thanks to your device&apos;s GPS/Wi-Fi.
-              </>
-            ) : (
-              <>
-                Pinned from your <strong className="text-foreground">manual search</strong> — spot on.
-              </>
-            )}{' '}
-            The fun facts below still come from your IP.
-          </div>
-        )}
-      </motion.div>
-
-      {/* Map */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.98 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.1 }}
-        className="rounded-3xl overflow-hidden border border-border shadow-sm"
-      >
-        <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-muted/30">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Navigation className="size-4" />
-            <span>
-              {usePrecise && precise
-                ? 'Pinpointed by your device 🎯'
-                : 'Google Maps says you’re roughly here'}
-            </span>
-          </div>
-          <code className="text-[11px] text-muted-foreground bg-muted px-2 py-1 rounded-md">
-            {activeCoords
-              ? `${activeCoords.latitude.toFixed(4)}, ${activeCoords.longitude.toFixed(4)}`
-              : '—'}
-          </code>
-        </div>
-        <iframe
-          title={`Map of ${usePrecise && precise ? precise.city ?? 'your location' : data.city}`}
-          src={mapSrc}
-          className="w-full h-72 md:h-80 border-0"
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-          allowFullScreen
-        />
-      </motion.div>
-
-
-      {/* Stats grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-        <StatCard
-          icon={Clock}
-          label="Local Time"
-          value={formatLocalTime(data.time_zone.current_time)}
-          sub={
-            data.time_zone.is_daylight_saving
-              ? `${data.time_zone.code} · daylight savings is ON`
-              : `${data.time_zone.code} · no daylight savings drama`
-          }
-          delay={0.1}
-        />
-        <StatCard
-          icon={Coins}
-          label="Currency"
-          value={`${data.currency.symbol} ${data.currency.code}`}
-          sub={`You'd pay in ${data.currency.plural}`}
-          delay={0.15}
-        />
-        <StatCard
-          icon={Wifi}
-          label="ISP"
-          value={data.connection.isp}
-          sub={`ASN ${data.connection.asn}`}
-          delay={0.2}
-        />
-        <StatCard
-          icon={Building2}
-          label="Capital"
-          value={data.location.capital}
-          sub={`Probably not ${data.city}, but close enough`}
-          delay={0.25}
-        />
-        <StatCard
-          icon={Languages}
-          label="Language"
-          value={language?.name ?? 'Unknown'}
-          sub={language ? `Native: ${language.native}` : undefined}
-          delay={0.3}
-        />
-        <StatCard
-          icon={Shield}
-          label="Timezone"
-          value={data.time_zone.id}
-          sub={gmtLabel}
-          delay={0.35}
-        />
+        {/* Dossier strip — not a card grid */}
+        {data ? (
+          <motion.section
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.25 }}
+            className="mt-10 md:mt-14"
+          >
+            <p className="text-[10px] tracking-[0.35em] uppercase text-white/35 mb-6">
+              Dossier
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-8 border-t border-white/10 pt-8">
+              {[
+                {
+                  label: 'Local time',
+                  value: formatLocalTime(data.time_zone.current_time),
+                  sub: data.time_zone.is_daylight_saving
+                    ? `${data.time_zone.code} · DST`
+                    : data.time_zone.code,
+                },
+                {
+                  label: 'Carrier',
+                  value: data.connection.isp || 'Unknown',
+                  sub: data.connection.asn ? `ASN ${data.connection.asn}` : undefined,
+                },
+                {
+                  label: 'Currency',
+                  value: [data.currency.symbol, data.currency.code].filter(Boolean).join(' ') || '—',
+                  sub: data.currency.plural || undefined,
+                },
+                {
+                  label: 'Capital',
+                  value: data.location.capital || '—',
+                  sub: data.city ? `You: ${data.city}` : undefined,
+                },
+                {
+                  label: 'Timezone',
+                  value: data.time_zone.id || '—',
+                  sub: gmtLabel,
+                },
+                {
+                  label: 'Calling',
+                  value: data.location.calling_code
+                    ? `+${data.location.calling_code}`
+                    : '—',
+                  sub: data.zip ? `Postal ${data.zip}` : undefined,
+                },
+              ].map((row, i) => (
+                <motion.div
+                  key={row.label}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 + i * 0.05 }}
+                  className="border-l border-emerald-400/25 pl-4"
+                >
+                  <p className="text-[10px] tracking-[0.28em] uppercase text-white/40 mb-2">
+                    {row.label}
+                  </p>
+                  <p
+                    className="text-xl md:text-2xl text-white leading-tight"
+                    style={{ fontFamily: serif.style.fontFamily }}
+                  >
+                    {row.value}
+                  </p>
+                  {row.sub ? (
+                    <p className="mt-1.5 text-xs text-white/40">{row.sub}</p>
+                  ) : null}
+                </motion.div>
+              ))}
+            </div>
+          </motion.section>
+        ) : null}
       </div>
-
     </div>
   )
 }
