@@ -350,9 +350,9 @@ export function MarketsBentoCards() {
               <stop offset="100%" stopColor="#a8a29e" stopOpacity="0" />
             </linearGradient>
             <linearGradient id="sd" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#111110" stopOpacity="0" />
-              <stop offset="55%" stopColor="#111110" stopOpacity=".7" />
-              <stop offset="100%" stopColor="#111110" stopOpacity="1" />
+              <stop offset="0%" stopColor="#161513" stopOpacity="0" />
+              <stop offset="55%" stopColor="#161513" stopOpacity=".65" />
+              <stop offset="100%" stopColor="#161513" stopOpacity="1" />
             </linearGradient>
           </defs>
           <line x1="0" y1="60" x2="300" y2="60" stroke="#fff" strokeWidth=".3" opacity=".05" />
