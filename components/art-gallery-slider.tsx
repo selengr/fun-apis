@@ -45,15 +45,46 @@ export function ArtGallerySlider({
 
   useEffect(() => {
     if (variant !== "books") return
-    setBooksLoading(true)
-    fetch("/api/books?action=trending&limit=15", { cache: "no-store" })
-      .then(r => r.json())
-      .then(json => {
+
+    let cancelled = false
+    const ctrl = new AbortController()
+
+    async function load(attempt = 0) {
+      setBooksLoading(true)
+      try {
+        const res = await fetch(`/api/books?action=trending&limit=15&t=${Date.now()}`, {
+          cache: "no-store",
+          signal: ctrl.signal,
+        })
+        const json = await res.json()
         const slides = booksToSlides((json.books ?? []) as BookCard[])
+        if (cancelled) return
+
+        if (slides.length === 0 && attempt < 1) {
+          // One quick retry — OL is flaky behind some VPNs
+          await new Promise(r => setTimeout(r, 600))
+          if (!cancelled) return load(attempt + 1)
+        }
+
         setBookSlides(slides)
-      })
-      .catch(() => setBookSlides([]))
-      .finally(() => setBooksLoading(false))
+      } catch {
+        if (cancelled || ctrl.signal.aborted) return
+        if (attempt < 1) {
+          await new Promise(r => setTimeout(r, 600))
+          if (!cancelled) return load(attempt + 1)
+        }
+        // API always returns curated fallback now; keep empty only if aborted
+        setBookSlides([])
+      } finally {
+        if (!cancelled) setBooksLoading(false)
+      }
+    }
+
+    load()
+    return () => {
+      cancelled = true
+      ctrl.abort()
+    }
   }, [variant])
 
   const items =

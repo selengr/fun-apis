@@ -11,25 +11,31 @@ export async function fetchCoverImage(
 
   const attempts: string[] = []
   for (const s of sizeOrder) {
-    if (id) attempts.push(`${OL_COVERS}/b/id/${id}-${s}.jpg`)
+    if (id) attempts.push(`${OL_COVERS}/b/id/${id}-${s}.jpg?default=false`)
   }
   for (const s of sizeOrder) {
-    if (isbn) attempts.push(`${OL_COVERS}/b/isbn/${isbn}-${s}.jpg`)
+    if (isbn) attempts.push(`${OL_COVERS}/b/isbn/${isbn}-${s}.jpg?default=false`)
   }
 
   for (const url of [...new Set(attempts)]) {
+    const ctrl = new AbortController()
+    const timer = setTimeout(() => ctrl.abort(), 8_000)
     try {
       const res = await fetch(url, {
         redirect: 'follow',
         headers: { 'User-Agent': 'fun-apis/1.0 (cover proxy)' },
+        signal: ctrl.signal,
         next: { revalidate: 604800 },
       })
+      clearTimeout(timer)
       const ct = res.headers.get('content-type') ?? ''
       if (!res.ok || !ct.includes('image')) continue
       const body = await res.arrayBuffer()
-      if (body.byteLength < 200) continue
+      // Open Library returns a tiny placeholder gif when missing — reject those
+      if (body.byteLength < 1000) continue
       return { body, contentType: ct }
     } catch {
+      clearTimeout(timer)
       continue
     }
   }
