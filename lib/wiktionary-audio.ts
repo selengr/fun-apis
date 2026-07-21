@@ -66,9 +66,7 @@ const LANG_NAME_TO_CODE: Record<string, string> = {
   Hungarian: 'hu',
 }
 
-const ENRICH_LIMIT = 8
-
-async function wikiFetch(host: string, params: Record<string, string>) {
+const LANG_NAME_TO_CODE: Record<string, string> = {
   const url = new URL(`https://${host}/w/api.php`)
   url.searchParams.set('format', 'json')
   url.searchParams.set('origin', '*')
@@ -228,6 +226,8 @@ export async function enrichTranslationsWithAudio(
   translations: WiktionaryTranslation[],
   mainWikitext: string,
 ): Promise<WiktionaryTranslation[]> {
+  // Only use audio/IPA already on the English Wiktionary page.
+  // Fetching each native Wiktionary (de/fr/ja/…) caused Wikimedia 429 rate limits.
   const sections = extractLanguageSections(mainWikitext)
   const sectionByLang = new Map(sections.map(s => [s.language.toLowerCase(), s]))
 
@@ -243,35 +243,15 @@ export async function enrichTranslationsWithAudio(
     }
   })
 
-  const pendingFiles: string[] = []
-  for (const sec of sections) {
-    if (sec.audio) pendingFiles.push(sec.audio)
-  }
-
-  const needsNative = enriched
-    .filter(t => t.code && NATIVE_WIKI[t.code] && !t.audio)
-    .slice(0, ENRICH_LIMIT)
-
-  for (const t of needsNative) {
-    const host = NATIVE_WIKI[t.code!]
-    const wt = await fetchNativeWikitext(host, t.terms[0])
-    if (!wt) continue
-    const files = extractAudioFiles(wt)
-    const idx = enriched.findIndex(x => x.language === t.language)
-    if (idx === -1) continue
-    enriched[idx].ipa = enriched[idx].ipa ?? extractIpaFromWikitext(wt)
-    if (files[0]) {
-      enriched[idx].audio = files[0]
-      pendingFiles.push(files[0])
-    }
-  }
+  const pendingFiles = sections.map(s => s.audio).filter(Boolean) as string[]
+  if (!pendingFiles.length) return enriched
 
   const urlMap = await resolveAudioFileUrls(pendingFiles)
 
   return enriched.map(t => {
     if (!t.audio) return t
     const resolved = urlMap.get(t.audio.toLowerCase())
-    return resolved ? { ...t, audio: resolved } : t
+    return resolved ? { ...t, audio: resolved } : { ...t, audio: undefined }
   })
 }
 
