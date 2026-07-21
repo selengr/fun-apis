@@ -231,17 +231,11 @@ export default function AgenticPage() {
             className="grid grid-cols-12 grid-rows-auto gap-3"
             onMouseMove={handleMouse}
           >
-            {/* Finance banner — styled after the crypto hero card, decorative (not a link) */}
-            <BentoCard
-              className="col-span-12 p-0 min-h-[220px] md:min-h-[260px] relative overflow-hidden border-amber-500/20 bg-gradient-to-br from-amber-500/10 via-card/80 to-orange-600/5"
-              delay={0}
-            >
+            <div className="col-span-12">
               <MarketsBanner />
-            </BentoCard>
+            </div>
 
             <MarketsBentoCards />
-
-     
           </div>
         </div>
       </section>
@@ -264,9 +258,7 @@ export default function AgenticPage() {
             </div>
             <div className="max-w-xs">
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Four live categories pulled straight from Unsplash — nature,
-                architecture, portraits, and space — quietly refreshing every
-                few seconds. Tap a card to dive into the full gallery.
+                Four live categories pulled, Tap a card to dive into the full gallery.
               </p>
               <a
                 href="/photos"

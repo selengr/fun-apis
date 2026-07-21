@@ -216,7 +216,7 @@ export function MarketsBentoCards() {
       <Link href="/crypto" className="col-span-12 md:col-span-4 block">
         <MarketBentoCard
           className="p-0 min-h-[200px] h-full cursor-pointer overflow-hidden relative"
-          style={{ background: '#0a0b0f', borderColor: 'rgba(245,158,11,0.15)' }}
+          style={{ background: '#0c0c0c', borderColor: 'rgba(255,255,255,0.08)' }}
           delay={120}
         >
           <svg
@@ -227,55 +227,43 @@ export function MarketsBentoCards() {
           >
             <defs>
               <linearGradient id="cg" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#f59e0b" stopOpacity=".2" />
-                <stop offset="100%" stopColor="#f59e0b" stopOpacity="0" />
+                <stop offset="0%" stopColor="#34d399" stopOpacity=".22" />
+                <stop offset="100%" stopColor="#34d399" stopOpacity="0" />
               </linearGradient>
               <linearGradient id="cd" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#0a0b0f" stopOpacity="0" />
-                <stop offset="55%" stopColor="#0a0b0f" stopOpacity=".7" />
-                <stop offset="100%" stopColor="#0a0b0f" stopOpacity="1" />
+                <stop offset="0%" stopColor="#0c0c0c" stopOpacity="0" />
+                <stop offset="55%" stopColor="#0c0c0c" stopOpacity=".7" />
+                <stop offset="100%" stopColor="#0c0c0c" stopOpacity="1" />
               </linearGradient>
             </defs>
-            <line x1="0" y1="60" x2="300" y2="60" stroke="#f59e0b" strokeWidth=".3" opacity=".1" />
-            <line x1="0" y1="100" x2="300" y2="100" stroke="#f59e0b" strokeWidth=".3" opacity=".1" />
-            <line x1="0" y1="140" x2="300" y2="140" stroke="#f59e0b" strokeWidth=".3" opacity=".1" />
+            <line x1="0" y1="60" x2="300" y2="60" stroke="#fff" strokeWidth=".3" opacity=".06" />
+            <line x1="0" y1="100" x2="300" y2="100" stroke="#fff" strokeWidth=".3" opacity=".06" />
+            <line x1="0" y1="140" x2="300" y2="140" stroke="#fff" strokeWidth=".3" opacity=".06" />
             {btcChart ? (
               <>
                 <path d={btcChart.fill} fill="url(#cg)" />
-                <path d={btcChart.line} fill="none" stroke="#f59e0b" strokeWidth="1.5" />
-                <circle cx={btcChart.lastX} cy={btcChart.lastY} r="3" fill="#f59e0b" />
-                <circle cx={btcChart.lastX} cy={btcChart.lastY} r="6" fill="#f59e0b" opacity=".2" />
+                <path d={btcChart.line} fill="none" stroke="#34d399" strokeWidth="1.5" />
+                <circle cx={btcChart.lastX} cy={btcChart.lastY} r="3" fill="#34d399" />
+                <circle cx={btcChart.lastX} cy={btcChart.lastY} r="6" fill="#34d399" opacity=".2" />
               </>
             ) : (
               <>
                 <path d="M0,160 L30,145 L60,130 L90,138 L120,110 L150,95 L180,100 L210,78 L240,65 L270,75 L300,52 L300,240 L0,240 Z" fill="url(#cg)" />
-                <path d="M0,160 L30,145 L60,130 L90,138 L120,110 L150,95 L180,100 L210,78 L240,65 L270,75 L300,52" fill="none" stroke="#f59e0b" strokeWidth="1.5" />
-                <circle cx="300" cy="52" r="3" fill="#f59e0b" />
-                <circle cx="300" cy="52" r="6" fill="#f59e0b" opacity=".2" />
+                <path d="M0,160 L30,145 L60,130 L90,138 L120,110 L150,95 L180,100 L210,78 L240,65 L270,75 L300,52" fill="none" stroke="#34d399" strokeWidth="1.5" />
+                <circle cx="300" cy="52" r="3" fill="#34d399" />
+                <circle cx="300" cy="52" r="6" fill="#34d399" opacity=".2" />
               </>
             )}
-            <PriceLabel x={16} pairLabel="BTC / USD" pairColor="#f59e0b" price={btcPrice} pct={btcPct} pctX={88} />
-            <PriceLabel x={170} pairLabel="ETH / USD" pairColor="#8b5cf6" price={ethPrice} pct={ethPct} pctX={238} />
+            <PriceLabel x={16} pairLabel="BTC / USD" pairColor="#a7f3d0" price={btcPrice} pct={btcPct} pctX={88} />
+            <PriceLabel x={170} pairLabel="ETH / USD" pairColor="#e7e5e4" price={ethPrice} pct={ethPct} pctX={238} />
             <rect x="0" y="0" width="300" height="240" fill="url(#cd)" />
           </svg>
 
           <div className="relative z-10 flex flex-col justify-end h-full p-6 pt-32">
-            <div className="w-8 h-8 rounded-xl border border-amber-500/25 bg-amber-500/10 flex items-center justify-center mb-4">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="1.5">
-                <path d="M3 17l6-6 4 4 8-8" />
-                <path d="M14 7h7v7" />
-              </svg>
-            </div>
-            <div className="flex items-center gap-2 mb-2">
-              <h3 className="text-[15px] font-medium text-white">Live crypto prices</h3>
-              <span className="relative flex size-1.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full size-1.5 bg-emerald-500" />
-              </span>
-            </div>
+            <p className="text-[10px] tracking-[0.22em] uppercase text-white/35 mb-2">Crypto</p>
+            <h3 className="text-[15px] font-light text-white mb-2">Live crypto prices</h3>
             <p className="text-sm text-white/45 leading-relaxed">
               Bitcoin, Ethereum, and the top coins — updated every 30 seconds.
-              Sparklines, ticker, and global stats in one clean view.
             </p>
           </div>
         </MarketBentoCard>
@@ -352,49 +340,37 @@ export function MarketsBentoCards() {
       {/* Coming soon */}
       <MarketBentoCard
         className="col-span-12 md:col-span-4 p-0 min-h-[200px] overflow-hidden relative"
-        style={{ background: '#0a0812', borderColor: 'rgba(139,92,246,0.15)' }}
+        style={{ background: '#111110', borderColor: 'rgba(255,255,255,0.08)' }}
         delay={200}
       >
         <svg className="absolute inset-0 w-full h-full" viewBox="0 0 300 240" preserveAspectRatio="none">
           <defs>
             <linearGradient id="sg" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#8b5cf6" stopOpacity=".22" />
-              <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0" />
+              <stop offset="0%" stopColor="#a8a29e" stopOpacity=".18" />
+              <stop offset="100%" stopColor="#a8a29e" stopOpacity="0" />
             </linearGradient>
             <linearGradient id="sd" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#0a0812" stopOpacity="0" />
-              <stop offset="55%" stopColor="#0a0812" stopOpacity=".7" />
-              <stop offset="100%" stopColor="#0a0812" stopOpacity="1" />
+              <stop offset="0%" stopColor="#111110" stopOpacity="0" />
+              <stop offset="55%" stopColor="#111110" stopOpacity=".7" />
+              <stop offset="100%" stopColor="#111110" stopOpacity="1" />
             </linearGradient>
           </defs>
-          <line x1="0" y1="60" x2="300" y2="60" stroke="#8b5cf6" strokeWidth=".3" opacity=".1" />
-          <line x1="0" y1="100" x2="300" y2="100" stroke="#8b5cf6" strokeWidth=".3" opacity=".1" />
-          <line x1="0" y1="140" x2="300" y2="140" stroke="#8b5cf6" strokeWidth=".3" opacity=".1" />
+          <line x1="0" y1="60" x2="300" y2="60" stroke="#fff" strokeWidth=".3" opacity=".05" />
+          <line x1="0" y1="100" x2="300" y2="100" stroke="#fff" strokeWidth=".3" opacity=".05" />
+          <line x1="0" y1="140" x2="300" y2="140" stroke="#fff" strokeWidth=".3" opacity=".05" />
           <path d="M0,165 L45,150 L90,158 L135,130 L180,118 L225,125 L270,95 L300,82 L300,240 L0,240 Z" fill="url(#sg)" />
-          <path d="M0,165 L45,150 L90,158 L135,130 L180,118 L225,125 L270,95 L300,82" fill="none" stroke="#8b5cf6" strokeWidth="1.5" />
-          <circle cx="300" cy="82" r="3" fill="#8b5cf6" />
-          <circle cx="300" cy="82" r="6" fill="#8b5cf6" opacity=".2" />
+          <path d="M0,165 L45,150 L90,158 L135,130 L180,118 L225,125 L270,95 L300,82" fill="none" stroke="#a8a29e" strokeWidth="1.5" />
+          <circle cx="300" cy="82" r="3" fill="#a8a29e" />
           {([[22,120,22,68],[58,96,22,92],[94,108,22,80],[130,75,22,113],[166,88,22,100],[202,55,22,133],[238,70,22,118]] as const).map(([x, y, w, h], i) => (
-            <rect key={i} x={x} y={y} width={w} height={h} rx="2" fill="#8b5cf6" opacity=".08" />
+            <rect key={i} x={x} y={y} width={w} height={h} rx="2" fill="#a8a29e" opacity=".08" />
           ))}
           <rect x="0" y="0" width="300" height="240" fill="url(#sd)" />
         </svg>
         <div className="relative z-10 flex flex-col justify-end h-full p-6 pt-32">
-          <div className="w-8 h-8 rounded-xl border border-violet-500/25 bg-violet-500/10 flex items-center justify-center mb-4">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" strokeWidth="1.5">
-              <circle cx="12" cy="12" r="10" />
-              <path d="M2 12h20" />
-              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-            </svg>
-          </div>
-          <div className="flex items-center gap-2 mb-2">
-            <h3 className="text-[15px] font-medium text-white">More on the way</h3>
-            <span className="text-[10px] uppercase tracking-widest text-violet-300/60 px-2 py-0.5 rounded-full border border-violet-500/25">
-              soon
-            </span>
-          </div>
+          <p className="text-[10px] tracking-[0.22em] uppercase text-white/35 mb-2">Soon</p>
+          <h3 className="text-[15px] font-light text-white mb-2">More markets</h3>
           <p className="text-sm text-white/45 leading-relaxed">
-            Stocks, commodities, and other finance tools. This section will grow as we add them.
+            Stocks, commodities, and other finance tools will land here next.
           </p>
         </div>
       </MarketBentoCard>
