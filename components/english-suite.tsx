@@ -83,19 +83,19 @@ const ENGLISH_TOOLS: Tool[] = [
   },
   {
     n: '04',
-    title: 'Pronunciation',
+    title: 'Pronunciation Studio',
     whisper: 'Soon',
-    desc: 'Accent training with studio voice comparisons.',
+    desc: 'Accent training with studio-quality voice comparisons — coming next.',
     href: null,
     live: false,
     image:
-      'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=1000&q=80',
+      'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=1600&q=80',
     imageAlt: 'Studio microphone',
     glyph: 'ə',
     phonetic: '/ʃ/ · /θ/ · /æ/',
-    ink: 'from-[#101018]/30 via-[#101018]/60 to-[#101018]/96',
-    grid: 'md:col-span-7',
-    height: 'min-h-[240px] md:min-h-[250px]',
+    ink: 'from-[#101018]/30 via-[#101018]/55 to-[#101018]/94',
+    grid: 'md:col-span-12',
+    height: 'min-h-[220px] md:min-h-[230px]',
   },
 ]
 
@@ -264,7 +264,7 @@ export function EnglishSuiteSection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 gap-4 md:gap-5 md:auto-rows-[minmax(250px,1fr)]">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-5 md:auto-rows-[minmax(240px,1fr)]">
           {ENGLISH_TOOLS.map((tool, i) => (
             <EnglishCard key={tool.n} tool={tool} delay={i * 90} />
           ))}
