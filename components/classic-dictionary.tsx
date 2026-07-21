@@ -4,20 +4,24 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Search,
-  BookOpen,
   RefreshCw,
   Copy,
   Check,
-  Share2,
   Volume2,
   X,
-  Sparkles,
   ImageIcon,
 } from 'lucide-react'
 import type { DictionaryEntry } from '@/types/dictionary'
-import { Input } from '@/components/ui/input'
+import { cn } from '@/lib/utils'
 
-const QUICK_WORDS = ['serendipity', 'ephemeral', 'eloquent', 'resilience', 'curious', 'wanderlust', 'harmony', 'luminous']
+const QUICK_WORDS = [
+  'serendipity',
+  'ephemeral',
+  'eloquent',
+  'resilience',
+  'curious',
+  'luminous',
+]
 
 const PRON_FLAG: Record<string, string> = {
   UK: '🇬🇧',
@@ -78,26 +82,29 @@ function WordPhoto({ word }: { word: string }) {
   if (!src) return null
 
   return (
-    <div className="relative h-56 lg:h-full min-h-[200px] rounded-2xl overflow-hidden border border-amber-900/10 dark:border-amber-100/10 shadow-2xl">
-      <img src={src} alt={word} loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-      <span className="absolute bottom-4 left-4 inline-flex items-center gap-1.5 text-[9px] uppercase tracking-[0.2em] text-white/80 bg-black/30 backdrop-blur-md px-3 py-1.5 rounded-full">
+    <div className="relative aspect-[4/3] md:aspect-auto md:h-full min-h-[180px] overflow-hidden rounded-2xl border border-border">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={src} alt="" className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
+      <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
+      <span className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.2em] text-foreground/70">
         <ImageIcon className="size-3" />
-        Visual
+        {word}
       </span>
     </div>
   )
 }
 
 export function ClassicDictionary() {
-  const [query, setQuery] = useState('serendipity')
+  const [query, setQuery] = useState('')
   const [data, setData] = useState<DictionaryEntry[] | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
+  const [booted, setBooted] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
   const [suggestions, setSuggestions] = useState<Suggestion[]>([])
   const [showSuggestions, setShowSuggestions] = useState(false)
   const { playing, play } = useAudioPlayer()
+  const inputRef = useRef<HTMLInputElement>(null)
 
   const wrapperRef = useRef<HTMLDivElement>(null)
   const suggestTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -107,13 +114,17 @@ export function ClassicDictionary() {
     setLoading(true)
     setError(null)
     setShowSuggestions(false)
+    setBooted(true)
     try {
-      const res = await fetch(`/api/dictionary?word=${encodeURIComponent(word.trim())}`, { cache: 'no-store' })
+      const res = await fetch(`/api/dictionary?word=${encodeURIComponent(word.trim())}`, {
+        cache: 'no-store',
+      })
       const json = await res.json()
-      if (!res.ok) throw new Error(json.error ?? 'Lookup failed')
+      if (!res.ok) throw new Error(json.error ?? 'Word not found')
       setData(json as DictionaryEntry[])
       setQuery((json as DictionaryEntry[])[0]?.word ?? word)
     } catch (err) {
+      setData(null)
       setError(err instanceof Error ? err.message : 'Lookup failed')
     } finally {
       setLoading(false)
@@ -121,8 +132,8 @@ export function ClassicDictionary() {
   }, [])
 
   useEffect(() => {
-    lookup('serendipity')
-  }, [lookup])
+    inputRef.current?.focus()
+  }, [])
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -144,7 +155,10 @@ export function ClassicDictionary() {
     }
     suggestTimer.current = setTimeout(async () => {
       try {
-        const res = await fetch(`/api/dictionary?endpoint=suggest&q=${encodeURIComponent(val)}`, { cache: 'no-store' })
+        const res = await fetch(
+          `/api/dictionary?endpoint=suggest&q=${encodeURIComponent(val)}`,
+          { cache: 'no-store' },
+        )
         const json = await res.json()
         setSuggestions(json.suggestions ?? [])
         setShowSuggestions((json.suggestions ?? []).length > 0)
@@ -181,13 +195,8 @@ export function ClassicDictionary() {
       m.synonyms.forEach(s => set.add(s))
       m.definitions.forEach(d => d.synonyms.forEach(s => set.add(s)))
     })
-    return [...set].slice(0, 20)
+    return [...set].slice(0, 16)
   }, [allMeanings])
-
-  const examples = useMemo(
-    () => allDefs.filter(d => d.example).map(d => ({ example: d.example!, def: d.definition, pos: d.partOfSpeech })),
-    [allDefs],
-  )
 
   const copyWord = async () => {
     if (!entry) return
@@ -196,280 +205,272 @@ export function ClassicDictionary() {
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const shareWord = async () => {
-    if (!entry) return
-    if (navigator.share) await navigator.share({ title: entry.word, url: window.location.href })
-    else await navigator.clipboard.writeText(entry.word)
-  }
-
-  const metrics = [
-    { label: 'Meanings', value: entry ? String(allMeanings.length) : '—' },
-    { label: 'Definitions', value: entry ? String(allDefs.length) : '—' },
-    { label: 'Audio', value: entry ? String(pronunciations.length) : '—' },
-    { label: 'Examples', value: entry ? String(examples.length) : '—' },
-  ]
-
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-24 pt-4 space-y-10">
-      {/* Metrics */}
+    <div className="max-w-3xl mx-auto px-5 md:px-6">
+      {/* Search — the whole point */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex flex-wrap justify-center gap-x-10 gap-y-4 py-6 border-y border-amber-900/8 dark:border-amber-100/8"
-      >
-        {metrics.map(m => (
-          <div key={m.label} className="text-center min-w-[80px]">
-            <p className="text-2xl sm:text-3xl font-light text-stone-900 dark:text-stone-100 tabular-nums">{m.value}</p>
-            <p className="text-[9px] uppercase tracking-[0.25em] text-stone-400 dark:text-stone-500 mt-1">{m.label}</p>
-          </div>
-        ))}
-      </motion.div>
-
-      {/* Search */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.05 }}
+        transition={{ duration: 0.45 }}
         ref={wrapperRef}
+        className={cn(!booted && 'min-h-[52vh] flex flex-col justify-center')}
       >
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1">
-            <Search className="absolute left-5 top-1/2 -translate-y-1/2 size-4 text-stone-400 pointer-events-none" />
-            <Input
+        {!booted ? (
+          <div className="mb-10 text-center">
+            <p
+              className="text-[clamp(4rem,18vw,8rem)] leading-none text-foreground/[0.06] dark:text-foreground/[0.08] select-none"
+              style={{ fontFamily: 'var(--font-dict-display), Georgia, serif' }}
+              aria-hidden
+            >
+              Aa
+            </p>
+            <h1 className="sr-only">Dictionary</h1>
+            <p className="mt-2 text-sm text-muted-foreground">Type a word. Press enter.</p>
+          </div>
+        ) : null}
+
+        <form
+          onSubmit={e => {
+            e.preventDefault()
+            lookup(query)
+          }}
+          className="relative"
+        >
+          <div className="group relative flex items-center gap-3 border-b-2 border-foreground/15 focus-within:border-foreground transition-colors duration-300 pb-3">
+            <Search className="size-5 text-muted-foreground shrink-0 group-focus-within:text-foreground transition-colors" />
+            <input
+              ref={inputRef}
               value={query}
               onChange={e => onInputChange(e.target.value)}
               onKeyDown={e => {
-                if (e.key === 'Enter') lookup(query)
                 if (e.key === 'Escape') setShowSuggestions(false)
               }}
               onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
-              placeholder="Search a word…"
-              className="h-14 pl-12 pr-12 text-base rounded-full border-amber-900/10 dark:border-amber-100/10 bg-white/80 dark:bg-white/[0.04] backdrop-blur-xl shadow-inner focus-visible:ring-amber-500/30"
+              placeholder="Search a word"
               autoComplete="off"
+              spellCheck={false}
+              className="flex-1 bg-transparent text-2xl md:text-3xl font-light tracking-tight text-foreground placeholder:text-muted-foreground/50 outline-none min-w-0"
+              style={{ fontFamily: 'var(--font-dict-display), Georgia, serif' }}
             />
-            {query && (
+            {query ? (
               <button
                 type="button"
-                onClick={() => { setQuery(''); setSuggestions([]); setShowSuggestions(false) }}
-                className="absolute right-4 top-1/2 -translate-y-1/2 size-8 rounded-full flex items-center justify-center text-stone-400 hover:text-stone-700 cursor-pointer"
+                onClick={() => {
+                  setQuery('')
+                  setSuggestions([])
+                  setShowSuggestions(false)
+                  inputRef.current?.focus()
+                }}
+                className="size-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                aria-label="Clear"
               >
                 <X className="size-4" />
               </button>
-            )}
-            <AnimatePresence>
-              {showSuggestions && suggestions.length > 0 && (
-                <motion.ul
-                  initial={{ opacity: 0, y: -8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  className="absolute top-[calc(100%+10px)] left-0 right-0 z-[100] max-h-64 overflow-y-auto rounded-2xl border border-amber-900/10 dark:border-amber-100/10 bg-white/95 dark:bg-stone-950/95 backdrop-blur-2xl shadow-2xl p-2"
-                >
-                  {suggestions.map(s => (
-                    <li key={s.word}>
-                      <button
-                        type="button"
-                        onMouseDown={() => { setQuery(s.word); lookup(s.word) }}
-                        className="w-full px-4 py-3 text-sm text-left rounded-xl hover:bg-amber-500/8 transition-colors cursor-pointer"
-                      >
-                        {s.word}
-                      </button>
-                    </li>
-                  ))}
-                </motion.ul>
-              )}
-            </AnimatePresence>
-          </div>
-          <button
-            type="button"
-            onClick={() => lookup(query)}
-            disabled={loading || !query.trim()}
-            className="h-14 px-8 rounded-full bg-stone-900 dark:bg-amber-100 text-amber-50 dark:text-stone-900 text-sm uppercase tracking-[0.2em] font-medium hover:brightness-110 transition-all cursor-pointer disabled:opacity-40 shrink-0"
-          >
-            {loading ? <RefreshCw className="size-4 animate-spin mx-auto" /> : 'Discover'}
-          </button>
-        </div>
-        <div className="flex flex-wrap justify-center gap-2 mt-5">
-          {QUICK_WORDS.map(w => (
+            ) : null}
             <button
-              key={w}
-              type="button"
-              onClick={() => lookup(w)}
-              className="text-xs px-4 py-1.5 rounded-full border border-amber-900/10 dark:border-amber-100/10 text-stone-500 hover:text-amber-800 dark:hover:text-amber-200 hover:border-amber-500/30 transition-all cursor-pointer tracking-wide"
+              type="submit"
+              disabled={loading || !query.trim()}
+              className="shrink-0 size-10 md:size-11 rounded-full bg-foreground text-background flex items-center justify-center disabled:opacity-30 hover:opacity-90 transition-opacity"
+              aria-label="Look up"
             >
-              {w}
+              {loading ? (
+                <RefreshCw className="size-4 animate-spin" />
+              ) : (
+                <Search className="size-4" />
+              )}
             </button>
-          ))}
-        </div>
+          </div>
+
+          <AnimatePresence>
+            {showSuggestions && suggestions.length > 0 ? (
+              <motion.ul
+                initial={{ opacity: 0, y: -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                className="absolute top-[calc(100%+8px)] left-0 right-0 z-[100] max-h-64 overflow-y-auto rounded-xl border border-border bg-popover text-popover-foreground shadow-lg p-1.5"
+              >
+                {suggestions.map(s => (
+                  <li key={s.word}>
+                    <button
+                      type="button"
+                      onMouseDown={() => {
+                        setQuery(s.word)
+                        lookup(s.word)
+                      }}
+                      className="w-full px-3 py-2.5 text-left text-sm rounded-lg hover:bg-muted transition-colors"
+                    >
+                      {s.word}
+                    </button>
+                  </li>
+                ))}
+              </motion.ul>
+            ) : null}
+          </AnimatePresence>
+        </form>
+
+        {!booted || (!entry && !error) ? (
+          <div className="mt-8 flex flex-wrap justify-center gap-x-5 gap-y-2">
+            {QUICK_WORDS.map(w => (
+              <button
+                key={w}
+                type="button"
+                onClick={() => lookup(w)}
+                className="text-sm text-muted-foreground hover:text-foreground underline-offset-4 hover:underline transition-colors"
+              >
+                {w}
+              </button>
+            ))}
+          </div>
+        ) : null}
       </motion.div>
 
-      {error && <p className="text-center text-sm text-red-500/90 py-2">{error}</p>}
+      {error ? (
+        <p className="mt-10 text-center text-sm text-destructive">{error}</p>
+      ) : null}
 
       <AnimatePresence mode="wait">
-        {entry && !error && (
-          <motion.div
+        {entry && !error ? (
+          <motion.article
             key={entry.word}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className={`space-y-10 transition-opacity duration-500 ${loading ? 'opacity-50 pointer-events-none' : ''}`}
+            transition={{ duration: 0.4 }}
+            className={cn('mt-14 space-y-12', loading && 'opacity-50 pointer-events-none')}
           >
-            {/* Hero */}
-            <section className="relative rounded-3xl overflow-hidden border border-amber-900/8 dark:border-amber-100/8 bg-white/60 dark:bg-white/[0.02] backdrop-blur-xl">
-              <div className="absolute inset-0 bg-gradient-to-br from-amber-50/50 via-transparent to-stone-100/30 dark:from-amber-950/20 dark:to-transparent pointer-events-none" />
-              <div className="relative flex flex-col lg:flex-row">
-                <div className="flex-1 p-8 sm:p-10 lg:p-12">
-                  <p className="text-[9px] uppercase tracking-[0.35em] text-amber-700/50 dark:text-amber-300/40 mb-6">
-                    Entry · English
-                  </p>
-                  <h2 className="text-5xl sm:text-6xl md:text-7xl font-light text-stone-900 dark:text-stone-50 capitalize leading-[0.95] tracking-tight">
+            {/* Word headword */}
+            <header className="grid md:grid-cols-[1fr_200px] gap-8 items-start">
+              <div>
+                <div className="flex flex-wrap items-baseline gap-x-4 gap-y-2">
+                  <h2
+                    className="text-[clamp(2.75rem,10vw,5rem)] leading-[0.95] tracking-tight text-foreground capitalize"
+                    style={{ fontFamily: 'var(--font-dict-display), Georgia, serif' }}
+                  >
                     {entry.word}
                   </h2>
-                  {phoneticText && (
-                    <p className="mt-4 text-lg text-amber-900/50 dark:text-amber-200/40 font-mono tracking-wider">{phoneticText}</p>
-                  )}
-                  {pronunciations.length > 0 && (
-                    <div className="mt-6 flex flex-wrap gap-2.5">
-                      {pronunciations.map(p => {
-                        const id = `pron-${p.label}`
-                        const active = playing === id
-                        return (
-                          <button
-                            key={id}
-                            type="button"
-                            onClick={() => play(id, p.audio)}
-                            className={`inline-flex items-center gap-3 h-12 pl-4 pr-5 rounded-full border text-sm transition-all cursor-pointer ${
-                              active
-                                ? 'border-amber-400/50 bg-amber-500/15 text-amber-800 dark:text-amber-100 shadow-[0_0_24px_rgba(201,169,98,0.2)]'
-                                : 'border-amber-900/10 dark:border-amber-100/10 bg-white/50 dark:bg-white/[0.04] hover:border-amber-500/35 text-stone-700 dark:text-stone-300'
-                            }`}
-                          >
-                            <span>{PRON_FLAG[p.label] ?? '✦'}</span>
-                            <span className="flex flex-col items-start leading-none gap-0.5">
-                              <span className="text-[9px] uppercase tracking-[0.2em] opacity-60">{p.label}</span>
-                              {p.ipa && <span className="text-xs font-mono">{p.ipa}</span>}
-                            </span>
-                            <Volume2 className={`size-4 ${active ? 'text-amber-600' : 'opacity-50'}`} />
-                          </button>
-                        )
-                      })}
-                    </div>
-                  )}
-                  <div className="flex flex-wrap gap-2 mt-8">
-                    <button
-                      type="button"
-                      onClick={copyWord}
-                      className="inline-flex items-center gap-2 h-10 px-5 rounded-full border border-amber-900/10 dark:border-amber-100/10 text-xs uppercase tracking-[0.15em] text-stone-500 hover:text-stone-800 dark:hover:text-stone-200 transition-colors cursor-pointer"
-                    >
-                      {copied ? <Check className="size-3.5 text-emerald-600" /> : <Copy className="size-3.5" />}
-                      {copied ? 'Copied' : 'Copy'}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={shareWord}
-                      className="inline-flex items-center gap-2 h-10 px-5 rounded-full border border-amber-900/10 dark:border-amber-100/10 text-xs uppercase tracking-[0.15em] text-stone-500 hover:text-stone-800 dark:hover:text-stone-200 transition-colors cursor-pointer"
-                    >
-                      <Share2 className="size-3.5" />
-                      Share
-                    </button>
+                  <button
+                    type="button"
+                    onClick={copyWord}
+                    className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {copied ? <Check className="size-3.5 text-emerald-600" /> : <Copy className="size-3.5" />}
+                    {copied ? 'Copied' : 'Copy'}
+                  </button>
+                </div>
+
+                {phoneticText ? (
+                  <p className="mt-3 font-mono text-base md:text-lg text-muted-foreground tracking-wide">
+                    {phoneticText}
+                  </p>
+                ) : null}
+
+                {pronunciations.length > 0 ? (
+                  <div className="mt-5 flex flex-wrap gap-2">
+                    {pronunciations.map(p => {
+                      const id = `pron-${p.label}`
+                      const active = playing === id
+                      return (
+                        <button
+                          key={id}
+                          type="button"
+                          onClick={() => play(id, p.audio)}
+                          className={cn(
+                            'inline-flex items-center gap-2 h-9 px-3.5 rounded-lg border text-sm transition-colors',
+                            active
+                              ? 'border-foreground bg-foreground text-background'
+                              : 'border-border bg-card hover:bg-muted text-foreground',
+                          )}
+                        >
+                          <span className="text-xs opacity-80">{PRON_FLAG[p.label] ?? '🔊'}</span>
+                          <span className="text-[10px] uppercase tracking-[0.15em]">{p.label}</span>
+                          {p.ipa ? (
+                            <span className="font-mono text-xs opacity-70">{p.ipa}</span>
+                          ) : null}
+                          <Volume2 className="size-3.5 opacity-60" />
+                        </button>
+                      )
+                    })}
                   </div>
-                </div>
-                <div className="lg:w-[340px] xl:w-[380px] shrink-0 p-6 lg:p-8 lg:pl-0">
-                  <WordPhoto word={entry.word} />
-                </div>
+                ) : null}
               </div>
-            </section>
 
-            {synonyms.length > 0 && (
-              <section className="rounded-2xl border border-amber-900/8 dark:border-amber-100/8 bg-white/50 dark:bg-white/[0.02] p-6">
-                <p className="text-[9px] uppercase tracking-[0.3em] text-stone-400 mb-4">Synonyms</p>
-                <div className="flex flex-wrap gap-2">
-                  {synonyms.map(s => (
-                    <button
-                      key={s}
-                      type="button"
-                      onClick={() => lookup(s)}
-                      className="text-sm px-4 py-1.5 rounded-full border border-amber-900/8 hover:border-amber-500/30 hover:bg-amber-500/5 transition-all cursor-pointer"
-                    >
-                      {s}
-                    </button>
+              <WordPhoto word={entry.word} />
+            </header>
+
+            {synonyms.length > 0 ? (
+              <section>
+                <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-3">
+                  Related
+                </p>
+                <p className="text-base leading-relaxed text-foreground/80">
+                  {synonyms.map((s, i) => (
+                    <span key={s}>
+                      <button
+                        type="button"
+                        onClick={() => lookup(s)}
+                        className="text-muted-foreground hover:text-foreground underline-offset-2 hover:underline transition-colors"
+                      >
+                        {s}
+                      </button>
+                      {i < synonyms.length - 1 ? (
+                        <span className="text-muted-foreground/40 mx-1.5">·</span>
+                      ) : null}
+                    </span>
                   ))}
-                </div>
+                </p>
               </section>
-            )}
+            ) : null}
 
-            <section className="grid lg:grid-cols-12 gap-8 items-start">
-              <div className="lg:col-span-7 space-y-6">
-                <div className="flex items-center gap-3">
-                  <BookOpen className="size-4 text-amber-600/60" />
-                  <h3 className="text-xl font-light">Definitions</h3>
-                </div>
-                <div className="space-y-4">
-                  {allDefs.map((def, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.03 }}
-                      className="relative pl-6 py-4 border-l border-amber-500/25"
+            {/* Definitions — clean numbered list */}
+            <section>
+              <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-6">
+                Meanings
+              </p>
+              <ol className="space-y-0 divide-y divide-border">
+                {allDefs.map((def, i) => (
+                  <li key={i} className="py-6 first:pt-0 grid grid-cols-[2.5rem_1fr] gap-2">
+                    <span
+                      className="text-2xl text-muted-foreground/40 leading-none pt-0.5 tabular-nums"
+                      style={{ fontFamily: 'var(--font-dict-display), Georgia, serif' }}
                     >
-                      <span className="absolute left-0 top-5 -translate-x-1/2 size-2 rounded-full bg-amber-500/60" />
-                      <span className="text-[9px] uppercase tracking-[0.25em] text-amber-700/50 dark:text-amber-300/40">
+                      {i + 1}
+                    </span>
+                    <div>
+                      <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
                         {def.partOfSpeech}
                       </span>
-                      <p className="mt-1 text-base text-stone-700 dark:text-stone-300 leading-relaxed">{def.definition}</p>
-                      {def.example && (
-                        <p className="mt-3 text-sm italic text-stone-500 dark:text-stone-400 pl-4 border-l border-amber-400/20">
-                          &ldquo;{def.example}&rdquo;
+                      <p className="mt-1.5 text-[1.05rem] leading-relaxed text-foreground">
+                        {def.definition}
+                      </p>
+                      {def.example ? (
+                        <p
+                          className="mt-3 text-[0.95rem] italic text-muted-foreground leading-relaxed"
+                          style={{ fontFamily: 'var(--font-dict-display), Georgia, serif' }}
+                        >
+                          “{def.example}”
                         </p>
-                      )}
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="lg:col-span-5 space-y-6">
-                {examples.length > 0 && (
-                  <div className="rounded-2xl border border-amber-900/8 dark:border-amber-100/8 p-6 bg-white/50 dark:bg-white/[0.02]">
-                    <div className="flex items-center gap-2 mb-4">
-                      <Sparkles className="size-4 text-amber-600/50" />
-                      <span className="text-[9px] uppercase tracking-[0.3em] text-stone-400">In context</span>
+                      ) : null}
                     </div>
-                    <div className="space-y-4">
-                      {examples.slice(0, 6).map((ex, i) => (
-                        <div key={i}>
-                          <p className="text-sm italic text-stone-600 dark:text-stone-400 leading-relaxed">
-                            &ldquo;{ex.example}&rdquo;
-                          </p>
-                          <p className="mt-1 text-xs text-stone-400 line-clamp-2">{ex.def}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {entry.sourceUrls?.[0] && (
-                  <div className="rounded-2xl border border-amber-900/8 dark:border-amber-100/8 p-6 bg-white/50 dark:bg-white/[0.02]">
-                    <p className="text-[9px] uppercase tracking-[0.3em] text-stone-400 mb-3">Source</p>
-                    <a
-                      href={entry.sourceUrls[0]}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm text-amber-800/70 dark:text-amber-200/60 hover:underline break-all"
-                    >
-                      Wiktionary reference
-                    </a>
-                  </div>
-                )}
-              </div>
+                  </li>
+                ))}
+              </ol>
             </section>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
-      <footer className="text-center pt-4">
-        <p className="text-[9px] uppercase tracking-[0.35em] text-stone-400 dark:text-stone-600">
-          Free Dictionary API · Datamuse
-        </p>
-      </footer>
+            {entry.sourceUrls?.[0] ? (
+              <footer className="pt-2 border-t border-border">
+                <a
+                  href={entry.sourceUrls[0]}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Source →
+                </a>
+              </footer>
+            ) : null}
+          </motion.article>
+        ) : null}
+      </AnimatePresence>
     </div>
   )
 }
