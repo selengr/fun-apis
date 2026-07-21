@@ -216,7 +216,7 @@ export function MarketsBentoCards() {
       <Link href="/crypto" className="col-span-12 md:col-span-4 block">
         <MarketBentoCard
           className="p-0 min-h-[200px] h-full cursor-pointer overflow-hidden relative"
-          style={{ background: '#0c0c0c', borderColor: 'rgba(255,255,255,0.08)' }}
+          style={{ background: '#14181d', borderColor: 'rgba(255,255,255,0.1)' }}
           delay={120}
         >
           <svg
@@ -231,9 +231,9 @@ export function MarketsBentoCards() {
                 <stop offset="100%" stopColor="#34d399" stopOpacity="0" />
               </linearGradient>
               <linearGradient id="cd" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#0c0c0c" stopOpacity="0" />
-                <stop offset="55%" stopColor="#0c0c0c" stopOpacity=".7" />
-                <stop offset="100%" stopColor="#0c0c0c" stopOpacity="1" />
+                <stop offset="0%" stopColor="#14181d" stopOpacity="0" />
+                <stop offset="55%" stopColor="#14181d" stopOpacity=".65" />
+                <stop offset="100%" stopColor="#14181d" stopOpacity="1" />
               </linearGradient>
             </defs>
             <line x1="0" y1="60" x2="300" y2="60" stroke="#fff" strokeWidth=".3" opacity=".06" />
