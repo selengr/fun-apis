@@ -230,8 +230,8 @@ export function UserLocationFinder() {
     return `https://maps.google.com/maps?q=${latitude},${longitude}&z=${zoom}&output=embed`
   }, [activeCoords, usePrecise, precise])
 
-  const ink = 'text-[var(--loc-ink)] dark:text-[#e8f0ed]'
-  const mute = 'text-[var(--loc-ink)]/50 dark:text-[#e8f0ed]/50'
+  const ink = 'text-[var(--loc-ink)]'
+  const mute = 'text-[var(--loc-ink)]/50'
   const mono = { fontFamily: 'var(--font-loc-mono), ui-monospace, monospace' } as const
   const display = { fontFamily: 'var(--font-loc-display), Georgia, serif' } as const
   const mark = { fontFamily: 'var(--font-loc-mark), system-ui, sans-serif' } as const
@@ -258,7 +258,7 @@ export function UserLocationFinder() {
         <button
           type="button"
           onClick={fetchLocation}
-          className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] border border-[var(--loc-ink)]/25 dark:border-white/25 px-5 py-3 hover:bg-[var(--loc-signal)] hover:text-white hover:border-[var(--loc-signal)] transition-colors cursor-pointer"
+          className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] border border-[var(--loc-line)] px-5 py-3 hover:bg-[var(--loc-signal)] hover:text-white hover:border-[var(--loc-signal)] transition-colors cursor-pointer"
           style={mono}
         >
           <RefreshCw className="size-3.5" />
@@ -362,7 +362,7 @@ export function UserLocationFinder() {
             transition={{ duration: 0.7, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
             className="relative"
           >
-            <div className="relative border border-[var(--loc-ink)]/15 dark:border-white/15 bg-[var(--loc-paper)]/55 dark:bg-[#0a161c]/55 backdrop-blur-sm px-6 py-8 md:px-8 md:py-10">
+            <div className="relative border border-[var(--loc-line)] bg-[var(--loc-panel)] backdrop-blur-sm px-6 py-8 md:px-8 md:py-10">
               <CornerMarks />
 
               {/* Soft radar disc behind IP */}
@@ -508,7 +508,7 @@ export function UserLocationFinder() {
 
         {geoError ? (
           <p
-            className="mb-3 text-xs border border-amber-700/25 bg-amber-500/10 text-amber-900 dark:text-amber-100/90 px-4 py-2.5"
+            className="mb-3 text-xs border border-amber-600/30 bg-amber-500/10 text-amber-900 dark:text-amber-100/90 px-4 py-2.5"
             style={mono}
           >
             {geoError}
@@ -530,7 +530,7 @@ export function UserLocationFinder() {
                   onKeyDown={e => e.key === 'Enter' && handleManualSearch()}
                   placeholder="City, Country"
                   className={cn(
-                    'flex-1 h-11 bg-transparent border border-[var(--loc-ink)]/20 dark:border-white/20 px-4 text-sm outline-none focus:border-[var(--loc-signal)] transition-colors',
+                    'flex-1 h-11 bg-transparent border border-[var(--loc-line)] px-4 text-sm outline-none focus:border-[var(--loc-signal)] transition-colors',
                     ink,
                   )}
                   style={mono}
@@ -540,7 +540,7 @@ export function UserLocationFinder() {
                   type="button"
                   onClick={handleManualSearch}
                   disabled={searching || !searchQuery.trim()}
-                  className="h-11 px-5 text-[10px] uppercase tracking-[0.18em] bg-[var(--loc-ink)] text-[var(--loc-mist)] dark:bg-[#e8f0ed] dark:text-[#0e1c24] disabled:opacity-40 cursor-pointer"
+                  className="h-11 px-5 text-[10px] uppercase tracking-[0.18em] bg-[var(--loc-ink)] text-[var(--loc-mist)] disabled:opacity-40 cursor-pointer"
                   style={mono}
                 >
                   {searching ? '…' : 'Pin'}
@@ -563,10 +563,10 @@ export function UserLocationFinder() {
           </p>
         ) : null}
 
-        <div className="relative border border-[var(--loc-ink)]/15 dark:border-white/15 bg-[var(--loc-ink)]/5 overflow-hidden">
+        <div className="relative border border-[var(--loc-line)] bg-[var(--loc-ink)]/[0.04] overflow-hidden">
           <CornerMarks />
           <div
-            className="flex items-center justify-between px-4 py-2.5 border-b border-[var(--loc-ink)]/10 dark:border-white/10 text-[10px] uppercase tracking-[0.22em]"
+            className="flex items-center justify-between px-4 py-2.5 border-b border-[var(--loc-line-soft)] text-[10px] uppercase tracking-[0.22em]"
             style={mono}
           >
             <span className={mute}>
@@ -613,7 +613,7 @@ export function UserLocationFinder() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.35 }}
-        className="mt-8 md:mt-10 border-y border-[var(--loc-ink)]/15 dark:border-white/15"
+        className="mt-8 md:mt-10 border-y border-[var(--loc-line)]"
       >
         <div className="grid grid-cols-2 md:grid-cols-4">
           {[
@@ -644,8 +644,8 @@ export function UserLocationFinder() {
               key={item.label}
               className={cn(
                 'px-4 py-5 md:py-6',
-                i % 2 === 1 && 'border-l border-[var(--loc-ink)]/10 dark:border-white/10',
-                i >= 2 && 'border-t md:border-t-0 border-[var(--loc-ink)]/10 dark:border-white/10',
+                i % 2 === 1 && 'border-l border-[var(--loc-line-soft)]',
+                i >= 2 && 'border-t md:border-t-0 border-[var(--loc-line-soft)]',
                 i === 2 && 'md:border-l',
               )}
             >
