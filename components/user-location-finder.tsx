@@ -258,7 +258,7 @@ export function UserLocationFinder() {
         <button
           type="button"
           onClick={fetchLocation}
-          className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] border border-[#0e1c24]/15 dark:border-white/15 px-5 py-3 hover:bg-[#0d8f7f] dark:bg-teal-400 hover:text-white hover:border-[#0d8f7f] dark:border-teal-400 transition-colors cursor-pointer"
+          className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] border border-[#0e1c24]/15 dark:border-white/15 px-5 py-3 hover:bg-[#0d8f7f] hover:border-[#0d8f7f] hover:text-white dark:hover:bg-teal-400 dark:hover:border-teal-400 dark:hover:text-[#071216] transition-colors cursor-pointer"
           style={mono}
         >
           <RefreshCw className="size-3.5" />
