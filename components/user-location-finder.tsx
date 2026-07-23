@@ -465,7 +465,7 @@ export function UserLocationFinder() {
               disabled={geoLoading}
               className={cn(
                 'inline-flex items-center gap-2 h-10 px-4 text-[10px] uppercase tracking-[0.18em] border transition-colors cursor-pointer disabled:opacity-50',
-                'border-[var(--loc-ink)]/20 dark:border-white/20 hover:border-[var(--loc-signal)] hover:bg-[var(--loc-signal)] hover:text-white',
+                'border border-[var(--loc-line)] hover:border-[var(--loc-signal)] hover:bg-[var(--loc-signal)] hover:text-[var(--loc-mist)]',
                 ink,
               )}
               style={mono}
@@ -482,7 +482,7 @@ export function UserLocationFinder() {
               onClick={() => setShowSearch(v => !v)}
               className={cn(
                 'inline-flex items-center gap-2 h-10 px-4 text-[10px] uppercase tracking-[0.18em] border transition-colors cursor-pointer',
-                'border-[var(--loc-ink)]/20 dark:border-white/20 hover:border-[var(--loc-ink)]/40',
+                'border border-[var(--loc-line)] hover:border-[var(--loc-ink)]/40',
                 ink,
               )}
               style={mono}
