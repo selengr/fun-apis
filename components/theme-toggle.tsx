@@ -12,7 +12,7 @@ const navBtnClass =
 
 export function ThemeToggle() {
   const [mounted, setMounted] = React.useState(false)
-  const { theme, setTheme } = useTheme()
+  const { resolvedTheme, setTheme } = useTheme()
 
   React.useEffect(() => {
     setMounted(true)
@@ -29,10 +29,12 @@ export function ThemeToggle() {
     )
   }
 
+  const isDark = resolvedTheme === 'dark'
+
   return (
     <button
       type="button"
-      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+      onClick={() => setTheme(isDark ? 'light' : 'dark')}
       className={`relative ${navBtnClass}`}
       aria-label="Toggle theme"
     >
