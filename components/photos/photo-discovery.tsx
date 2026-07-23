@@ -388,7 +388,9 @@ export function PhotoDiscovery() {
             {loadError.includes('UNSPLASH_ACCESS_KEY') && (
               <p className="mt-2 text-red-200/60 text-xs">
                 Add <code className="rounded bg-black/30 px-1">UNSPLASH_ACCESS_KEY</code> to{' '}
-                <code className="rounded bg-black/30 px-1">.env.local</code> and restart the dev server.
+                <code className="rounded bg-black/30 px-1">.env.local</code> locally, or to{' '}
+                <code className="rounded bg-black/30 px-1">Vercel → Environment Variables</code> for
+                production, then redeploy.
               </p>
             )}
             <button
