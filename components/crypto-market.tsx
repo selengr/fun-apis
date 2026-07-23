@@ -2,93 +2,74 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import {
-  TrendingUp,
-  TrendingDown,
-  Search,
-  RefreshCw,
-  Zap,
-  Globe2,
-  BarChart2,
-  Coins,
-  Radio,
-} from 'lucide-react'
+import { Search, RefreshCw } from 'lucide-react'
 import type { CoinMarket, GlobalMarketData } from '@/types/coingecko'
-import { Input } from '@/components/ui/input'
 import { Sparkline } from '@/components/crypto-sparkline'
 import { formatPct, formatUsd } from '@/lib/crypto-format'
+import { cn } from '@/lib/utils'
 
 const REFRESH_MS = 30_000
 
-function ChangePill({ value, size = 'sm' }: { value: number; size?: 'sm' | 'lg' }) {
+const mono = { fontFamily: 'var(--font-cx-mono), ui-monospace, monospace' } as const
+const display = { fontFamily: 'var(--font-cx-display), Georgia, serif' } as const
+const mark = { fontFamily: 'var(--font-cx-mark), system-ui, sans-serif' } as const
+
+function Delta({ value, large }: { value: number; large?: boolean }) {
   const up = value >= 0
   return (
     <span
-      className={`inline-flex items-center gap-1 font-semibold tabular-nums rounded-full border ${
-        size === 'lg' ? 'text-sm px-3 py-1' : 'text-[11px] px-2 py-0.5'
-      } ${
-        up
-          ? 'text-emerald-400 bg-emerald-500/15 border-emerald-500/25'
-          : 'text-red-400 bg-red-500/15 border-red-500/25'
-      }`}
+      className={cn(
+        'font-semibold tabular-nums tracking-tight',
+        large ? 'text-base md:text-lg' : 'text-[11px] md:text-xs',
+      )}
+      style={{
+        ...mono,
+        color: up ? 'var(--cx-up)' : 'var(--cx-down)',
+      }}
     >
-      {up ? <TrendingUp className={size === 'lg' ? 'size-3.5' : 'size-3'} /> : <TrendingDown className={size === 'lg' ? 'size-3.5' : 'size-3'} />}
       {formatPct(value)}
     </span>
   )
 }
 
-function RankBadge({ rank }: { rank: number }) {
-  if (rank <= 3) {
-    const colors = [
-      'from-amber-400/20 to-amber-600/10 text-amber-500 border-amber-500/30',
-      'from-slate-300/20 to-slate-500/10 text-slate-400 border-slate-400/30',
-      'from-orange-400/20 to-orange-700/10 text-orange-500 border-orange-600/30',
-    ]
-    return (
-      <span
-        className={`inline-flex size-7 items-center justify-center rounded-lg bg-gradient-to-br border text-xs font-bold tabular-nums ${colors[rank - 1]}`}
-      >
-        {rank}
-      </span>
-    )
-  }
-  return (
-    <span className="inline-flex size-7 items-center justify-center rounded-lg bg-muted/40 text-xs text-muted-foreground tabular-nums">
-      {rank}
-    </span>
-  )
-}
-
 function TickerTape({ coins }: { coins: CoinMarket[] }) {
-  const items = [...coins.slice(0, 12), ...coins.slice(0, 12)]
+  const items = [...coins.slice(0, 14), ...coins.slice(0, 14)]
   if (!items.length) return null
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-border/60 bg-card/30 backdrop-blur-md py-2.5">
-      <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
-      <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+    <div className="relative overflow-hidden border-y border-[color:var(--cx-line)] bg-[color:var(--cx-tape)] py-3">
       <div
-        className="flex gap-8 whitespace-nowrap"
-        style={{ animation: 'ticker 40s linear infinite' }}
+        className="pointer-events-none absolute inset-y-0 left-0 w-16 z-10"
+        style={{ background: 'linear-gradient(90deg, var(--cx-bg), transparent)' }}
+      />
+      <div
+        className="pointer-events-none absolute inset-y-0 right-0 w-16 z-10"
+        style={{ background: 'linear-gradient(270deg, var(--cx-bg), transparent)' }}
+      />
+      <div
+        className="flex gap-10 whitespace-nowrap w-max"
+        style={{ animation: 'cx-ticker 55s linear infinite' }}
       >
         {items.map((coin, i) => (
-          <span key={`${coin.id}-${i}`} className="inline-flex items-center gap-2 text-sm shrink-0">
-            <img src={coin.image} alt="" className="size-5 rounded-full" />
-            <span className="font-medium text-foreground uppercase text-xs">{coin.symbol}</span>
-            <span className="font-mono tabular-nums text-foreground/90">{formatUsd(coin.current_price)}</span>
-            <span
-              className={`text-xs font-medium tabular-nums ${
-                coin.price_change_percentage_24h >= 0 ? 'text-emerald-400' : 'text-red-400'
-              }`}
-            >
-              {formatPct(coin.price_change_percentage_24h)}
+          <span
+            key={`${coin.id}-${i}`}
+            className="inline-flex items-center gap-2.5 text-sm shrink-0"
+            style={mono}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={coin.image} alt="" className="size-4 rounded-full opacity-90" />
+            <span className="uppercase text-[11px] tracking-wider text-[color:var(--cx-mute)]">
+              {coin.symbol}
             </span>
+            <span className="tabular-nums text-[color:var(--cx-fg)]">
+              {formatUsd(coin.current_price)}
+            </span>
+            <Delta value={coin.price_change_percentage_24h} />
           </span>
         ))}
       </div>
       <style>{`
-        @keyframes ticker {
+        @keyframes cx-ticker {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
         }
@@ -104,7 +85,7 @@ const SORT_OPTIONS: { key: SortKey; label: string }[] = [
   { key: 'price', label: 'Price' },
   { key: 'change24h', label: '24h' },
   { key: 'market_cap', label: 'MCap' },
-  { key: 'volume', label: 'Volume' },
+  { key: 'volume', label: 'Vol' },
 ]
 
 export function CryptoMarket() {
@@ -115,7 +96,6 @@ export function CryptoMarket() {
   const [query, setQuery] = useState('')
   const [sort, setSort] = useState<SortKey>('rank')
   const [countdown, setCountdown] = useState(30)
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
   const [refreshing, setRefreshing] = useState(false)
 
   const fetchData = useCallback(async (search?: string) => {
@@ -129,7 +109,6 @@ export function CryptoMarket() {
       setCoins(json.coins ?? [])
       if (json.global?.data) setGlobal(json.global.data)
       setError(null)
-      setLastUpdated(new Date())
       setCountdown(30)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong')
@@ -158,209 +137,329 @@ export function CryptoMarket() {
   const sorted = useMemo(() => {
     const list = [...coins]
     switch (sort) {
-      case 'price': return list.sort((a, b) => b.current_price - a.current_price)
-      case 'change24h': return list.sort((a, b) => b.price_change_percentage_24h - a.price_change_percentage_24h)
-      case 'market_cap': return list.sort((a, b) => b.market_cap - a.market_cap)
-      case 'volume': return list.sort((a, b) => b.total_volume - a.total_volume)
-      default: return list.sort((a, b) => a.market_cap_rank - b.market_cap_rank)
+      case 'price':
+        return list.sort((a, b) => b.current_price - a.current_price)
+      case 'change24h':
+        return list.sort(
+          (a, b) => b.price_change_percentage_24h - a.price_change_percentage_24h,
+        )
+      case 'market_cap':
+        return list.sort((a, b) => b.market_cap - a.market_cap)
+      case 'volume':
+        return list.sort((a, b) => b.total_volume - a.total_volume)
+      default:
+        return list.sort((a, b) => a.market_cap_rank - b.market_cap_rank)
     }
   }, [coins, sort])
 
-  const topThree = sorted.slice(0, 3)
+  const hero = sorted[0]
+  const board = sorted.slice(0, 5)
 
   if (loading && coins.length === 0) {
     return (
-      <div className="max-w-6xl mx-auto px-4 space-y-4">
-        <div className="h-12 rounded-2xl bg-muted/30 animate-pulse" />
-        <div className="grid md:grid-cols-3 gap-3">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="h-44 rounded-2xl bg-muted/40 animate-pulse" />
+      <div className="max-w-6xl mx-auto px-6 md:px-10 space-y-6">
+        <div className="h-16 w-48 bg-[color:var(--cx-fg)]/10 animate-pulse" />
+        <div className="h-24 w-full max-w-xl bg-[color:var(--cx-fg)]/10 animate-pulse" />
+        <div className="h-12 w-full bg-[color:var(--cx-fg)]/8 animate-pulse" />
+        <div className="grid md:grid-cols-5 gap-px">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="h-40 bg-[color:var(--cx-fg)]/8 animate-pulse" />
           ))}
         </div>
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="h-16 rounded-xl bg-muted/25 animate-pulse" />
-        ))}
       </div>
     )
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 pb-16 space-y-6">
-      {/* Live ticker */}
-      <TickerTape coins={sorted} />
-
-      {/* Global pulse strip */}
-      {global && (
+    <div className="space-y-0">
+      {/* ── HERO ─────────────────────────────────────────────────────────── */}
+      <section className="max-w-6xl mx-auto px-6 md:px-10 mb-10 md:mb-14">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-3"
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-10"
         >
-          {[
-            { icon: Globe2, label: 'Market Cap', value: formatUsd(global.total_market_cap.usd, true), sub: formatPct(global.market_cap_change_percentage_24h_usd) + ' today', accent: 'from-violet-500/20 to-transparent' },
-            { icon: BarChart2, label: '24h Volume', value: formatUsd(global.total_volume.usd, true), sub: `${global.markets.toLocaleString()} exchanges`, accent: 'from-sky-500/20 to-transparent' },
-            { icon: Zap, label: 'BTC Dominance', value: `${global.market_cap_percentage.btc.toFixed(1)}%`, sub: `ETH ${global.market_cap_percentage.eth.toFixed(1)}%`, accent: 'from-amber-500/20 to-transparent' },
-            { icon: Coins, label: 'Assets Tracked', value: global.active_cryptocurrencies.toLocaleString(), sub: 'live universe', accent: 'from-emerald-500/20 to-transparent' },
-          ].map((s, i) => (
-            <motion.div
-              key={s.label}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.06 }}
-              className="group relative overflow-hidden rounded-2xl border border-border/50 bg-card/40 backdrop-blur-xl p-4 hover:border-border transition-colors"
+          <div className="max-w-xl">
+            <p
+              className="text-[10px] uppercase tracking-[0.35em] text-[color:var(--cx-mute)] mb-5"
+              style={mono}
             >
-              <div className={`absolute inset-0 bg-gradient-to-br ${s.accent} opacity-60 group-hover:opacity-100 transition-opacity`} />
-              <div className="relative">
-                <div className="flex items-center gap-2 text-muted-foreground mb-2">
-                  <s.icon className="size-3.5" />
-                  <span className="text-[10px] uppercase tracking-[0.15em]">{s.label}</span>
+              CoinGecko wire · USD
+            </p>
+            <h1
+              className="text-[clamp(3.5rem,14vw,8rem)] leading-[0.85] tracking-tight text-[color:var(--cx-fg)]"
+              style={display}
+            >
+              Tick
+              <span style={{ color: 'var(--cx-signal)' }}>.</span>
+            </h1>
+            <p
+              className="mt-6 text-lg md:text-xl text-[color:var(--cx-mute)] max-w-md leading-snug"
+              style={display}
+            >
+              The open market tape — prices, dominance, and seven-day pulse.
+            </p>
+          </div>
+
+          {hero ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.97 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.12, duration: 0.55 }}
+              className="relative border border-[color:var(--cx-line)] bg-[color:var(--cx-panel)] backdrop-blur-sm px-6 py-6 md:px-8 md:py-7 min-w-[min(100%,320px)]"
+            >
+              <div className="pointer-events-none absolute top-3 left-3 size-3 border-l border-t border-[color:var(--cx-signal)]" />
+              <div className="pointer-events-none absolute top-3 right-3 size-3 border-r border-t border-[color:var(--cx-signal)]" />
+              <div className="pointer-events-none absolute bottom-3 left-3 size-3 border-l border-b border-[color:var(--cx-signal)]" />
+              <div className="pointer-events-none absolute bottom-3 right-3 size-3 border-r border-b border-[color:var(--cx-signal)]" />
+
+              <div className="flex items-center gap-3 mb-4">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={hero.image} alt="" className="size-9 rounded-full" />
+                <div>
+                  <p className="text-sm text-[color:var(--cx-fg)]" style={mark}>
+                    {hero.name}
+                  </p>
+                  <p
+                    className="text-[10px] uppercase tracking-[0.2em] text-[color:var(--cx-mute)]"
+                    style={mono}
+                  >
+                    #{hero.market_cap_rank} · {hero.symbol}
+                  </p>
                 </div>
-                <p className="text-xl md:text-2xl font-semibold tabular-nums tracking-tight text-foreground">
-                  {s.value}
-                </p>
-                <p className="text-[11px] text-muted-foreground mt-1">{s.sub}</p>
+              </div>
+              <p
+                className="text-[clamp(1.8rem,5vw,2.75rem)] font-bold tabular-nums tracking-tight leading-none text-[color:var(--cx-fg)]"
+                style={mono}
+              >
+                {formatUsd(hero.current_price)}
+              </p>
+              <div className="mt-3 flex items-center justify-between gap-4">
+                <Delta value={hero.price_change_percentage_24h} large />
+                <Sparkline
+                  data={hero.sparkline_in_7d?.price ?? []}
+                  positive={(hero.price_change_percentage_7d_in_currency ?? 0) >= 0}
+                />
               </div>
             </motion.div>
-          ))}
+          ) : null}
         </motion.div>
-      )}
+      </section>
 
-      {/* Top 3 bento */}
-      {topThree.length > 0 && (
-        <div className="grid md:grid-cols-3 gap-3">
-          {topThree.map((coin, i) => {
-            const up = coin.price_change_percentage_24h >= 0
-            const isHero = i === 0
-            return (
-              <motion.div
-                key={coin.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 + i * 0.08 }}
-                className={`relative overflow-hidden rounded-2xl border backdrop-blur-xl transition-all duration-300 hover:scale-[1.01] ${
-                  isHero
-                    ? 'md:col-span-1 border-amber-500/20 bg-gradient-to-br from-amber-500/10 via-card/80 to-orange-600/5 p-5 md:p-6'
-                    : 'border-border/50 bg-card/50 p-4 md:p-5'
-                }`}
+      {/* Full-bleed tape */}
+      <TickerTape coins={sorted} />
+
+      {/* ── GLOBAL LEDGER ────────────────────────────────────────────────── */}
+      {global ? (
+        <section className="max-w-6xl mx-auto px-6 md:px-10 mt-10 md:mt-12">
+          <div className="border-y border-[color:var(--cx-line)]">
+            <div className="grid grid-cols-2 md:grid-cols-4">
+              {[
+                {
+                  label: 'Market Cap',
+                  value: formatUsd(global.total_market_cap.usd, true),
+                  sub: formatPct(global.market_cap_change_percentage_24h_usd),
+                },
+                {
+                  label: '24h Volume',
+                  value: formatUsd(global.total_volume.usd, true),
+                  sub: `${global.markets.toLocaleString()} venues`,
+                },
+                {
+                  label: 'BTC Dom',
+                  value: `${global.market_cap_percentage.btc.toFixed(1)}%`,
+                  sub: `ETH ${global.market_cap_percentage.eth.toFixed(1)}%`,
+                },
+                {
+                  label: 'Universe',
+                  value: global.active_cryptocurrencies.toLocaleString(),
+                  sub: 'assets tracked',
+                },
+              ].map((item, i) => (
+                <div
+                  key={item.label}
+                  className={cn(
+                    'px-4 py-5 md:py-6',
+                    i % 2 === 1 && 'border-l border-[color:var(--cx-line-soft)]',
+                    i >= 2 && 'border-t md:border-t-0 border-[color:var(--cx-line-soft)]',
+                    i === 2 && 'md:border-l',
+                  )}
+                >
+                  <p
+                    className="text-[10px] uppercase tracking-[0.28em] text-[color:var(--cx-mute)] mb-2"
+                    style={mono}
+                  >
+                    {item.label}
+                  </p>
+                  <p
+                    className="text-xl md:text-2xl tabular-nums tracking-tight text-[color:var(--cx-fg)]"
+                    style={mono}
+                  >
+                    {item.value}
+                  </p>
+                  <p className="mt-1 text-[11px] text-[color:var(--cx-mute)]" style={mono}>
+                    {item.sub}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      {/* ── TOP BOARD ────────────────────────────────────────────────────── */}
+      {board.length > 0 ? (
+        <section className="max-w-6xl mx-auto px-6 md:px-10 mt-10 md:mt-14">
+          <div className="flex items-end justify-between gap-4 mb-5">
+            <div>
+              <p
+                className="text-[10px] uppercase tracking-[0.3em] text-[color:var(--cx-mute)] mb-1"
+                style={mono}
               >
-                {isHero && (
-                  <div
-                    className="absolute inset-0 opacity-[0.04]"
-                    style={{
-                      backgroundImage:
-                        'linear-gradient(var(--foreground) 1px, transparent 1px), linear-gradient(90deg, var(--foreground) 1px, transparent 1px)',
-                      backgroundSize: '20px 20px',
-                    }}
-                  />
-                )}
-                <div className="relative">
-                  <div className="flex items-start justify-between gap-2 mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="relative">
-                        <img
-                          src={coin.image}
-                          alt=""
-                          className={`rounded-full ring-2 ring-background ${isHero ? 'size-12' : 'size-10'}`}
-                        />
-                        <span className="absolute -bottom-1 -right-1 size-5 rounded-full bg-background flex items-center justify-center text-[9px] font-bold border border-border">
-                          {coin.market_cap_rank}
-                        </span>
-                      </div>
-                      <div>
-                        <p className="font-medium text-foreground">{coin.name}</p>
-                        <p className="text-[11px] uppercase font-mono text-muted-foreground">{coin.symbol}</p>
-                      </div>
-                    </div>
-                    <ChangePill value={coin.price_change_percentage_24h} size={isHero ? 'lg' : 'sm'} />
-                  </div>
+                Board
+              </p>
+              <h2 className="text-2xl md:text-3xl tracking-tight" style={display}>
+                Top of tape
+              </h2>
+            </div>
+          </div>
 
-                  <p className={`font-mono font-bold tabular-nums tracking-tight text-foreground ${isHero ? 'text-3xl md:text-4xl' : 'text-2xl'}`}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-px bg-[color:var(--cx-line)] border border-[color:var(--cx-line)]">
+            {board.map((coin, i) => {
+              const up = coin.price_change_percentage_24h >= 0
+              return (
+                <motion.div
+                  key={coin.id}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.05 + i * 0.05 }}
+                  className="bg-[color:var(--cx-bg)] p-4 md:p-5 flex flex-col min-h-[160px]"
+                >
+                  <div className="flex items-center justify-between gap-2 mb-4">
+                    <span
+                      className="text-[10px] tabular-nums text-[color:var(--cx-mute)]"
+                      style={mono}
+                    >
+                      {String(coin.market_cap_rank).padStart(2, '0')}
+                    </span>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={coin.image} alt="" className="size-6 rounded-full" />
+                  </div>
+                  <p
+                    className="text-[11px] uppercase tracking-[0.18em] text-[color:var(--cx-mute)]"
+                    style={mono}
+                  >
+                    {coin.symbol}
+                  </p>
+                  <p className="text-sm mt-0.5 text-[color:var(--cx-fg)] truncate" style={mark}>
+                    {coin.name}
+                  </p>
+                  <p
+                    className="mt-auto pt-4 text-lg font-semibold tabular-nums tracking-tight"
+                    style={mono}
+                  >
                     {formatUsd(coin.current_price)}
                   </p>
-
-                  <div className="flex items-end justify-between mt-4 gap-2">
-                    <div className="text-[11px] text-muted-foreground space-y-0.5">
-                      <p>MCap {formatUsd(coin.market_cap, true)}</p>
-                      <p>Vol {formatUsd(coin.total_volume, true)}</p>
+                  <div className="mt-2 flex items-center justify-between gap-2">
+                    <Delta value={coin.price_change_percentage_24h} />
+                    <div className="opacity-80">
+                      <Sparkline
+                        data={coin.sparkline_in_7d?.price ?? []}
+                        positive={(coin.price_change_percentage_7d_in_currency ?? 0) >= 0}
+                      />
                     </div>
-                    <Sparkline
-                      data={coin.sparkline_in_7d?.price ?? []}
-                      positive={(coin.price_change_percentage_7d_in_currency ?? 0) >= 0}
-                      large={isHero}
-                    />
                   </div>
-                </div>
-              </motion.div>
-            )
-          })}
-        </div>
-      )}
-
-      {/* Toolbar */}
-      <div className="flex flex-col gap-3">
-        <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
-          <div className="relative flex-1">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-            <Input
-              value={query}
-              onChange={e => setQuery(e.target.value)}
-              placeholder="Search 10,000+ assets…"
-              className="pl-10 h-11 rounded-2xl bg-card/50 border-border/60 backdrop-blur-sm"
-            />
+                  <div
+                    className="mt-3 h-px w-full"
+                    style={{ background: up ? 'var(--cx-up)' : 'var(--cx-down)', opacity: 0.45 }}
+                  />
+                </motion.div>
+              )
+            })}
           </div>
+        </section>
+      ) : null}
+
+      {/* ── CONTROLS + LEDGER ────────────────────────────────────────────── */}
+      <section className="max-w-6xl mx-auto px-6 md:px-10 mt-10 md:mt-14">
+        <div className="flex flex-col md:flex-row md:items-end gap-5 mb-6">
+          <div className="flex-1">
+            <label
+              className="block text-[10px] uppercase tracking-[0.28em] text-[color:var(--cx-mute)] mb-2"
+              style={mono}
+            >
+              Search tape
+            </label>
+            <div className="relative">
+              <Search className="absolute left-0 top-1/2 -translate-y-1/2 size-4 text-[color:var(--cx-mute)]" />
+              <input
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+                placeholder="bitcoin, sol, eth…"
+                className="w-full bg-transparent border-0 border-b border-[color:var(--cx-line)] focus:border-[color:var(--cx-signal)] pl-7 pr-2 py-3 text-base outline-none transition-colors placeholder:text-[color:var(--cx-mute)]"
+                style={mono}
+                aria-label="Search assets"
+              />
+            </div>
+          </div>
+
           <button
+            type="button"
             onClick={() => fetchData(query || undefined)}
             disabled={refreshing}
-            className="inline-flex items-center justify-center gap-2 h-11 px-4 rounded-2xl border border-border/60 bg-card/50 backdrop-blur-sm text-xs text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-all shrink-0"
+            className="inline-flex items-center gap-2 h-11 px-4 border border-[color:var(--cx-line)] text-[10px] uppercase tracking-[0.2em] hover:bg-[color:var(--cx-signal)] hover:text-[color:var(--cx-signal-ink)] hover:border-[color:var(--cx-signal)] transition-colors cursor-pointer disabled:opacity-50 shrink-0"
+            style={mono}
           >
-            <RefreshCw className={`size-3.5 ${refreshing ? 'animate-spin' : ''}`} />
-            <span className="inline-flex items-center gap-1.5">
-              <span className="relative flex size-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full size-2 bg-emerald-500" />
-              </span>
-              Live · {countdown}s
-            </span>
+            <RefreshCw className={cn('size-3.5', refreshing && 'animate-spin')} />
+            Live · {countdown}s
           </button>
         </div>
 
-        <div className="flex gap-1.5 flex-wrap">
+        <div className="flex flex-wrap gap-1 mb-6">
           {SORT_OPTIONS.map(opt => (
             <button
               key={opt.key}
+              type="button"
               onClick={() => setSort(opt.key)}
-              className={`text-[11px] px-3 py-1.5 rounded-full border transition-all duration-200 ${
+              className={cn(
+                'text-[10px] uppercase tracking-[0.18em] px-3 py-2 border transition-colors cursor-pointer',
                 sort === opt.key
-                  ? 'bg-foreground text-background border-foreground font-medium'
-                  : 'bg-card/40 text-muted-foreground border-border/60 hover:text-foreground hover:border-border'
-              }`}
+                  ? 'bg-[color:var(--cx-fg)] text-[color:var(--cx-bg)] border-[color:var(--cx-fg)]'
+                  : 'border-[color:var(--cx-line)] text-[color:var(--cx-mute)] hover:text-[color:var(--cx-fg)]',
+              )}
+              style={mono}
             >
               {opt.label}
             </button>
           ))}
         </div>
-      </div>
 
-      {error && (
-        <p className="text-sm text-red-400 text-center rounded-xl border border-red-500/20 bg-red-500/10 py-2 px-4">
-          {error}
-        </p>
-      )}
+        {error ? (
+          <p
+            className="mb-4 text-sm border border-[color:var(--cx-down)]/30 bg-[color:var(--cx-down)]/10 text-[color:var(--cx-down)] px-4 py-2.5"
+            style={mono}
+          >
+            {error}
+          </p>
+        ) : null}
 
-      {/* Market list */}
-      <div className="rounded-2xl border border-border/50 overflow-hidden bg-card/30 backdrop-blur-xl shadow-sm">
-        <div className="hidden lg:grid grid-cols-[3rem_1fr_8rem_4.5rem_5rem_5rem_7rem_7rem] gap-3 px-5 py-3.5 border-b border-border/40 bg-muted/20 text-[10px] uppercase tracking-[0.12em] text-muted-foreground font-medium">
+        {/* Desktop ledger header */}
+        <div
+          className="hidden lg:grid grid-cols-[3rem_minmax(0,1.4fr)_7.5rem_4rem_4.5rem_4rem_6.5rem_6.5rem] gap-3 px-1 py-3 border-b border-[color:var(--cx-line)] text-[10px] uppercase tracking-[0.22em] text-[color:var(--cx-mute)]"
+          style={mono}
+        >
           <span>#</span>
           <span>Asset</span>
           <span className="text-right">Price</span>
           <span className="text-right">1h</span>
           <span className="text-right">24h</span>
           <span className="text-right">7d</span>
-          <span className="text-right">Market Cap</span>
-          <span className="text-center">Trend</span>
+          <span className="text-right">MCap</span>
+          <span className="text-right">Trend</span>
         </div>
 
-        <div className="divide-y divide-border/30">
+        <div className="divide-y divide-[color:var(--cx-line-soft)]">
           <AnimatePresence mode="popLayout">
             {sorted.map((coin, i) => {
               const up24 = coin.price_change_percentage_24h >= 0
@@ -368,86 +467,93 @@ export function CryptoMarket() {
                 <motion.div
                   key={coin.id}
                   layout
-                  initial={{ opacity: 0, x: -8 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: Math.min(i * 0.015, 0.3) }}
-                  className={`group relative grid grid-cols-1 lg:grid-cols-[3rem_1fr_8rem_4.5rem_5rem_5rem_7rem_7rem] gap-2 lg:gap-3 px-5 py-4 items-center hover:bg-muted/15 transition-colors ${
-                    i < 3 ? 'bg-muted/5' : ''
-                  }`}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: Math.min(i * 0.012, 0.25) }}
+                  className="group relative grid grid-cols-1 lg:grid-cols-[3rem_minmax(0,1.4fr)_7.5rem_4rem_4.5rem_4rem_6.5rem_6.5rem] gap-2 lg:gap-3 px-1 py-4 items-center hover:bg-[color:var(--cx-tape)] transition-colors"
                 >
-                  <div
-                    className={`absolute left-0 top-2 bottom-2 w-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity ${
-                      up24 ? 'bg-emerald-500' : 'bg-red-500'
-                    }`}
+                  <span
+                    className="absolute left-0 top-3 bottom-3 w-px opacity-0 group-hover:opacity-100 transition-opacity"
+                    style={{ background: up24 ? 'var(--cx-up)' : 'var(--cx-down)' }}
                   />
 
-                  <div className="hidden lg:flex justify-center">
-                    <RankBadge rank={coin.market_cap_rank} />
-                  </div>
+                  <span
+                    className="hidden lg:block text-[11px] tabular-nums text-[color:var(--cx-mute)]"
+                    style={mono}
+                  >
+                    {String(coin.market_cap_rank).padStart(2, '0')}
+                  </span>
 
                   <div className="flex items-center gap-3 min-w-0">
-                    <img
-                      src={coin.image}
-                      alt=""
-                      className="size-9 rounded-full ring-1 ring-border/50 group-hover:ring-border transition-all"
-                    />
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={coin.image} alt="" className="size-8 rounded-full" />
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-foreground truncate group-hover:text-foreground transition-colors">
+                      <p className="text-sm truncate text-[color:var(--cx-fg)]" style={mark}>
                         {coin.name}
                       </p>
-                      <p className="text-[10px] uppercase font-mono text-muted-foreground tracking-wider">
+                      <p
+                        className="text-[10px] uppercase tracking-[0.16em] text-[color:var(--cx-mute)]"
+                        style={mono}
+                      >
                         {coin.symbol}
-                        <span className="lg:hidden ml-2 normal-case tracking-normal">#{coin.market_cap_rank}</span>
+                        <span className="lg:hidden ml-2 normal-case tracking-normal">
+                          #{coin.market_cap_rank}
+                        </span>
                       </p>
                     </div>
                     <div className="lg:hidden text-right">
-                      <p className="font-mono text-sm font-semibold tabular-nums">{formatUsd(coin.current_price)}</p>
-                      <ChangePill value={coin.price_change_percentage_24h} />
+                      <p className="text-sm font-semibold tabular-nums" style={mono}>
+                        {formatUsd(coin.current_price)}
+                      </p>
+                      <Delta value={coin.price_change_percentage_24h} />
                     </div>
                   </div>
 
-                  <span className="hidden lg:block text-right font-mono text-sm font-semibold tabular-nums text-foreground">
+                  <span
+                    className="hidden lg:block text-right text-sm font-semibold tabular-nums"
+                    style={mono}
+                  >
                     {formatUsd(coin.current_price)}
                   </span>
 
-                  <span
-                    className={`hidden lg:block text-right text-xs font-medium tabular-nums ${
-                      (coin.price_change_percentage_1h_in_currency ?? 0) >= 0 ? 'text-emerald-400' : 'text-red-400'
-                    }`}
-                  >
-                    {coin.price_change_percentage_1h_in_currency != null
-                      ? formatPct(coin.price_change_percentage_1h_in_currency)
-                      : '—'}
+                  <span className="hidden lg:flex justify-end">
+                    {coin.price_change_percentage_1h_in_currency != null ? (
+                      <Delta value={coin.price_change_percentage_1h_in_currency} />
+                    ) : (
+                      <span className="text-[color:var(--cx-mute)] text-xs">—</span>
+                    )}
                   </span>
 
-                  <div className="hidden lg:flex justify-end">
-                    <ChangePill value={coin.price_change_percentage_24h} />
-                  </div>
-
-                  <span
-                    className={`hidden lg:block text-right text-xs font-medium tabular-nums ${
-                      (coin.price_change_percentage_7d_in_currency ?? 0) >= 0 ? 'text-emerald-400' : 'text-red-400'
-                    }`}
-                  >
-                    {coin.price_change_percentage_7d_in_currency != null
-                      ? formatPct(coin.price_change_percentage_7d_in_currency)
-                      : '—'}
+                  <span className="hidden lg:flex justify-end">
+                    <Delta value={coin.price_change_percentage_24h} />
                   </span>
 
-                  <span className="hidden lg:block text-right text-xs text-muted-foreground tabular-nums">
+                  <span className="hidden lg:flex justify-end">
+                    {coin.price_change_percentage_7d_in_currency != null ? (
+                      <Delta value={coin.price_change_percentage_7d_in_currency} />
+                    ) : (
+                      <span className="text-[color:var(--cx-mute)] text-xs">—</span>
+                    )}
+                  </span>
+
+                  <span
+                    className="hidden lg:block text-right text-xs text-[color:var(--cx-mute)] tabular-nums"
+                    style={mono}
+                  >
                     {formatUsd(coin.market_cap, true)}
                   </span>
 
-                  <div className="hidden lg:flex justify-center opacity-70 group-hover:opacity-100 transition-opacity">
+                  <div className="hidden lg:flex justify-end opacity-75 group-hover:opacity-100 transition-opacity">
                     <Sparkline
                       data={coin.sparkline_in_7d?.price ?? []}
                       positive={(coin.price_change_percentage_7d_in_currency ?? 0) >= 0}
                     />
                   </div>
 
-                  <div className="flex lg:hidden items-center justify-between col-span-full pt-1 border-t border-border/20 mt-1">
-                    <span className="text-[11px] text-muted-foreground">
-                      MCap {formatUsd(coin.market_cap, true)} · Vol {formatUsd(coin.total_volume, true)}
+                  <div className="flex lg:hidden items-center justify-between col-span-full pt-2 border-t border-[color:var(--cx-line-soft)] mt-1">
+                    <span className="text-[11px] text-[color:var(--cx-mute)]" style={mono}>
+                      MCap {formatUsd(coin.market_cap, true)} · Vol{' '}
+                      {formatUsd(coin.total_volume, true)}
                     </span>
                     <Sparkline
                       data={coin.sparkline_in_7d?.price ?? []}
@@ -459,7 +565,7 @@ export function CryptoMarket() {
             })}
           </AnimatePresence>
         </div>
-      </div>
+      </section>
     </div>
   )
 }

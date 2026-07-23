@@ -24,8 +24,8 @@ export function Sparkline({ data, positive, large }: SparklineProps) {
     })
     .join(' ')
 
-  const stroke = positive ? '#34d399' : '#f87171'
-  const glow = positive ? 'rgba(52,211,153,0.35)' : 'rgba(248,113,113,0.35)'
+  const stroke = positive ? '#2d9a64' : '#e05548'
+  const glow = positive ? 'rgba(45,154,100,0.32)' : 'rgba(224,85,72,0.32)'
 
   return (
     <svg width={w} height={h} className="overflow-visible">
