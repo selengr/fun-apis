@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import { MetExplorer } from '@/components/met-explorer'
 import { ThemeToggle } from '@/components/theme-toggle'
 
@@ -25,17 +25,17 @@ export default function ArtPage() {
 
       <div className="fixed top-0 inset-x-0 z-50 flex justify-center px-4 pt-5 pointer-events-none">
         <div className="pointer-events-auto w-full max-w-2xl flex items-center justify-between px-4 py-2.5 rounded-full border border-stone-900/8 dark:border-amber-100/8 bg-[#f4efe6]/80 dark:bg-[#12100e]/80 backdrop-blur-xl">
+          <ThemeToggle />
+          <span className="font-pixel text-[9px] tracking-[0.22em] text-stone-400/80 hidden sm:inline">
+            THE MET
+          </span>
           <Link
             href="/"
             className="inline-flex items-center gap-2 text-[11px] px-3 py-2 rounded-full text-stone-500 hover:text-stone-900 dark:hover:text-stone-100 transition-colors tracking-[0.1em] uppercase cursor-pointer"
           >
-            <ArrowLeft className="size-3.5" />
             Return
+            <ArrowRight className="size-3.5" />
           </Link>
-          <span className="font-pixel text-[9px] tracking-[0.22em] text-stone-400/80 hidden sm:inline">
-            THE MET
-          </span>
-          <ThemeToggle />
         </div>
       </div>
 

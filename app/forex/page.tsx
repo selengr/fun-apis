@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import { ForexMarket } from '@/components/forex-market'
 import { PageHeader } from '@/components/page-header'
 import { ThemeToggle } from '@/components/theme-toggle'
@@ -37,13 +37,7 @@ export default function ForexPage() {
           className="pointer-events-auto w-full max-w-3xl flex items-center justify-between px-4 py-2.5 rounded-2xl border border-black/[0.06] dark:border-white/[0.08]"
           style={NAV_GLASS}
         >
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-[11px] px-3 py-2 rounded-xl border border-black/10 dark:border-white/20 text-black/70 dark:text-white/70 hover:text-black dark:hover:text-white transition-all tracking-wide cursor-pointer"
-          >
-            <ArrowLeft className="size-3.5" />
-            Back home
-          </Link>
+          <ThemeToggle />
           <span className="inline-flex items-center gap-2 font-pixel text-[10px] tracking-[0.2em] text-black/50 dark:text-white/50 hidden sm:inline">
             <span className="relative flex size-1.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
@@ -51,7 +45,13 @@ export default function ForexPage() {
             </span>
             FOREX
           </span>
-          <ThemeToggle />
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-[11px] px-3 py-2 rounded-xl border border-black/10 dark:border-white/20 text-black/70 dark:text-white/70 hover:text-black dark:hover:text-white transition-all tracking-wide cursor-pointer"
+          >
+            Back home
+            <ArrowRight className="size-3.5" />
+          </Link>
         </div>
       </div>
 

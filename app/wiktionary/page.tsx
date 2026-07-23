@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import { Cormorant_Garamond } from 'next/font/google'
 import { WiktionaryDictionary } from '@/components/wiktionary-dictionary'
 import { ThemeToggle } from '@/components/theme-toggle'
@@ -46,18 +46,18 @@ export default function WiktionaryPage() {
           className="pointer-events-auto w-full max-w-3xl flex items-center justify-between px-4 py-2.5 rounded-2xl border border-black/[0.06] dark:border-white/[0.08]"
           style={NAV_GLASS}
         >
+          <ThemeToggle />
+          <span className="font-pixel text-[10px] tracking-[0.2em] text-black/50 dark:text-white/50 hidden sm:inline">
+            WIKTIONARY
+          </span>
           <Link
             href="/"
             className="inline-flex items-center gap-2 text-[11px] px-3 py-2 rounded-xl border border-black/10 dark:border-white/20 text-black/70 dark:text-white/70 hover:text-black dark:hover:text-white hover:border-black/20 dark:hover:border-white/30 hover:bg-black/[0.03] dark:hover:bg-white/[0.08] transition-all duration-200 tracking-wide"
             style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
           >
-            <ArrowLeft className="size-3.5" />
             Back home
+            <ArrowRight className="size-3.5" />
           </Link>
-          <span className="font-pixel text-[10px] tracking-[0.2em] text-black/50 dark:text-white/50 hidden sm:inline">
-            WIKTIONARY
-          </span>
-          <ThemeToggle />
         </div>
       </div>
 
