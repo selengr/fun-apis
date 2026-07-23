@@ -240,10 +240,10 @@ export function UserLocationFinder() {
     return (
       <div className="max-w-6xl mx-auto px-6 md:px-10">
         <div className="relative min-h-[70vh] flex flex-col justify-center gap-8">
-          <div className="h-3 w-40 bg-[#0e1c24] dark:bg-[#e4efeb]/10 dark:bg-white/10 animate-pulse" />
-          <div className="h-20 md:h-28 w-full max-w-xl bg-[#0e1c24] dark:bg-[#e4efeb]/10 dark:bg-white/10 animate-pulse" />
-          <div className="h-14 w-full max-w-lg bg-[#0e1c24] dark:bg-[#e4efeb]/8 dark:bg-white/8 animate-pulse" />
-          <div className="h-[42vh] w-full bg-[#0e1c24] dark:bg-[#e4efeb]/8 dark:bg-white/8 animate-pulse mt-4" />
+          <div className="h-3 w-40 bg-[#0e1c24]/10 dark:bg-white/10 animate-pulse" />
+          <div className="h-20 md:h-28 w-full max-w-xl bg-[#0e1c24]/10 dark:bg-white/10 animate-pulse" />
+          <div className="h-14 w-full max-w-lg bg-[#0e1c24]/8 dark:bg-white/10 animate-pulse" />
+          <div className="h-[42vh] w-full bg-[#0e1c24]/8 dark:bg-white/10 animate-pulse mt-4" />
         </div>
       </div>
     )
@@ -464,7 +464,9 @@ export function UserLocationFinder() {
               onClick={requestPrecise}
               disabled={geoLoading}
               className={cn(
-                'inline-flex items-center gap-2 h-10 px-4 text-[10px] uppercase tracking-[0.18em] border border-[#0e1c24]/15 dark:border-white/15 transition-colors cursor-pointer disabled:opacity-50 hover:border-[#0d8f7f] dark:border-teal-400 hover:bg-[#0d8f7f] dark:bg-teal-400 hover:text-white dark:hover:text-[#071216]',
+                'inline-flex items-center gap-2 h-10 px-4 text-[10px] uppercase tracking-[0.18em] border border-[#0e1c24]/15 dark:border-white/15 transition-colors cursor-pointer disabled:opacity-50',
+                'hover:border-[#0d8f7f] hover:bg-[#0d8f7f] hover:text-white',
+                'dark:hover:border-teal-400 dark:hover:bg-teal-400 dark:hover:text-[#071216]',
                 ink,
               )}
               style={mono}
@@ -480,7 +482,8 @@ export function UserLocationFinder() {
               type="button"
               onClick={() => setShowSearch(v => !v)}
               className={cn(
-                'inline-flex items-center gap-2 h-10 px-4 text-[10px] uppercase tracking-[0.18em] border border-[#0e1c24]/15 dark:border-white/15 transition-colors cursor-pointer hover:border-[#0e1c24]/40 dark:border-white/40',
+                'inline-flex items-center gap-2 h-10 px-4 text-[10px] uppercase tracking-[0.18em] border border-[#0e1c24]/15 dark:border-white/15 transition-colors cursor-pointer',
+                'hover:border-[#0e1c24]/40 dark:hover:border-white/40',
                 ink,
               )}
               style={mono}
