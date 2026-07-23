@@ -35,9 +35,11 @@ export const SEARCH_SUGGESTIONS = [
 ] as const
 
 export function getUnsplashClient() {
-  const accessKey = process.env.UNSPLASH_ACCESS_KEY
+  const accessKey = process.env.UNSPLASH_ACCESS_KEY?.trim()
   if (!accessKey) {
-    throw new Error('Missing UNSPLASH_ACCESS_KEY in .env.local')
+    throw new Error(
+      'Missing UNSPLASH_ACCESS_KEY. Add it to .env.local locally, and to Vercel Environment Variables for production.',
+    )
   }
   return createApi({ accessKey })
 }
