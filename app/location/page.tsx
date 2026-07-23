@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import type { CSSProperties } from 'react'
 import { ArrowRight } from 'lucide-react'
 import { Instrument_Serif, JetBrains_Mono, Syne } from 'next/font/google'
 import { UserLocationFinder } from '@/components/user-location-finder'
@@ -41,7 +42,7 @@ export default function LocationPage() {
           '--loc-signal-dim': 'rgba(13, 143, 127, 0.18)',
           background: 'var(--loc-mist)',
           color: 'var(--loc-ink)',
-        } as React.CSSProperties
+        } as CSSProperties
       }
     >
       {/* Cartographic atmosphere — topo wash, not a stock globe card */}

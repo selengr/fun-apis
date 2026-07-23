@@ -666,14 +666,10 @@ export function UserLocationFinder() {
         </div>
       </motion.section>
 
-      <style jsx global>{`
+      <style>{`
         @keyframes loc-radar {
-          from {
-            transform: translate(-50%, -50%) rotate(0deg);
-          }
-          to {
-            transform: translate(-50%, -50%) rotate(360deg);
-          }
+          from { transform: translate(-50%, -50%) rotate(0deg); }
+          to { transform: translate(-50%, -50%) rotate(360deg); }
         }
       `}</style>
     </div>
