@@ -305,7 +305,7 @@ export default function AgenticPage() {
               />
             </div>
 
-            <div className="flex flex-col md:flex-row gap-3 p-4 md:absolute md:bottom-4 md:right-4 md:p-0 md:w-auto">
+            <div className="flex flex-col md:flex-row-reverse gap-3 p-4 md:absolute md:bottom-4 md:right-4 md:p-0 md:w-auto">
               <article className="rounded-xl border border-border/50 bg-card/60 backdrop-blur-xl p-6 md:w-72 flex flex-col">
                 <div className="flex items-start justify-between gap-3 mb-4">
                   <h3 className="text-lg font-light">Convert a file</h3>
