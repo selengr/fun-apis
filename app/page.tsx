@@ -281,63 +281,77 @@ export default function AgenticPage() {
         className="py-32 px-6 md:px-12 lg:px-20 border-t border-border"
       >
         <div className="max-w-6xl mx-auto">
-          <div className="mb-16">
-            <PixelIcon type="integrations" size={40} />
-            <div className="mt-4">
-              <Tag>TOOLS</Tag>
+          <div className="mb-14 md:mb-16 flex flex-col md:flex-row md:items-end md:justify-between gap-8">
+            <div>
+              <PixelIcon type="integrations" size={40} />
+              <div className="mt-4">
+                <Tag>TOOLS</Tag>
+              </div>
+              <RevealText className="mt-5 text-4xl md:text-5xl font-light tracking-tight leading-[1.05]">
+                {"Stamp. Morph.\nDone."}
+              </RevealText>
             </div>
-            <RevealText className="mt-5 text-4xl md:text-5xl font-light tracking-tight leading-[1.05]">
-              {"Quick tools.\nWhen you need them."}
-            </RevealText>
+            <p className="text-sm text-muted-foreground leading-relaxed max-w-xs md:text-right">
+              Two ateliers on the homepage — full studios live one click away.
+            </p>
           </div>
 
-          {/* Full-width image block with glass cards */}
-          <div
-            className="rounded-2xl overflow-hidden border border-border flex flex-col md:block md:relative"
-            onMouseMove={handleMouse}
-          >
-            <div className="relative w-full h-[240px] md:h-[340px] shrink-0">
-              <img
-                src="/images/banners/https___west.avif"
-                alt="Quick tools"
-                className="absolute inset-0 w-full h-full object-cover object-center"
-              />
-            </div>
-
-            <div className="flex flex-col md:flex-row gap-3 p-4 md:absolute md:bottom-4 md:right-4 md:p-0 md:w-auto">
-              <div className="rounded-xl border border-border/50 p-6 pt-4 bg-card/60 backdrop-blur-xl md:w-72">
-                <div className="flex items-start justify-between gap-3 mb-2">
-                  <h3 className="text-lg font-light">Make a QR</h3>
-                  <Link
-                    href="/qr"
-                    className="inline-flex items-center gap-0.5 text-[10px] text-muted-foreground/70 hover:text-foreground transition-colors tracking-wide shrink-0 mt-1"
-                  >
-                    More details
-                    <ArrowUpRight className="size-3" />
-                  </Link>
+          <div className="grid md:grid-cols-2 gap-4 md:gap-5">
+            {/* Stamp — QR */}
+            <article className="group relative flex flex-col min-h-[420px] overflow-hidden rounded-[1.5rem] border border-border bg-gradient-to-b from-card/80 to-muted/20 dark:from-card/50 dark:to-background/40 p-6 md:p-8">
+              <div className="flex items-start justify-between gap-3 mb-6">
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.28em] text-muted-foreground mb-2">
+                    01 · Stamp
+                  </p>
+                  <h3 className="text-2xl md:text-3xl font-light tracking-tight text-foreground">
+                    Make a QR
+                  </h3>
                 </div>
+                <Link
+                  href="/qr"
+                  className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.18em] text-muted-foreground hover:text-foreground transition-colors shrink-0 mt-1"
+                >
+                  Studio
+                  <ArrowUpRight className="size-3" />
+                </Link>
+              </div>
+              <div className="flex-1">
                 <QuickQrMaker />
               </div>
+            </article>
 
-              <div className="rounded-xl border border-border/50 p-6 bg-card/60 backdrop-blur-xl md:w-72">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-2 h-2 rounded-full bg-emerald-500/80 animate-pulse shrink-0" />
-                  <div className="flex items-center justify-between w-full gap-3">
-                    <span className="text-xs text-muted-foreground tracking-widest">
-                      CONVERT
-                    </span>
-                    <Link
-                      href="/convert"
-                      className="inline-flex items-center gap-0.5 text-[10px] text-muted-foreground/70 hover:text-foreground transition-colors tracking-wide shrink-0"
-                    >
-                      More details
-                      <ArrowUpRight className="size-3" />
-                    </Link>
-                  </div>
+            {/* Morph — Convert */}
+            <article className="group relative flex flex-col min-h-[420px] overflow-hidden rounded-[1.5rem] border border-border bg-gradient-to-b from-card/80 to-muted/20 dark:from-card/50 dark:to-background/40 p-6 md:p-8">
+              <div
+                className="pointer-events-none absolute inset-0 opacity-[0.035] dark:opacity-[0.06]"
+                style={{
+                  backgroundImage:
+                    'linear-gradient(var(--foreground) 1px, transparent 1px), linear-gradient(90deg, var(--foreground) 1px, transparent 1px)',
+                  backgroundSize: '28px 28px',
+                }}
+              />
+              <div className="relative flex items-start justify-between gap-3 mb-6">
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.28em] text-muted-foreground mb-2">
+                    02 · Morph
+                  </p>
+                  <h3 className="text-2xl md:text-3xl font-light tracking-tight text-foreground">
+                    Convert a file
+                  </h3>
                 </div>
+                <Link
+                  href="/convert"
+                  className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.18em] text-muted-foreground hover:text-foreground transition-colors shrink-0 mt-1"
+                >
+                  Studio
+                  <ArrowUpRight className="size-3" />
+                </Link>
+              </div>
+              <div className="relative flex-1">
                 <QuickFileConverter />
               </div>
-            </div>
+            </article>
           </div>
         </div>
       </section>
