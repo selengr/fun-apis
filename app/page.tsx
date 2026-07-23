@@ -296,7 +296,7 @@ export default function AgenticPage() {
             className="rounded-2xl overflow-hidden border border-border flex flex-col md:block md:relative"
             onMouseMove={handleMouse}
           >
-            <div className="relative w-full h-[240px] md:h-[340px] shrink-0">
+            <div className="relative w-full h-[240px] md:h-[440px] shrink-0">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/images/banners/https___west.avif"
@@ -305,15 +305,10 @@ export default function AgenticPage() {
               />
             </div>
 
-            <div className="flex flex-col md:flex-row gap-3 p-4 md:absolute md:bottom-4 md:right-4 md:left-4 md:p-0 md:w-auto md:justify-end">
-              <article className="rounded-xl border border-border/50 bg-card/70 backdrop-blur-xl p-5 md:w-[300px] flex flex-col min-h-[320px]">
+            <div className="flex flex-col md:flex-row gap-3 p-4 md:absolute md:bottom-4 md:left-4 md:p-0 md:w-auto">
+              <article className="rounded-xl border border-border/50 bg-card/60 backdrop-blur-xl p-6 md:w-72 flex flex-col">
                 <div className="flex items-start justify-between gap-3 mb-4">
-                  <div>
-                    <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground mb-1">
-                      Stamp
-                    </p>
-                    <h3 className="text-lg font-light tracking-tight">Make a QR</h3>
-                  </div>
+                  <h3 className="text-lg font-light">Make a QR</h3>
                   <Link
                     href="/qr"
                     className="inline-flex items-center gap-0.5 text-[10px] text-muted-foreground/70 hover:text-foreground transition-colors tracking-wide shrink-0 mt-1"
@@ -322,19 +317,12 @@ export default function AgenticPage() {
                     <ArrowUpRight className="size-3" />
                   </Link>
                 </div>
-                <div className="flex-1">
-                  <QuickQrMaker />
-                </div>
+                <QuickQrMaker />
               </article>
 
-              <article className="rounded-xl border border-border/50 bg-card/70 backdrop-blur-xl p-5 md:w-[300px] flex flex-col min-h-[320px]">
+              <article className="rounded-xl border border-border/50 bg-card/60 backdrop-blur-xl p-6 md:w-72 flex flex-col">
                 <div className="flex items-start justify-between gap-3 mb-4">
-                  <div>
-                    <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground mb-1">
-                      Morph
-                    </p>
-                    <h3 className="text-lg font-light tracking-tight">Convert a file</h3>
-                  </div>
+                  <h3 className="text-lg font-light">Convert a file</h3>
                   <Link
                     href="/convert"
                     className="inline-flex items-center gap-0.5 text-[10px] text-muted-foreground/70 hover:text-foreground transition-colors tracking-wide shrink-0 mt-1"
@@ -343,9 +331,7 @@ export default function AgenticPage() {
                     <ArrowUpRight className="size-3" />
                   </Link>
                 </div>
-                <div className="flex-1">
-                  <QuickFileConverter />
-                </div>
+                <QuickFileConverter />
               </article>
             </div>
           </div>
