@@ -1,13 +1,29 @@
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
+import { Instrument_Serif, JetBrains_Mono } from 'next/font/google'
 import { FileConverter } from '@/components/file-converter'
-import { PageHeader } from '@/components/page-header'
 import { ThemeToggle } from '@/components/theme-toggle'
 
+const display = Instrument_Serif({
+  subsets: ['latin'],
+  weight: '400',
+  style: ['normal', 'italic'],
+  variable: '--font-convert-display',
+})
+
+const mono = JetBrains_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  variable: '--font-convert-mono',
+})
+
 export const metadata = {
-  title: 'File Converter — CloudConvert',
-  description: 'Convert PDF, images, video, audio, documents and spreadsheets',
+  title: 'Convert',
+  description: 'Morph files between formats — PDF, images, video, audio, documents, and spreadsheets',
 }
+
+const ATMOSPHERE =
+  'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&w=2000&q=80'
 
 const NAV_GLASS = {
   backdropFilter: 'blur(16px)',
@@ -18,17 +34,26 @@ const NAV_GLASS = {
 
 export default function ConvertPage() {
   return (
-    <main className="relative min-h-screen bg-background overflow-hidden">
+    <main
+      className={`${display.variable} ${mono.variable} relative min-h-screen bg-background overflow-hidden`}
+    >
       <div className="pointer-events-none fixed inset-0 -z-10">
-        <div className="absolute top-0 right-1/3 w-[520px] h-[520px] rounded-full bg-sky-400/[0.08] blur-[120px]" />
-        <div className="absolute bottom-0 left-1/4 w-[480px] h-[480px] rounded-full bg-violet-400/[0.07] blur-[110px]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 w-[500px] h-[280px] rounded-full bg-cyan-400/[0.05] blur-[140px]" />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={ATMOSPHERE}
+          alt=""
+          aria-hidden
+          className="absolute inset-0 w-full h-full object-cover object-center opacity-[0.12] dark:opacity-[0.22] grayscale"
+        />
+        <div className="absolute inset-0 bg-background/80 dark:bg-background/70" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-transparent to-background" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_20%,oklch(0.7_0.04_200_/0.08),transparent_55%)] dark:bg-[radial-gradient(ellipse_at_50%_20%,oklch(0.45_0.05_200_/0.12),transparent_55%)]" />
         <div
-          className="absolute inset-0 opacity-[0.02] dark:opacity-[0.04]"
+          className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
           style={{
             backgroundImage:
               'linear-gradient(var(--foreground) 1px, transparent 1px), linear-gradient(90deg, var(--foreground) 1px, transparent 1px)',
-            backgroundSize: '48px 48px',
+            backgroundSize: '64px 64px',
           }}
         />
       </div>
@@ -40,21 +65,20 @@ export default function ConvertPage() {
         >
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-[11px] px-3 py-2 rounded-xl border border-black/10 dark:border-white/20 text-black/70 dark:text-white/70 hover:text-black dark:hover:text-white hover:border-black/20 dark:hover:border-white/30 hover:bg-black/[0.03] dark:hover:bg-white/[0.08] transition-all duration-200 tracking-wide cursor-pointer"
+            className="inline-flex items-center gap-2 text-[11px] px-3 py-2 rounded-xl border border-black/10 dark:border-white/20 text-black/70 dark:text-white/70 hover:text-black dark:hover:text-white hover:border-black/20 dark:hover:border-white/30 hover:bg-black/[0.03] dark:hover:bg-white/[0.08] transition-all duration-200 tracking-wide"
             style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
           >
             <ArrowLeft className="size-3.5" />
             Back home
           </Link>
           <span className="font-pixel text-[10px] tracking-[0.2em] text-black/50 dark:text-white/50 hidden sm:inline">
-            CONVERT
+            MORPH
           </span>
           <ThemeToggle />
         </div>
       </div>
 
-      <div className="pt-24 pb-6 md:pt-28">
-        <PageHeader title="Convert anything" />
+      <div className="pt-24 pb-20 md:pt-28">
         <FileConverter />
       </div>
     </main>
