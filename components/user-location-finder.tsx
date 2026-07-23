@@ -464,8 +464,7 @@ export function UserLocationFinder() {
               onClick={requestPrecise}
               disabled={geoLoading}
               className={cn(
-                'inline-flex items-center gap-2 h-10 px-4 text-[10px] uppercase tracking-[0.18em] border transition-colors cursor-pointer disabled:opacity-50',
-                'border border-[var(--loc-line)] hover:border-[var(--loc-signal)] hover:bg-[var(--loc-signal)] hover:text-[var(--loc-mist)]',
+                'inline-flex items-center gap-2 h-10 px-4 text-[10px] uppercase tracking-[0.18em] border border-[var(--loc-line)] transition-colors cursor-pointer disabled:opacity-50 hover:border-[var(--loc-signal)] hover:bg-[var(--loc-signal)] hover:text-[var(--loc-mist)]',
                 ink,
               )}
               style={mono}
@@ -481,8 +480,7 @@ export function UserLocationFinder() {
               type="button"
               onClick={() => setShowSearch(v => !v)}
               className={cn(
-                'inline-flex items-center gap-2 h-10 px-4 text-[10px] uppercase tracking-[0.18em] border transition-colors cursor-pointer',
-                'border border-[var(--loc-line)] hover:border-[var(--loc-ink)]/40',
+                'inline-flex items-center gap-2 h-10 px-4 text-[10px] uppercase tracking-[0.18em] border border-[var(--loc-line)] transition-colors cursor-pointer hover:border-[var(--loc-ink)]/40',
                 ink,
               )}
               style={mono}
