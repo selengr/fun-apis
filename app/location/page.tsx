@@ -32,7 +32,7 @@ export const metadata = {
 export default function LocationPage() {
   return (
     <main
-      className={`${display.variable} ${mono.variable} ${mark.variable} relative min-h-screen overflow-x-clip`}
+      className={`${display.variable} ${mono.variable} ${mark.variable} relative min-h-screen overflow-x-clip bg-[#e8f0ed] text-[#0e1c24] dark:bg-[#071216] dark:text-[#e8f0ed]`}
       style={
         {
           '--loc-ink': '#0e1c24',
@@ -40,8 +40,6 @@ export default function LocationPage() {
           '--loc-mist': '#e8f0ed',
           '--loc-signal': '#0d8f7f',
           '--loc-signal-dim': 'rgba(13, 143, 127, 0.18)',
-          background: 'var(--loc-mist)',
-          color: 'var(--loc-ink)',
         } as CSSProperties
       }
     >
