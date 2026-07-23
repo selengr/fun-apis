@@ -135,7 +135,7 @@ export function FileConverter() {
 
         <div className="flex items-center justify-center gap-3 sm:gap-5 select-none">
           <motion.span
-            key={sourceLabel}
+            key={`from-${sourceLabel}`}
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-[clamp(2.5rem,12vw,5.5rem)] font-light tracking-tight text-foreground/25 leading-none uppercase"
@@ -145,7 +145,7 @@ export function FileConverter() {
           </motion.span>
           <ArrowRight className="size-6 sm:size-8 text-foreground/30 shrink-0" />
           <motion.span
-            key={targetLabel}
+            key={`to-${targetLabel}`}
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-[clamp(2.5rem,12vw,5.5rem)] font-light tracking-tight text-foreground leading-none uppercase"
