@@ -110,10 +110,10 @@ function LiveClock({ timeZone, fallbackIso }: { timeZone: string; fallbackIso: s
 function CornerMarks({ className }: { className?: string }) {
   return (
     <div className={cn('pointer-events-none absolute inset-0', className)} aria-hidden>
-      <span className="absolute top-3 left-3 size-4 border-l-2 border-t-2 border-[var(--loc-signal)]" />
-      <span className="absolute top-3 right-3 size-4 border-r-2 border-t-2 border-[var(--loc-signal)]" />
-      <span className="absolute bottom-3 left-3 size-4 border-l-2 border-b-2 border-[var(--loc-signal)]" />
-      <span className="absolute bottom-3 right-3 size-4 border-r-2 border-b-2 border-[var(--loc-signal)]" />
+      <span className="absolute top-3 left-3 size-4 border-l-2 border-t-2 border-[#0d8f7f] dark:border-teal-400" />
+      <span className="absolute top-3 right-3 size-4 border-r-2 border-t-2 border-[#0d8f7f] dark:border-teal-400" />
+      <span className="absolute bottom-3 left-3 size-4 border-l-2 border-b-2 border-[#0d8f7f] dark:border-teal-400" />
+      <span className="absolute bottom-3 right-3 size-4 border-r-2 border-b-2 border-[#0d8f7f] dark:border-teal-400" />
     </div>
   )
 }
@@ -230,8 +230,8 @@ export function UserLocationFinder() {
     return `https://maps.google.com/maps?q=${latitude},${longitude}&z=${zoom}&output=embed`
   }, [activeCoords, usePrecise, precise])
 
-  const ink = 'text-[var(--loc-ink)]'
-  const mute = 'text-[var(--loc-ink)]/50'
+  const ink = 'text-[#0e1c24] dark:text-[#e4efeb]'
+  const mute = 'text-[#0e1c24]/50 dark:text-[#e4efeb]/50'
   const mono = { fontFamily: 'var(--font-loc-mono), ui-monospace, monospace' } as const
   const display = { fontFamily: 'var(--font-loc-display), Georgia, serif' } as const
   const mark = { fontFamily: 'var(--font-loc-mark), system-ui, sans-serif' } as const
@@ -240,10 +240,10 @@ export function UserLocationFinder() {
     return (
       <div className="max-w-6xl mx-auto px-6 md:px-10">
         <div className="relative min-h-[70vh] flex flex-col justify-center gap-8">
-          <div className="h-3 w-40 bg-[var(--loc-ink)]/10 dark:bg-white/10 animate-pulse" />
-          <div className="h-20 md:h-28 w-full max-w-xl bg-[var(--loc-ink)]/10 dark:bg-white/10 animate-pulse" />
-          <div className="h-14 w-full max-w-lg bg-[var(--loc-ink)]/8 dark:bg-white/8 animate-pulse" />
-          <div className="h-[42vh] w-full bg-[var(--loc-ink)]/8 dark:bg-white/8 animate-pulse mt-4" />
+          <div className="h-3 w-40 bg-[#0e1c24] dark:bg-[#e4efeb]/10 dark:bg-white/10 animate-pulse" />
+          <div className="h-20 md:h-28 w-full max-w-xl bg-[#0e1c24] dark:bg-[#e4efeb]/10 dark:bg-white/10 animate-pulse" />
+          <div className="h-14 w-full max-w-lg bg-[#0e1c24] dark:bg-[#e4efeb]/8 dark:bg-white/8 animate-pulse" />
+          <div className="h-[42vh] w-full bg-[#0e1c24] dark:bg-[#e4efeb]/8 dark:bg-white/8 animate-pulse mt-4" />
         </div>
       </div>
     )
@@ -258,7 +258,7 @@ export function UserLocationFinder() {
         <button
           type="button"
           onClick={fetchLocation}
-          className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] border border-[var(--loc-line)] px-5 py-3 hover:bg-[var(--loc-signal)] hover:text-white hover:border-[var(--loc-signal)] transition-colors cursor-pointer"
+          className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] border border-[#0e1c24]/15 dark:border-white/15 px-5 py-3 hover:bg-[#0d8f7f] dark:bg-teal-400 hover:text-white hover:border-[#0d8f7f] dark:border-teal-400 transition-colors cursor-pointer"
           style={mono}
         >
           <RefreshCw className="size-3.5" />
@@ -304,7 +304,7 @@ export function UserLocationFinder() {
             type="button"
             onClick={fetchLocation}
             className={cn(
-              'inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.22em] hover:text-[var(--loc-signal)] transition-colors cursor-pointer',
+              'inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.22em] hover:text-[#0d8f7f] dark:hover:text-teal-300 transition-colors cursor-pointer',
               mute,
             )}
             style={mono}
@@ -335,7 +335,7 @@ export function UserLocationFinder() {
               style={display}
             >
               {city}
-              <span className="italic text-[var(--loc-signal)]">.</span>
+              <span className="italic text-[#0d8f7f] dark:text-teal-300">.</span>
             </h1>
             <p
               className={cn('mt-5 text-lg md:text-xl font-light tracking-wide', ink)}
@@ -362,7 +362,7 @@ export function UserLocationFinder() {
             transition={{ duration: 0.7, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
             className="relative"
           >
-            <div className="relative border border-[var(--loc-line)] bg-[var(--loc-panel)] backdrop-blur-sm px-6 py-8 md:px-8 md:py-10">
+            <div className="relative border border-[#0e1c24]/15 dark:border-white/15 bg-[#d4e0dc]/60 dark:bg-[#0c1c22]/75 backdrop-blur-sm px-6 py-8 md:px-8 md:py-10">
               <CornerMarks />
 
               {/* Soft radar disc behind IP */}
@@ -374,12 +374,12 @@ export function UserLocationFinder() {
                   className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-[140%] rounded-full"
                   style={{
                     background:
-                      'conic-gradient(from 0deg, transparent 0deg, var(--loc-signal-dim) 50deg, transparent 90deg)',
+                      'conic-gradient(from 0deg, transparent 0deg, rgba(13,143,127,0.18) 50deg, transparent 90deg)',
                     animation: 'loc-radar 4.5s linear infinite',
                   }}
                 />
-                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-[55%] rounded-full border border-[var(--loc-signal)]/25" />
-                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-[35%] rounded-full border border-[var(--loc-signal)]/20" />
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-[55%] rounded-full border border-[#0d8f7f] dark:border-teal-400/25" />
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-[35%] rounded-full border border-[#0d8f7f] dark:border-teal-400/20" />
               </div>
 
               <p
@@ -421,8 +421,8 @@ export function UserLocationFinder() {
                 <span
                   className={cn(
                     'mt-4 inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.2em] transition-colors',
-                    copied ? 'text-[var(--loc-signal)]' : mute,
-                    'group-hover:text-[var(--loc-signal)]',
+                    copied ? 'text-[#0d8f7f] dark:text-teal-300' : mute,
+                    'group-hover:text-[#0d8f7f] dark:hover:text-teal-300',
                   )}
                   style={mono}
                 >
@@ -464,7 +464,7 @@ export function UserLocationFinder() {
               onClick={requestPrecise}
               disabled={geoLoading}
               className={cn(
-                'inline-flex items-center gap-2 h-10 px-4 text-[10px] uppercase tracking-[0.18em] border border-[var(--loc-line)] transition-colors cursor-pointer disabled:opacity-50 hover:border-[var(--loc-signal)] hover:bg-[var(--loc-signal)] hover:text-[var(--loc-mist)]',
+                'inline-flex items-center gap-2 h-10 px-4 text-[10px] uppercase tracking-[0.18em] border border-[#0e1c24]/15 dark:border-white/15 transition-colors cursor-pointer disabled:opacity-50 hover:border-[#0d8f7f] dark:border-teal-400 hover:bg-[#0d8f7f] dark:bg-teal-400 hover:text-white dark:hover:text-[#071216]',
                 ink,
               )}
               style={mono}
@@ -480,7 +480,7 @@ export function UserLocationFinder() {
               type="button"
               onClick={() => setShowSearch(v => !v)}
               className={cn(
-                'inline-flex items-center gap-2 h-10 px-4 text-[10px] uppercase tracking-[0.18em] border border-[var(--loc-line)] transition-colors cursor-pointer hover:border-[var(--loc-ink)]/40',
+                'inline-flex items-center gap-2 h-10 px-4 text-[10px] uppercase tracking-[0.18em] border border-[#0e1c24]/15 dark:border-white/15 transition-colors cursor-pointer hover:border-[#0e1c24]/40 dark:border-white/40',
                 ink,
               )}
               style={mono}
@@ -528,7 +528,7 @@ export function UserLocationFinder() {
                   onKeyDown={e => e.key === 'Enter' && handleManualSearch()}
                   placeholder="City, Country"
                   className={cn(
-                    'flex-1 h-11 bg-transparent border border-[var(--loc-line)] px-4 text-sm outline-none focus:border-[var(--loc-signal)] transition-colors',
+                    'flex-1 h-11 bg-transparent border border-[#0e1c24]/15 dark:border-white/15 px-4 text-sm outline-none focus:border-[#0d8f7f] dark:border-teal-400 transition-colors',
                     ink,
                   )}
                   style={mono}
@@ -538,7 +538,7 @@ export function UserLocationFinder() {
                   type="button"
                   onClick={handleManualSearch}
                   disabled={searching || !searchQuery.trim()}
-                  className="h-11 px-5 text-[10px] uppercase tracking-[0.18em] bg-[var(--loc-ink)] text-[var(--loc-mist)] disabled:opacity-40 cursor-pointer"
+                  className="h-11 px-5 text-[10px] uppercase tracking-[0.18em] bg-[#0e1c24] dark:bg-[#e4efeb] text-[#e8f0ed] dark:text-[#071216] disabled:opacity-40 cursor-pointer"
                   style={mono}
                 >
                   {searching ? '…' : 'Pin'}
@@ -561,10 +561,10 @@ export function UserLocationFinder() {
           </p>
         ) : null}
 
-        <div className="relative border border-[var(--loc-line)] bg-[var(--loc-ink)]/[0.04] overflow-hidden">
+        <div className="relative border border-[#0e1c24]/15 dark:border-white/15 bg-[#0e1c24]/[0.04] dark:bg-white/[0.04] overflow-hidden">
           <CornerMarks />
           <div
-            className="flex items-center justify-between px-4 py-2.5 border-b border-[var(--loc-line-soft)] text-[10px] uppercase tracking-[0.22em]"
+            className="flex items-center justify-between px-4 py-2.5 border-b border-[#0e1c24]/10 dark:border-white/10 text-[10px] uppercase tracking-[0.22em]"
             style={mono}
           >
             <span className={mute}>
@@ -597,10 +597,10 @@ export function UserLocationFinder() {
                 }}
               />
               <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                <div className="size-3 rounded-full bg-[var(--loc-signal)] shadow-[0_0_0_6px_rgba(13,143,127,0.25)]" />
+                <div className="size-3 rounded-full bg-[#0d8f7f] dark:bg-teal-400 shadow-[0_0_0_6px_rgba(13,143,127,0.25)]" />
               </div>
-              <div className="absolute left-1/2 inset-y-8 w-px bg-[var(--loc-signal)]/30 -translate-x-1/2" />
-              <div className="absolute top-1/2 inset-x-8 h-px bg-[var(--loc-signal)]/30 -translate-y-1/2" />
+              <div className="absolute left-1/2 inset-y-8 w-px bg-[#0d8f7f] dark:bg-teal-400/30 -translate-x-1/2" />
+              <div className="absolute top-1/2 inset-x-8 h-px bg-[#0d8f7f] dark:bg-teal-400/30 -translate-y-1/2" />
             </div>
           </div>
         </div>
@@ -611,7 +611,7 @@ export function UserLocationFinder() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.35 }}
-        className="mt-8 md:mt-10 border-y border-[var(--loc-line)]"
+        className="mt-8 md:mt-10 border-y border-[#0e1c24]/15 dark:border-white/15"
       >
         <div className="grid grid-cols-2 md:grid-cols-4">
           {[
@@ -642,8 +642,8 @@ export function UserLocationFinder() {
               key={item.label}
               className={cn(
                 'px-4 py-5 md:py-6',
-                i % 2 === 1 && 'border-l border-[var(--loc-line-soft)]',
-                i >= 2 && 'border-t md:border-t-0 border-[var(--loc-line-soft)]',
+                i % 2 === 1 && 'border-l border-[#0e1c24]/10 dark:border-white/10',
+                i >= 2 && 'border-t md:border-t-0 border-[#0e1c24]/10 dark:border-white/10',
                 i === 2 && 'md:border-l',
               )}
             >
