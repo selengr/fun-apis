@@ -125,27 +125,45 @@ export function ArtGallerySlider({
   const isBooks = variant === "books"
 
   return (
-    <div className="relative h-full w-full overflow-hidden bg-black py-10">
+    <div className="relative h-full w-full overflow-hidden py-10 bg-[#0c0f12] dark:bg-[#080a0c]">
+      {/* Stage atmosphere — cards unchanged */}
       <AnimatePresence mode="wait">
         <motion.div
           key={currentIndex}
-          initial={{ opacity: 0, scale: 1.1 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
           className="absolute inset-0"
           style={{
             background: `
-              radial-gradient(ellipse at 30% 20%, ${currentColors[0]}66 0%, transparent 50%),
-              radial-gradient(ellipse at 70% 80%, ${currentColors[1]}66 0%, transparent 50%),
-              radial-gradient(ellipse at 50% 50%, ${currentColors[2]}44 0%, transparent 70%),
-              linear-gradient(180deg, #0a0a0a 0%, #111111 100%)
+              radial-gradient(ellipse 80% 55% at 50% 40%, ${currentColors[0]}28 0%, transparent 62%),
+              radial-gradient(ellipse 50% 40% at 18% 85%, ${currentColors[1]}1f 0%, transparent 55%),
+              radial-gradient(ellipse 45% 35% at 88% 15%, ${currentColors[2]}18 0%, transparent 50%),
+              linear-gradient(180deg, #10151a 0%, #0c0f12 45%, #0a0c0e 100%)
             `,
           }}
         />
       </AnimatePresence>
 
-      <div className="absolute inset-0 backdrop-blur-3xl" />
+      {/* Soft vignette + shelf grain — no heavy blur mud */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background: `
+            radial-gradient(ellipse 70% 60% at 50% 45%, transparent 35%, rgba(0,0,0,0.55) 100%),
+            linear-gradient(90deg, rgba(0,0,0,0.35) 0%, transparent 18%, transparent 82%, rgba(0,0,0,0.35) 100%)
+          `,
+        }}
+      />
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.07]"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+        }}
+      />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/40 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/25 to-transparent" />
 
       <header className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between p-8">
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>

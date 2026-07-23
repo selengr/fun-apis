@@ -1,24 +1,34 @@
 import mongoose from "mongoose"
 
-const MONGODB_URI = process.env.NEXT_PUBLIC_MONGODB_URI
-
-if (!MONGODB_URI) {
-  throw new Error("Please define MONGODB_URI in .env.local");
+type MongooseCache = {
+  conn: typeof mongoose | null
+  promise: Promise<typeof mongoose> | null
 }
 
-let cached = (global as any).mongoose;
+declare global {
+  // eslint-disable-next-line no-var
+  var mongoose: MongooseCache | undefined
+}
 
-if (!cached) {
-  cached = (global as any).mongoose = { conn: null, promise: null };
+const cached: MongooseCache = global.mongoose ?? { conn: null, promise: null }
+global.mongoose = cached
+
+function getMongoUri() {
+  return process.env.MONGODB_URI ?? process.env.NEXT_PUBLIC_MONGODB_URI
 }
 
 export async function connectDB() {
-  if (cached.conn) return cached.conn;
-
-  if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI as string);
+  const uri = getMongoUri()
+  if (!uri) {
+    throw new Error("Please define MONGODB_URI in .env.local")
   }
 
-  cached.conn = await cached.promise;
-  return cached.conn;
+  if (cached.conn) return cached.conn
+
+  if (!cached.promise) {
+    cached.promise = mongoose.connect(uri)
+  }
+
+  cached.conn = await cached.promise
+  return cached.conn
 }

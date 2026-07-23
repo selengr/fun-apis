@@ -188,7 +188,7 @@ export default function AgenticPage() {
       </section>
 
 
-      <section className="relative min-h-[520px] h-[55vh] w-screen overflow-hidden bg-black border-y border-border">
+      <section className="relative min-h-[520px] h-[55vh] w-screen overflow-hidden border-y border-border">
         <ArtGallerySlider variant="books" />
       </section>
     
