@@ -55,12 +55,15 @@ export function ForexChart({ data, positive, height = 280 }: ForexChartProps) {
     )
   }
 
-  const stroke = positive ? '#34d399' : '#f87171'
+  const stroke = positive ? '#2d9a64' : '#e05548'
   const gradId = `forex-grad-${positive ? 'up' : 'dn'}`
 
   return (
     <div className="w-full">
-      <div className="flex justify-between text-[10px] text-muted-foreground tabular-nums mb-2 px-1">
+      <div
+        className="flex justify-between text-[10px] tabular-nums mb-2 px-1"
+        style={{ color: 'var(--fx-mute, var(--muted-foreground))' }}
+      >
         <span>Low {min.toFixed(4)}</span>
         <span>High {max.toFixed(4)}</span>
       </div>
@@ -91,8 +94,11 @@ export function ForexChart({ data, positive, height = 280 }: ForexChartProps) {
         {labels.map(l => (
           <span
             key={l.label + l.x}
-            className="absolute text-[10px] text-muted-foreground -translate-x-1/2 tabular-nums"
-            style={{ left: `${(l.x / 800) * 100}%` }}
+            className="absolute text-[10px] -translate-x-1/2 tabular-nums"
+            style={{
+              left: `${(l.x / 800) * 100}%`,
+              color: 'var(--fx-mute, var(--muted-foreground))',
+            }}
           >
             {l.label}
           </span>

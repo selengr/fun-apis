@@ -52,7 +52,10 @@ export function CurrencyCombobox({
   return (
     <div className={cn('min-w-0', className)}>
       {label && (
-        <p className="mb-2 text-[10px] uppercase tracking-[0.22em] text-muted-foreground/80">
+        <p
+          className="mb-2 text-[10px] uppercase tracking-[0.22em]"
+          style={{ color: 'var(--fx-mute, var(--muted-foreground))' }}
+        >
           {label}
         </p>
       )}
@@ -63,25 +66,30 @@ export function CurrencyCombobox({
             role="combobox"
             aria-expanded={open}
             className={cn(
-              'group flex w-full items-center gap-3 rounded-2xl border border-border/50 bg-background/70 px-3.5 py-3 text-left',
-              'shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] backdrop-blur-md transition-all duration-300 cursor-pointer',
-              'hover:border-emerald-500/30 hover:bg-background/90',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/25',
-              open && 'border-emerald-500/40 ring-2 ring-emerald-500/15',
+              'group flex w-full items-center gap-3 border px-3.5 py-3 text-left transition-colors cursor-pointer',
+              'border-[color:var(--fx-line,var(--border))] bg-[color:var(--fx-bg,var(--background))]/40',
+              'hover:border-[color:var(--fx-accent,var(--foreground))]/40',
+              'focus-visible:outline-none focus-visible:border-[color:var(--fx-accent,var(--foreground))]',
+              open && 'border-[color:var(--fx-accent,var(--foreground))]',
             )}
           >
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-muted/50 text-lg ring-1 ring-border/40">
-              {FLAG[value] ?? '💱'}
+            <span className="flex size-10 shrink-0 items-center justify-center border border-[color:var(--fx-line-soft,var(--border))] text-lg">
+              {FLAG[value] ?? '·'}
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block font-mono text-sm font-semibold tracking-wide text-foreground">
+              <span className="block font-mono text-sm font-semibold tracking-wide">
                 {value}
               </span>
-              <span className="block truncate text-xs text-muted-foreground">
+              <span
+                className="block truncate text-xs"
+                style={{ color: 'var(--fx-mute, var(--muted-foreground))' }}
+              >
                 {selected?.name ?? 'Select currency'}
               </span>
             </span>
-            <ChevronsUpDown className="size-4 shrink-0 text-muted-foreground/60 transition-colors group-hover:text-foreground" />
+            <ChevronsUpDown
+              className="size-4 shrink-0 opacity-50 transition-opacity group-hover:opacity-100"
+            />
           </button>
         </PopoverTrigger>
         <PopoverContent

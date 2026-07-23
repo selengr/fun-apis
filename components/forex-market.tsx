@@ -2,16 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
-import {
-  ArrowDownUp,
-  RefreshCw,
-  TrendingUp,
-  TrendingDown,
-  Landmark,
-  CalendarRange,
-  Coins,
-  Equal,
-} from 'lucide-react'
+import { ArrowDownUp, RefreshCw } from 'lucide-react'
 import type { ForexPeriod, FrankfurterCurrency } from '@/types/frankfurter'
 import {
   FALLBACK_CURRENCIES,
@@ -27,23 +18,20 @@ import { CurrencyCombobox } from '@/components/currency-combobox'
 import { cn } from '@/lib/utils'
 
 const PERIODS: ForexPeriod[] = ['today', '7', '30', '90', '365']
-
 const DEFAULT_BASE = 'USD'
 const DEFAULT_QUOTE = 'IRR'
 
-function ChangePill({ value, size = 'sm' }: { value: number; size?: 'sm' | 'lg' }) {
+const mono = { fontFamily: 'var(--font-fx-mono), ui-monospace, monospace' } as const
+const display = { fontFamily: 'var(--font-fx-display), Georgia, serif' } as const
+const mark = { fontFamily: 'var(--font-fx-mark), system-ui, sans-serif' } as const
+
+function Delta({ value, large }: { value: number; large?: boolean }) {
   const up = value >= 0
   return (
     <span
-      className={cn(
-        'inline-flex items-center gap-1 font-semibold tabular-nums rounded-full border',
-        size === 'lg' ? 'text-sm px-3 py-1' : 'text-[11px] px-2 py-0.5',
-        up
-          ? 'text-emerald-400 bg-emerald-500/15 border-emerald-500/25'
-          : 'text-red-400 bg-red-500/15 border-red-500/25',
-      )}
+      className={cn('font-semibold tabular-nums', large ? 'text-base md:text-lg' : 'text-xs')}
+      style={{ ...mono, color: up ? 'var(--fx-up)' : 'var(--fx-down)' }}
     >
-      {up ? <TrendingUp className={size === 'lg' ? 'size-3.5' : 'size-3'} /> : <TrendingDown className={size === 'lg' ? 'size-3.5' : 'size-3'} />}
       {up ? '+' : ''}
       {value.toFixed(2)}%
     </span>
@@ -51,9 +39,7 @@ function ChangePill({ value, size = 'sm' }: { value: number; size?: 'sm' | 'lg' 
 }
 
 function formatIrr(rate: number): string {
-  return rate.toLocaleString(undefined, {
-    maximumFractionDigits: 0,
-  })
+  return rate.toLocaleString(undefined, { maximumFractionDigits: 0 })
 }
 
 export function ForexMarket() {
@@ -132,7 +118,9 @@ export function ForexMarket() {
     setHistoryLoading(true)
     try {
       const params = new URLSearchParams({ base, quote })
-      const res = await fetch(`/api/forex?action=series&days=${period}&${params}`, { cache: 'no-store' })
+      const res = await fetch(`/api/forex?action=series&days=${period}&${params}`, {
+        cache: 'no-store',
+      })
       const json = await res.json()
       if (!res.ok) throw new Error(json.error ?? 'History fetch failed')
       setSeries(json.series ?? [])
@@ -188,157 +176,165 @@ export function ForexMarket() {
 
   if (loading && rate == null) {
     return (
-      <div className="max-w-6xl mx-auto px-4 space-y-4 pb-16">
-        <div className="h-44 rounded-2xl bg-muted/30 animate-pulse" />
-        <div className="h-40 rounded-2xl bg-muted/25 animate-pulse" />
-        <div className="h-72 rounded-2xl bg-muted/20 animate-pulse" />
+      <div className="max-w-6xl mx-auto px-6 md:px-10 space-y-6">
+        <div className="h-14 w-40 bg-[color:var(--fx-fg)]/10 animate-pulse" />
+        <div className="h-24 w-full max-w-lg bg-[color:var(--fx-fg)]/10 animate-pulse" />
+        <div className="h-64 w-full bg-[color:var(--fx-fg)]/8 animate-pulse" />
       </div>
     )
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 pb-16 space-y-6">
-      {/* Hero — live USD → IRR by default */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        className={cn(
-          'relative overflow-hidden rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 via-card/80 to-sky-600/5 backdrop-blur-xl p-6 md:p-8 transition-shadow duration-300',
-          pulse && 'ring-2 ring-emerald-400/40 shadow-[0_0_30px_rgba(52,211,153,0.15)]',
-        )}
-      >
-        <div
-          className="absolute inset-0 opacity-[0.04]"
-          style={{
-            backgroundImage:
-              'linear-gradient(var(--foreground) 1px, transparent 1px), linear-gradient(90deg, var(--foreground) 1px, transparent 1px)',
-            backgroundSize: '20px 20px',
-          }}
-        />
-        <div className="relative flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
-          <div>
-            <div className="flex flex-wrap items-center gap-2 text-muted-foreground mb-3">
-              <span className="relative flex size-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full size-2 bg-emerald-500" />
-              </span>
-              <Landmark className="size-3.5" />
-              <span className="text-[10px] uppercase tracking-[0.15em]">
-                {isUsdIrr ? 'USD → Iranian Rial · right now' : 'Live exchange rate'}
-              </span>
-              {rateDate && <span className="text-[10px]">· {rateDate}</span>}
-            </div>
-            <p className="text-sm text-muted-foreground mb-1">
-              1 <span className="font-mono font-medium text-foreground">{base}</span> =
-            </p>
-            <p className="font-mono font-bold tabular-nums tracking-tight text-foreground text-4xl md:text-5xl">
-              {rate != null ? displayRate(rate, quote) : '—'}{' '}
-              <span className="text-2xl md:text-3xl text-muted-foreground">{quote}</span>
-            </p>
-            {isUsdIrr && (
-              <p className="mt-2 text-sm text-muted-foreground">
-                Iranian Rial · ریال ایران
-              </p>
-            )}
-            {!isUsdIrr && (
-              <p className="mt-2 text-sm text-muted-foreground">{quoteName}</p>
-            )}
-          </div>
-          <div className="flex flex-col items-start lg:items-end gap-3">
-            <ChangePill value={change} size="lg" />
-            <p className="text-[11px] text-muted-foreground">
-              {period === 'today' ? 'vs previous session' : `${periodLabel(period)} change`}
-            </p>
-            <button
-              type="button"
-              onClick={() => void fetchRate()}
-              disabled={refreshing}
-              className="inline-flex items-center gap-2 h-9 px-3 rounded-xl border border-border/60 bg-background/50 text-[11px] text-muted-foreground hover:text-foreground transition-all cursor-pointer disabled:opacity-50"
+    <div className="max-w-6xl mx-auto px-6 md:px-10 space-y-12 md:space-y-16 pb-8">
+      {/* ── HERO ─────────────────────────────────────────────────────────── */}
+      <section>
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-10"
+        >
+          <div className="max-w-xl">
+            <p
+              className="text-[10px] uppercase tracking-[0.35em] text-[color:var(--fx-mute)] mb-5"
+              style={mono}
             >
-              <RefreshCw className={cn('size-3.5', refreshing && 'animate-spin')} />
-              {lastUpdated
-                ? `Updated ${lastUpdated.toLocaleTimeString()} · ${countdown}s`
-                : `Refresh · ${countdown}s`}
-            </button>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Premium converter atelier */}
-      <motion.section
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.05 }}
-        className="relative overflow-hidden rounded-[1.75rem] border border-border/40 bg-gradient-to-b from-card/80 via-card/50 to-card/30 backdrop-blur-2xl shadow-[0_24px_80px_rgba(0,0,0,0.06)]"
-      >
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400/40 to-transparent" />
-        <div className="absolute -right-20 -top-20 size-56 rounded-full bg-emerald-400/8 blur-3xl pointer-events-none" />
-        <div className="absolute -left-16 bottom-0 size-48 rounded-full bg-sky-400/6 blur-3xl pointer-events-none" />
-
-        <div className="relative p-5 sm:p-7 md:p-8">
-          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-7">
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.28em] text-emerald-700/50 dark:text-emerald-300/40 mb-1.5">
-                Currency atelier
-              </p>
-              <h2 className="text-xl font-light tracking-tight text-foreground">
-                Convert with precision
-              </h2>
-            </div>
-            <p className="text-xs text-muted-foreground font-mono tabular-nums">
-              1 {base} = {rate != null ? displayRate(rate, quote) : '—'} {quote}
+              Frankfurter · ECB reference
+            </p>
+            <h1
+              className="text-[clamp(3.5rem,14vw,8rem)] leading-[0.85] tracking-tight text-[color:var(--fx-fg)]"
+              style={display}
+            >
+              Parity
+              <span style={{ color: 'var(--fx-accent)' }}>.</span>
+            </h1>
+            <p
+              className="mt-6 text-lg md:text-xl text-[color:var(--fx-mute)] max-w-md leading-snug"
+              style={display}
+            >
+              Cross rates from the clearing desk — convert, compare, chart.
             </p>
           </div>
 
-          <div className="relative space-y-3">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.97 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.1, duration: 0.55 }}
+            className={cn(
+              'relative border border-[color:var(--fx-line)] bg-[color:var(--fx-panel)] backdrop-blur-sm px-6 py-6 md:px-8 md:py-7 min-w-[min(100%,340px)] transition-shadow',
+              pulse && 'shadow-[0_0_0_1px_var(--fx-accent)]',
+            )}
+          >
+            <div className="pointer-events-none absolute top-3 left-3 size-3 border-l border-t border-[color:var(--fx-accent)]" />
+            <div className="pointer-events-none absolute top-3 right-3 size-3 border-r border-t border-[color:var(--fx-accent)]" />
+            <div className="pointer-events-none absolute bottom-3 left-3 size-3 border-l border-b border-[color:var(--fx-accent)]" />
+            <div className="pointer-events-none absolute bottom-3 right-3 size-3 border-r border-b border-[color:var(--fx-accent)]" />
+
+            <p
+              className="text-[10px] uppercase tracking-[0.28em] text-[color:var(--fx-mute)] mb-3"
+              style={mono}
+            >
+              {isUsdIrr ? 'USD → IRR' : `${base} → ${quote}`}
+              {rateDate ? ` · ${rateDate}` : ''}
+            </p>
+            <p className="text-sm text-[color:var(--fx-mute)] mb-1" style={mono}>
+              1 <span className="text-[color:var(--fx-fg)]">{base}</span> =
+            </p>
+            <p
+              className="text-[clamp(1.9rem,5vw,2.85rem)] font-bold tabular-nums tracking-tight leading-none text-[color:var(--fx-fg)]"
+              style={mono}
+            >
+              {rate != null ? displayRate(rate, quote) : '—'}{' '}
+              <span className="text-xl font-medium text-[color:var(--fx-mute)]">{quote}</span>
+            </p>
+            <div className="mt-4 flex items-center justify-between gap-3">
+              <div>
+                <Delta value={change} large />
+                <p className="mt-1 text-[10px] text-[color:var(--fx-mute)]" style={mono}>
+                  {period === 'today' ? 'vs prior session' : `${periodLabel(period)}`}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => void fetchRate()}
+                disabled={refreshing}
+                className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.18em] text-[color:var(--fx-mute)] hover:text-[color:var(--fx-accent)] transition-colors cursor-pointer disabled:opacity-50"
+                style={mono}
+              >
+                <RefreshCw className={cn('size-3', refreshing && 'animate-spin')} />
+                {countdown}s
+              </button>
+            </div>
+            <p className="mt-3 text-xs text-[color:var(--fx-mute)]">
+              {isUsdIrr ? 'Iranian Rial · ریال ایران' : quoteName}
+            </p>
+          </motion.div>
+        </motion.div>
+      </section>
+
+      {/* ── CONVERTER ────────────────────────────────────────────────────── */}
+      <section>
+        <div className="flex items-end justify-between gap-4 mb-5">
+          <div>
+            <p
+              className="text-[10px] uppercase tracking-[0.3em] text-[color:var(--fx-mute)] mb-1"
+              style={mono}
+            >
+              Desk
+            </p>
+            <h2 className="text-2xl md:text-3xl tracking-tight" style={display}>
+              Convert
+            </h2>
+          </div>
+          <p className="text-xs tabular-nums text-[color:var(--fx-mute)] hidden sm:block" style={mono}>
+            1 {base} = {rate != null ? displayRate(rate, quote) : '—'} {quote}
+          </p>
+        </div>
+
+        <div className="border border-[color:var(--fx-line)] bg-[color:var(--fx-panel)] backdrop-blur-sm">
+          <div className="grid lg:grid-cols-[1fr_auto_1fr] gap-0">
             {/* From */}
-            <div className="rounded-3xl border border-border/50 bg-background/55 p-4 sm:p-5 shadow-sm">
-              <div className="grid sm:grid-cols-[1fr_minmax(0,1.1fr)] gap-4 sm:gap-5 items-end">
-                <CurrencyCombobox
-                  label="You send"
-                  value={base}
-                  currencies={sortedCurrencies}
-                  onChange={setBase}
-                />
-                <div>
-                  <p className="mb-2 text-[10px] uppercase tracking-[0.22em] text-muted-foreground/80">
-                    Amount
-                  </p>
-                  <div className="relative">
-                    <input
-                      type="number"
-                      min="0"
-                      step="any"
-                      value={amount}
-                      onChange={e => setAmount(e.target.value)}
-                      className={cn(
-                        'w-full h-[3.65rem] rounded-2xl border border-border/50 bg-muted/20 px-4 pr-16',
-                        'font-mono text-2xl font-light tabular-nums tracking-tight text-foreground',
-                        'outline-none transition-all placeholder:text-muted-foreground/40',
-                        'focus:border-emerald-500/35 focus:ring-2 focus:ring-emerald-500/15',
-                      )}
-                      placeholder="0"
-                    />
-                    <span className="absolute right-4 top-1/2 -translate-y-1/2 font-mono text-xs font-medium text-muted-foreground">
-                      {base}
-                    </span>
-                  </div>
+            <div className="p-5 md:p-7 border-b lg:border-b-0 lg:border-r border-[color:var(--fx-line-soft)]">
+              <CurrencyCombobox
+                label="From"
+                value={base}
+                currencies={sortedCurrencies}
+                onChange={setBase}
+              />
+              <div className="mt-5">
+                <p
+                  className="mb-2 text-[10px] uppercase tracking-[0.22em] text-[color:var(--fx-mute)]"
+                  style={mono}
+                >
+                  Amount
+                </p>
+                <div className="relative border-b border-[color:var(--fx-line)] focus-within:border-[color:var(--fx-accent)] transition-colors">
+                  <input
+                    type="number"
+                    min="0"
+                    step="any"
+                    value={amount}
+                    onChange={e => setAmount(e.target.value)}
+                    className="w-full bg-transparent py-3 pr-14 text-3xl font-light tabular-nums tracking-tight outline-none placeholder:text-[color:var(--fx-mute)]"
+                    style={mono}
+                    placeholder="0"
+                  />
+                  <span
+                    className="absolute right-0 top-1/2 -translate-y-1/2 text-xs text-[color:var(--fx-mute)]"
+                    style={mono}
+                  >
+                    {base}
+                  </span>
                 </div>
               </div>
             </div>
 
             {/* Swap */}
-            <div className="relative z-10 flex justify-center -my-1">
+            <div className="flex items-center justify-center py-3 lg:py-0 lg:px-3 border-b lg:border-b-0 lg:border-r border-[color:var(--fx-line-soft)]">
               <button
                 type="button"
                 onClick={swap}
-                className={cn(
-                  'inline-flex size-12 items-center justify-center rounded-full',
-                  'border border-border/60 bg-background text-foreground shadow-lg shadow-black/5',
-                  'transition-all duration-300 cursor-pointer',
-                  'hover:scale-105 hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:text-emerald-700 dark:hover:text-emerald-300',
-                  'active:scale-95',
-                )}
+                className="inline-flex size-11 items-center justify-center border border-[color:var(--fx-line)] text-[color:var(--fx-fg)] hover:bg-[color:var(--fx-accent)] hover:text-[color:var(--fx-on-accent)] hover:border-[color:var(--fx-accent)] transition-colors cursor-pointer"
                 aria-label="Swap currencies"
               >
                 <ArrowDownUp className="size-4" />
@@ -346,48 +342,54 @@ export function ForexMarket() {
             </div>
 
             {/* To */}
-            <div className="rounded-3xl border border-emerald-500/15 bg-gradient-to-br from-emerald-500/[0.07] via-background/50 to-sky-500/[0.04] p-4 sm:p-5">
-              <div className="grid sm:grid-cols-[1fr_minmax(0,1.1fr)] gap-4 sm:gap-5 items-end">
-                <CurrencyCombobox
-                  label="You receive"
-                  value={quote}
-                  currencies={sortedCurrencies}
-                  onChange={setQuote}
-                />
-                <div>
-                  <p className="mb-2 text-[10px] uppercase tracking-[0.22em] text-muted-foreground/80">
-                    Result
+            <div className="p-5 md:p-7">
+              <CurrencyCombobox
+                label="To"
+                value={quote}
+                currencies={sortedCurrencies}
+                onChange={setQuote}
+              />
+              <div className="mt-5">
+                <p
+                  className="mb-2 text-[10px] uppercase tracking-[0.22em] text-[color:var(--fx-mute)]"
+                  style={mono}
+                >
+                  You get
+                </p>
+                <div className="border-b border-[color:var(--fx-line)] py-3 flex items-baseline justify-between gap-3">
+                  <p
+                    className="text-3xl font-light tabular-nums tracking-tight truncate text-[color:var(--fx-fg)]"
+                    style={mono}
+                  >
+                    {converted != null
+                      ? quote === 'IRR'
+                        ? formatIrr(converted)
+                        : formatConverted(converted, quote)
+                      : '—'}
                   </p>
-                  <div className="relative flex h-[3.65rem] items-center rounded-2xl border border-emerald-500/20 bg-background/60 px-4 pr-16">
-                    <Equal className="absolute left-3.5 size-3.5 text-emerald-600/40 dark:text-emerald-300/30" />
-                    <p className="w-full pl-5 font-mono text-2xl font-light tabular-nums tracking-tight text-foreground truncate">
-                      {converted != null
-                        ? quote === 'IRR'
-                          ? formatIrr(converted)
-                          : formatConverted(converted, quote)
-                        : '—'}
-                    </p>
-                    <span className="absolute right-4 font-mono text-xs font-medium text-muted-foreground">
-                      {quote}
-                    </span>
-                  </div>
+                  <span className="text-xs text-[color:var(--fx-mute)] shrink-0" style={mono}>
+                    {quote}
+                  </span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Quick pairs */}
-          <div className="mt-6 pt-5 border-t border-border/40">
-            <p className="mb-3 text-[10px] uppercase tracking-[0.22em] text-muted-foreground/70">
-              Signature pairs
+          {/* Signature pairs */}
+          <div className="border-t border-[color:var(--fx-line-soft)] px-5 md:px-7 py-4">
+            <p
+              className="mb-3 text-[10px] uppercase tracking-[0.22em] text-[color:var(--fx-mute)]"
+              style={mono}
+            >
+              Signature crosses
             </p>
-            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+            <div className="flex flex-wrap gap-2">
               {[
-                { base: 'USD', quote: 'IRR', label: 'USD → IRR' },
+                { base: 'USD', quote: 'IRR', label: 'USD/IRR' },
                 ...POPULAR_PAIRS.map(p => ({
                   base: p.base,
                   quote: p.quote,
-                  label: `${p.base} → ${p.quote}`,
+                  label: `${p.base}/${p.quote}`,
                 })),
               ].map(p => {
                 const active = base === p.base && quote === p.quote
@@ -395,13 +397,17 @@ export function ForexMarket() {
                   <button
                     key={p.label}
                     type="button"
-                    onClick={() => { setBase(p.base); setQuote(p.quote) }}
+                    onClick={() => {
+                      setBase(p.base)
+                      setQuote(p.quote)
+                    }}
                     className={cn(
-                      'shrink-0 rounded-full px-4 py-2 text-[11px] font-medium tracking-wide transition-all duration-300 cursor-pointer',
+                      'text-[11px] px-3 py-2 border transition-colors cursor-pointer',
                       active
-                        ? 'bg-foreground text-background shadow-md'
-                        : 'border border-border/50 bg-background/40 text-muted-foreground hover:border-emerald-500/30 hover:text-foreground',
+                        ? 'bg-[color:var(--fx-fg)] text-[color:var(--fx-bg)] border-[color:var(--fx-fg)]'
+                        : 'border-[color:var(--fx-line)] text-[color:var(--fx-mute)] hover:text-[color:var(--fx-fg)] hover:border-[color:var(--fx-fg)]/40',
                     )}
+                    style={mono}
                   >
                     {p.label}
                   </button>
@@ -410,85 +416,119 @@ export function ForexMarket() {
             </div>
           </div>
         </div>
-      </motion.section>
+      </section>
 
-      {/* History / today */}
-      <div className="rounded-2xl border border-border/50 bg-card/30 backdrop-blur-xl overflow-hidden shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-5 py-4 border-b border-border/40 bg-muted/20">
-          <div className="flex items-center gap-2">
-            <CalendarRange className="size-4 text-muted-foreground" />
-            <span className="text-sm font-medium text-foreground">
-              {period === 'today' ? 'Today' : 'History'}
-            </span>
-            <span className="text-xs text-muted-foreground font-mono">{base}/{quote}</span>
+      {/* ── HISTORY ──────────────────────────────────────────────────────── */}
+      <section>
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-5">
+          <div>
+            <p
+              className="text-[10px] uppercase tracking-[0.3em] text-[color:var(--fx-mute)] mb-1"
+              style={mono}
+            >
+              Series
+            </p>
+            <h2 className="text-2xl md:text-3xl tracking-tight" style={display}>
+              {period === 'today' ? 'Session' : 'History'}
+            </h2>
           </div>
-          <div className="flex gap-1.5 flex-wrap">
+          <div className="flex flex-wrap gap-1">
             {PERIODS.map(d => (
               <button
                 key={d}
                 type="button"
                 onClick={() => setPeriod(d)}
                 className={cn(
-                  'text-[11px] px-3 py-1.5 rounded-full border transition-all cursor-pointer',
+                  'text-[10px] uppercase tracking-[0.16em] px-3 py-2 border transition-colors cursor-pointer',
                   period === d
-                    ? 'bg-foreground text-background border-foreground font-medium'
-                    : 'bg-card/40 text-muted-foreground border-border/60 hover:text-foreground',
+                    ? 'bg-[color:var(--fx-fg)] text-[color:var(--fx-bg)] border-[color:var(--fx-fg)]'
+                    : 'border-[color:var(--fx-line)] text-[color:var(--fx-mute)] hover:text-[color:var(--fx-fg)]',
                 )}
+                style={mono}
               >
                 {periodLabel(d)}
               </button>
             ))}
           </div>
         </div>
-        <div className={cn('p-5 md:p-6 transition-opacity', historyLoading && 'opacity-60')}>
+
+        <div
+          className={cn(
+            'border border-[color:var(--fx-line)] bg-[color:var(--fx-panel)] backdrop-blur-sm p-5 md:p-7 transition-opacity',
+            historyLoading && 'opacity-60',
+          )}
+        >
+          <div className="flex items-center justify-between gap-3 mb-6">
+            <p className="text-xs text-[color:var(--fx-mute)]" style={mono}>
+              {base}/{quote}
+              {lastUpdated
+                ? ` · updated ${lastUpdated.toLocaleTimeString()}`
+                : ''}
+            </p>
+            <Delta value={change} />
+          </div>
+
           {error ? (
-            <p className="text-sm text-red-400 text-center py-16 rounded-xl border border-red-500/20 bg-red-500/10">
+            <p
+              className="text-sm border border-[color:var(--fx-down)]/30 bg-[color:var(--fx-down)]/10 text-[color:var(--fx-down)] px-4 py-3"
+              style={mono}
+            >
               {error}
             </p>
           ) : period === 'today' ? (
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div className="rounded-xl border border-border/40 bg-muted/15 p-5">
-                <p className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground mb-2">
-                  Latest session
-                </p>
-                <p className="font-mono text-3xl font-semibold tabular-nums text-foreground">
-                  {series[series.length - 1]
-                    ? displayRate(series[series.length - 1].rate, quote)
-                    : rate != null
-                      ? displayRate(rate, quote)
-                      : '—'}
-                </p>
-                <p className="mt-2 text-xs text-muted-foreground">
-                  {series[series.length - 1]?.date ?? rateDate ?? '—'}
-                </p>
-              </div>
-              <div className="rounded-xl border border-border/40 bg-muted/15 p-5">
-                <p className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground mb-2">
-                  Previous session
-                </p>
-                <p className="font-mono text-3xl font-semibold tabular-nums text-foreground">
-                  {series.length > 1 ? displayRate(series[0].rate, quote) : '—'}
-                </p>
-                <div className="mt-2 flex items-center gap-2">
-                  <p className="text-xs text-muted-foreground">
-                    {series.length > 1 ? series[0].date : 'Waiting for prior fix'}
+            <div className="space-y-6">
+              <div className="grid sm:grid-cols-2 gap-px bg-[color:var(--fx-line)] border border-[color:var(--fx-line)]">
+                <div className="bg-[color:var(--fx-bg)] p-5">
+                  <p
+                    className="text-[10px] uppercase tracking-[0.22em] text-[color:var(--fx-mute)] mb-2"
+                    style={mono}
+                  >
+                    Latest
                   </p>
-                  {series.length > 1 && <ChangePill value={change} />}
+                  <p
+                    className="text-3xl font-semibold tabular-nums text-[color:var(--fx-fg)]"
+                    style={mono}
+                  >
+                    {series[series.length - 1]
+                      ? displayRate(series[series.length - 1].rate, quote)
+                      : rate != null
+                        ? displayRate(rate, quote)
+                        : '—'}
+                  </p>
+                  <p className="mt-2 text-xs text-[color:var(--fx-mute)]" style={mono}>
+                    {series[series.length - 1]?.date ?? rateDate ?? '—'}
+                  </p>
+                </div>
+                <div className="bg-[color:var(--fx-bg)] p-5">
+                  <p
+                    className="text-[10px] uppercase tracking-[0.22em] text-[color:var(--fx-mute)] mb-2"
+                    style={mono}
+                  >
+                    Previous
+                  </p>
+                  <p
+                    className="text-3xl font-semibold tabular-nums text-[color:var(--fx-fg)]"
+                    style={mono}
+                  >
+                    {series.length > 1 ? displayRate(series[0].rate, quote) : '—'}
+                  </p>
+                  <div className="mt-2 flex items-center gap-2">
+                    <p className="text-xs text-[color:var(--fx-mute)]" style={mono}>
+                      {series.length > 1 ? series[0].date : 'Waiting for prior fix'}
+                    </p>
+                    {series.length > 1 && <Delta value={change} />}
+                  </div>
                 </div>
               </div>
               {series.length >= 2 && (
-                <div className="sm:col-span-2 pt-2">
-                  <ForexChart data={series} positive={change >= 0} height={160} />
-                </div>
+                <ForexChart data={series} positive={change >= 0} height={180} />
               )}
             </div>
           ) : (
             <ForexChart data={series} positive={change >= 0} />
           )}
         </div>
-      </div>
-
-
+      </section>
     </div>
   )
 }
