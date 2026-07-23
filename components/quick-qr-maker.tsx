@@ -1,8 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import Link from 'next/link'
-import { Download, ArrowUpRight } from 'lucide-react'
+import { Download } from 'lucide-react'
 import { generateQrPng, downloadDataUrl } from '@/lib/qr-barcode'
 
 export function QuickQrMaker() {
@@ -22,7 +21,7 @@ export function QuickQrMaker() {
     debounceRef.current = setTimeout(async () => {
       const id = ++genIdRef.current
       try {
-        const dataUrl = await generateQrPng(value, 280)
+        const dataUrl = await generateQrPng(value, 360)
         if (id === genIdRef.current) setPng(dataUrl)
       } catch {
         if (id === genIdRef.current) setPng(null)
@@ -35,26 +34,33 @@ export function QuickQrMaker() {
   }, [text])
 
   return (
-    <div className="space-y-2.5">
+    <div className="flex flex-col h-full gap-5">
+      <div className="relative flex-1 flex items-center justify-center min-h-[160px] rounded-2xl border border-border/60 bg-background/60 dark:bg-background/40">
+        <div className="pointer-events-none absolute top-3 left-3 size-3 border-l border-t border-foreground/25" />
+        <div className="pointer-events-none absolute top-3 right-3 size-3 border-r border-t border-foreground/25" />
+        <div className="pointer-events-none absolute bottom-3 left-3 size-3 border-l border-b border-foreground/25" />
+        <div className="pointer-events-none absolute bottom-3 right-3 size-3 border-r border-b border-foreground/25" />
+
+        {png ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={png}
+            alt="QR preview"
+            className="size-[120px] md:size-[140px] rounded-md bg-white shadow-sm"
+          />
+        ) : (
+          <p className="text-sm text-muted-foreground/50 font-mono tracking-wide">awaiting ink…</p>
+        )}
+      </div>
+
       <input
         type="text"
         value={text}
-        onChange={(e) => setText(e.target.value)}
-        placeholder="paste link or text"
-        className="w-full rounded-lg border border-border/60 bg-muted/50 px-3 py-2 text-[11px] text-foreground outline-none placeholder:text-muted-foreground/50 focus:border-border focus:bg-muted/70 transition-colors"
+        onChange={e => setText(e.target.value)}
+        placeholder="paste a link or message"
+        className="w-full bg-transparent border-b border-foreground/15 focus:border-foreground pb-2 text-base font-light tracking-tight text-foreground outline-none placeholder:text-muted-foreground/40 transition-colors"
         aria-label="QR content"
       />
-
-      <div className="flex items-center justify-center py-1 min-h-[80px] md:min-h-[90px] rounded-lg border border-border/50 bg-muted/40">
-        {png ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={png} alt="QR preview" className="size-[65px] rounded-sm bg-white" />
-        ) : (
-          <span className="text-[10px] text-muted-foreground/45 font-mono">
-            qr.ready 
-          </span>
-        )}
-      </div>
 
       <button
         type="button"
@@ -62,12 +68,11 @@ export function QuickQrMaker() {
           if (png) downloadDataUrl(png, 'qr-code.png')
         }}
         disabled={!png}
-        className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-lg bg-black text-white text-[10px] hover:bg-black/85 disabled:opacity-40 disabled:pointer-events-none transition-colors cursor-pointer"
+        className="inline-flex items-center justify-center gap-2 h-11 rounded-full bg-foreground text-background text-[11px] uppercase tracking-[0.18em] font-medium hover:opacity-90 disabled:opacity-35 disabled:pointer-events-none transition-opacity cursor-pointer"
       >
-        <Download className="size-3" />
+        <Download className="size-3.5" />
         Download PNG
       </button>
-
     </div>
   )
 }
