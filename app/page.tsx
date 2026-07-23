@@ -6,8 +6,6 @@ import { ArrowUpRight } from 'lucide-react'
 
 import {
   IntroAnimation,
-  INTRO_DURATION_MS,
-  HERO_REVEAL_MS,
 } from "@/components/intro-animation";
 
 import { PixelIcon } from "@/components/pixel-icon";
@@ -123,12 +121,7 @@ export default function AgenticPage() {
 
   const handleIntroDone = useCallback(() => {
     setHeroReady(true);
-  }, []);
-
-  // Start video zoom slightly before hero content reveals, for seamless overlap
-  useEffect(() => {
-    const t = setTimeout(() => setVideoReady(true), HERO_REVEAL_MS);
-    return () => clearTimeout(t);
+    setVideoReady(true);
   }, []);
 
   const handleMouse = (e: React.MouseEvent<HTMLDivElement>) => {

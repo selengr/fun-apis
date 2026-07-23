@@ -24,11 +24,34 @@ export const HERO_REVEAL_MS = CURTAIN_DELAY + CURTAIN_DURATION - 150
 
 type Phase = "idle" | "in" | "out" | "done"
 
+export const INTRO_SEEN_KEY = "rk-intro-seen"
+
+export function hasSeenIntro(): boolean {
+  try {
+    return typeof window !== "undefined" && sessionStorage.getItem(INTRO_SEEN_KEY) === "1"
+  } catch {
+    return false
+  }
+}
+
 export function IntroAnimation({ onDone }: { onDone: () => void }) {
   const [phase, setPhase] = useState<Phase>("idle")
   const [curtainUp, setCurtainUp] = useState(false)
+  const [play, setPlay] = useState(false)
 
   useEffect(() => {
+    if (hasSeenIntro()) {
+      onDone()
+      return
+    }
+
+    try {
+      sessionStorage.setItem(INTRO_SEEN_KEY, "1")
+    } catch {
+      /* private mode / blocked storage */
+    }
+
+    setPlay(true)
     // Tiny delay so the browser has painted before we start transitioning
     const t0 = setTimeout(() => setPhase("in"), 80)
     const t1 = setTimeout(() => setPhase("out"), LETTERS_IN_TOTAL)
@@ -36,10 +59,16 @@ export function IntroAnimation({ onDone }: { onDone: () => void }) {
     const t3 = setTimeout(() => onDone(), HERO_REVEAL_MS)
     const t4 = setTimeout(() => setPhase("done"), ANIM_TOTAL)
 
-    return () => { clearTimeout(t0); clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4) }
+    return () => {
+      clearTimeout(t0)
+      clearTimeout(t1)
+      clearTimeout(t2)
+      clearTimeout(t3)
+      clearTimeout(t4)
+    }
   }, [onDone])
 
-  if (phase === "done") return null
+  if (!play || phase === "done") return null
 
   return (
     <div className="fixed inset-0 z-[100] pointer-events-none" aria-hidden="true">
