@@ -3,31 +3,28 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Laugh,
   RefreshCw,
   Heart,
-  Sparkles,
   Dices,
   Calendar,
-  Layers,
   Infinity,
   ChevronDown,
   Copy,
   Check,
   Trash2,
+  Search,
 } from 'lucide-react'
 import type { Joke, JokeApiInfo, JokeResponse, StoredFavorite } from '@/types/jokeapi'
-import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 
 const CATEGORIES = [
-  { key: 'Any', emoji: '🎲', label: 'Any', accent: 'from-violet-500/20 to-transparent', color: '#8b5cf6' },
-  { key: 'Programming', emoji: '💻', label: 'Code', accent: 'from-sky-500/20 to-transparent', color: '#0ea5e9' },
-  { key: 'Pun', emoji: '🎪', label: 'Puns', accent: 'from-amber-500/20 to-transparent', color: '#f59e0b' },
-  { key: 'Misc', emoji: '🃏', label: 'Misc', accent: 'from-rose-500/20 to-transparent', color: '#f43f5e' },
-  { key: 'Dark', emoji: '🌙', label: 'Dark', accent: 'from-zinc-500/20 to-transparent', color: '#52525b' },
-  { key: 'Spooky', emoji: '👻', label: 'Spooky', accent: 'from-purple-500/20 to-transparent', color: '#a855f7' },
-  { key: 'Christmas', emoji: '🎄', label: 'Xmas', accent: 'from-emerald-500/20 to-transparent', color: '#10b981' },
+  { key: 'Any', label: 'Any', mark: '*', emoji: '🎲', color: '#5c6578' },
+  { key: 'Programming', label: 'Code', mark: '</>', emoji: '💻', color: '#3b6ea5' },
+  { key: 'Pun', label: 'Puns', mark: 'Pn', emoji: '🎪', color: '#c96b3c' },
+  { key: 'Misc', label: 'Misc', mark: 'Mx', emoji: '🃏', color: '#e23d2d' },
+  { key: 'Dark', label: 'Dark', mark: 'Dk', emoji: '🌙', color: '#3a3f4a' },
+  { key: 'Spooky', label: 'Spooky', mark: 'Sp', emoji: '👻', color: '#6b5b95' },
+  { key: 'Christmas', label: 'Xmas', mark: 'Xm', emoji: '🎄', color: '#2f6b4f' },
 ] as const
 
 const FAVORITES_KEY = 'fun-apis-joke-favorites'
@@ -72,6 +69,7 @@ function JokeCard({
   onToggleFavorite,
   revealed,
   onReveal,
+  stage,
 }: {
   joke: Joke
   large?: boolean
@@ -79,6 +77,7 @@ function JokeCard({
   onToggleFavorite: (j: Joke) => void
   revealed?: boolean
   onReveal?: () => void
+  stage?: boolean
 }) {
   const [copied, setCopied] = useState(false)
   const isFav = favorites.some(f => f.id === joke.id)
@@ -94,57 +93,98 @@ function JokeCard({
 
   const copy = async () => {
     if (!text) return
-    await navigator.clipboard.writeText(isTwopart && revealed ? `${joke.setup}\n\n${joke.delivery}` : text)
+    await navigator.clipboard.writeText(
+      isTwopart && revealed ? `${joke.setup}\n\n${joke.delivery}` : text ?? '',
+    )
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
 
   return (
-    <motion.div
+    <motion.article
       layout
-      initial={{ opacity: 0, y: 16 }}
+      initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`relative rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl overflow-hidden ${
-        large ? 'p-6 md:p-8' : 'p-4 md:p-5'
-      }`}
+      className={cn(
+        'relative overflow-hidden border',
+        large ? 'p-6 sm:p-8 md:p-10' : 'p-4 sm:p-5',
+      )}
+      style={
+        stage
+          ? {
+              background: 'var(--jk-stage)',
+              color: 'var(--jk-stage-fg)',
+              borderColor: 'transparent',
+            }
+          : {
+              background: 'var(--jk-panel)',
+              borderColor: 'var(--jk-line)',
+              color: 'var(--jk-fg)',
+            }
+      }
     >
-      <div className={`absolute inset-0 bg-gradient-to-br ${cat.accent} opacity-60 pointer-events-none`} />
+      <div
+        className="pointer-events-none absolute left-0 top-0 bottom-0 w-1"
+        style={{ background: stage ? 'var(--jk-cue)' : cat.color }}
+        aria-hidden
+      />
 
-      <div className="relative">
-        <div className="flex items-center justify-between gap-2 mb-4">
-          <div className="flex items-center gap-2">
-            <span className="text-xl">{cat.emoji}</span>
-            <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+      <div className="relative pl-2">
+        <div className="flex items-center justify-between gap-2 mb-4 sm:mb-5">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <span
+              className="shrink-0 font-[family-name:var(--font-jk-mono)] text-[10px] uppercase tracking-[0.2em] px-2 py-1 border"
+              style={{
+                borderColor: stage ? 'rgba(242,243,246,0.2)' : 'var(--jk-line)',
+                color: stage ? 'var(--jk-cue)' : 'var(--jk-mute)',
+              }}
+            >
+              {cat.mark}
+            </span>
+            <span
+              className="truncate font-[family-name:var(--font-jk-mono)] text-[10px] uppercase tracking-[0.18em]"
+              style={{ color: stage ? 'rgba(242,243,246,0.45)' : 'var(--jk-mute)' }}
+            >
               {joke.category} · #{joke.id}
             </span>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 shrink-0">
             <button
               type="button"
               onClick={copy}
-              className="size-8 rounded-full border border-border/60 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+              className="size-8 border flex items-center justify-center transition-opacity hover:opacity-80 cursor-pointer"
+              style={{
+                borderColor: stage ? 'rgba(242,243,246,0.2)' : 'var(--jk-line)',
+                color: stage ? 'rgba(242,243,246,0.7)' : 'var(--jk-mute)',
+              }}
               aria-label="Copy joke"
             >
-              {copied ? <Check className="size-3.5 text-emerald-500" /> : <Copy className="size-3.5" />}
+              {copied ? <Check className="size-3.5" style={{ color: 'var(--jk-cue)' }} /> : <Copy className="size-3.5" />}
             </button>
             <button
               type="button"
               onClick={() => onToggleFavorite(joke)}
-              className={`size-8 rounded-full border flex items-center justify-center transition-colors cursor-pointer ${
-                isFav
-                  ? 'border-red-500/40 bg-red-500/10 text-red-400'
-                  : 'border-border/60 text-muted-foreground hover:text-red-400'
-              }`}
+              className="size-8 border flex items-center justify-center transition-colors cursor-pointer"
+              style={{
+                borderColor: isFav ? 'var(--jk-hot)' : stage ? 'rgba(242,243,246,0.2)' : 'var(--jk-line)',
+                color: isFav ? 'var(--jk-hot)' : stage ? 'rgba(242,243,246,0.7)' : 'var(--jk-mute)',
+                background: isFav ? 'var(--jk-hot-soft)' : 'transparent',
+              }}
               aria-label={isFav ? 'Remove from favorites' : 'Add to favorites'}
             >
-              <Heart className={`size-3.5 ${isFav ? 'fill-current' : ''}`} />
+              <Heart className={cn('size-3.5', isFav && 'fill-current')} />
             </button>
           </div>
         </div>
 
         {isTwopart ? (
-          <div className="space-y-3">
-            <p className={`leading-relaxed text-foreground ${large ? 'text-xl md:text-2xl font-light' : 'text-base'}`}>
+          <div className="space-y-4">
+            <p
+              className={cn(
+                'font-[family-name:var(--font-jk-display)] leading-[1.35] tracking-tight',
+                large ? 'text-2xl sm:text-3xl md:text-[2.15rem]' : 'text-lg sm:text-xl',
+              )}
+            >
               {joke.setup}
             </p>
             <AnimatePresence mode="wait">
@@ -153,7 +193,11 @@ function JokeCard({
                   key="delivery"
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className={`font-medium text-foreground ${large ? 'text-lg md:text-xl' : 'text-base'}`}
+                  className={cn(
+                    'font-[family-name:var(--font-jk-display)] italic leading-[1.35]',
+                    large ? 'text-xl sm:text-2xl' : 'text-base sm:text-lg',
+                  )}
+                  style={{ color: stage ? 'var(--jk-cue)' : 'var(--jk-hot)' }}
                 >
                   {joke.delivery}
                 </motion.p>
@@ -162,23 +206,33 @@ function JokeCard({
                   key="reveal"
                   type="button"
                   onClick={onReveal}
-                  className="text-sm px-4 py-2 rounded-full border border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-2 h-10 px-4 font-[family-name:var(--font-jk-mono)] text-[11px] uppercase tracking-[0.16em] cursor-pointer transition-opacity hover:opacity-90"
+                  style={{
+                    background: 'var(--jk-cue)',
+                    color: 'var(--jk-on-fg)',
+                  }}
                 >
-                  Reveal punchline →
+                  Reveal punchline
                 </motion.button>
               )}
             </AnimatePresence>
           </div>
         ) : (
-          <p className={`leading-relaxed text-foreground ${large ? 'text-xl md:text-2xl font-light' : 'text-base'}`}>
+          <p
+            className={cn(
+              'font-[family-name:var(--font-jk-display)] leading-[1.35] tracking-tight',
+              large ? 'text-2xl sm:text-3xl md:text-[2.15rem]' : 'text-lg sm:text-xl',
+            )}
+          >
             {joke.joke}
           </p>
         )}
       </div>
-    </motion.div>
+    </motion.article>
   )
 }
 
+/** Used on homepage DevEx section — keep API stable. */
 export function SpinWheel({
   spinning,
   landed,
@@ -199,11 +253,13 @@ export function SpinWheel({
     .join(', ')})`
 
   return (
-    <div className={cn(
-      'flex items-center',
-      compact ? 'flex-row gap-3' : 'flex-col gap-4',
-    )}>
-      <div className={`relative shrink-0 ${compact ? 'size-24' : 'size-44 md:size-52'}`}>
+    <div
+      className={cn(
+        'flex items-center',
+        compact ? 'flex-row gap-3' : 'flex-col gap-4',
+      )}
+    >
+      <div className={cn('relative shrink-0', compact ? 'size-24' : 'size-40 sm:size-48')}>
         <motion.div
           animate={{
             rotate: spinning
@@ -225,9 +281,12 @@ export function SpinWheel({
                 style={{ transform: `rotate(${angle}deg)` }}
               >
                 <span
-                  className={cn('drop-shadow-sm select-none', compact ? 'text-sm mt-1.5' : 'text-lg mt-3')}
+                  className={cn(
+                    'select-none font-mono font-semibold text-white/90 drop-shadow-sm',
+                    compact ? 'text-[9px] mt-2' : 'text-[10px] mt-3.5',
+                  )}
                 >
-                  {seg.emoji}
+                  {seg.mark}
                 </span>
               </div>
             )
@@ -238,12 +297,12 @@ export function SpinWheel({
               compact ? 'inset-2.5' : 'inset-4',
             )}
           >
-            <span className={compact ? 'text-lg' : 'text-2xl'}>
-              {landed ? segments.find(s => s.key === landed)?.emoji ?? '🎲' : '🎲'}
+            <span className={cn('font-mono font-bold', compact ? 'text-xs' : 'text-sm')}>
+              {landed ? segments.find(s => s.key === landed)?.mark ?? '*' : '*'}
             </span>
           </div>
         </motion.div>
-        <div className="absolute -top-1 left-1/2 -translate-x-1/2 size-0 border-l-[8px] border-r-[8px] border-b-[14px] border-l-transparent border-r-transparent border-b-amber-500 z-10" />
+        <div className="absolute -top-1 left-1/2 -translate-x-1/2 size-0 border-l-[8px] border-r-[8px] border-b-[14px] border-l-transparent border-r-transparent border-b-[#e23d2d] z-10" />
       </div>
 
       {!hideButton && (
@@ -251,11 +310,16 @@ export function SpinWheel({
           type="button"
           onClick={onSpin}
           disabled={spinning}
-          className={`inline-flex items-center gap-2 rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-500/15 to-orange-500/10 font-medium hover:from-amber-500/25 hover:to-orange-500/15 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
-            compact ? 'px-3 py-1.5 text-[11px]' : 'px-5 py-2.5 text-sm'
-          }`}
+          className={cn(
+            'inline-flex items-center gap-2 font-medium transition-opacity cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed',
+            compact ? 'px-3 py-1.5 text-[11px]' : 'px-5 py-2.5 text-sm',
+          )}
+          style={{
+            background: 'var(--jk-fg, #12141a)',
+            color: 'var(--jk-on-fg, #e8e9ed)',
+          }}
         >
-          <Dices className={`size-3.5 ${spinning ? 'animate-spin' : ''}`} />
+          <Dices className={cn('size-3.5', spinning && 'animate-spin')} />
           {spinning ? 'Spinning…' : 'Spin for a joke'}
         </button>
       )}
@@ -296,7 +360,7 @@ export function JokesHub() {
     setLoading(true)
     setError(null)
     try {
-      const infoJson = await apiFetch({ endpoint: 'info' }) as unknown as JokeApiInfo
+      const infoJson = (await apiFetch({ endpoint: 'info' })) as unknown as JokeApiInfo
       setInfo(infoJson)
 
       const total = infoJson.jokes?.totalCount ?? 1368
@@ -352,7 +416,9 @@ export function JokesHub() {
     const el = feedEndRef.current
     if (!el || tab !== 'feed') return
     const obs = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) loadMore() },
+      ([e]) => {
+        if (e.isIntersecting) loadMore()
+      },
       { rootMargin: '200px' },
     )
     obs.observe(el)
@@ -364,7 +430,7 @@ export function JokesHub() {
     setError(null)
     setRandomLoading(true)
     try {
-      const params: Record<string, string> = { category }
+      const params: Record<string, string> = {}
       if (search.trim()) params.contains = search.trim()
       const joke = await fetchOne(category, params)
       setHeroJoke(joke)
@@ -453,7 +519,14 @@ export function JokesHub() {
         joke: f.joke,
         setup: f.setup,
         delivery: f.delivery,
-        flags: { nsfw: false, religious: false, political: false, racist: false, sexist: false, explicit: false },
+        flags: {
+          nsfw: false,
+          religious: false,
+          political: false,
+          racist: false,
+          sexist: false,
+          explicit: false,
+        },
         safe: true,
         lang: 'en',
       })),
@@ -462,72 +535,230 @@ export function JokesHub() {
 
   if (loading) {
     return (
-      <div className="max-w-6xl mx-auto px-4 space-y-4">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-24 rounded-2xl bg-muted/30 animate-pulse" />
-          ))}
-        </div>
-        <div className="h-48 rounded-2xl bg-muted/30 animate-pulse" />
-        <div className="h-64 rounded-2xl bg-muted/30 animate-pulse" />
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 space-y-6 animate-pulse">
+        <div className="h-14 w-40" style={{ background: 'var(--jk-line-soft)' }} />
+        <div className="h-10 w-full max-w-md" style={{ background: 'var(--jk-line-soft)' }} />
+        <div className="h-72 w-full" style={{ background: 'var(--jk-line-soft)' }} />
       </div>
     )
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 pb-16 space-y-6">
-      {/* Stats strip */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="grid grid-cols-2 lg:grid-cols-4 gap-3"
-      >
-        {[
-          { icon: Laugh, label: 'Jokes', value: String(totalJokes), sub: 'in the library', accent: 'from-amber-500/20 to-transparent' },
-          { icon: Layers, label: 'Categories', value: '7', sub: 'from code to Christmas', accent: 'from-orange-500/20 to-transparent' },
-          { icon: Sparkles, label: 'Languages', value: '6', sub: 'joke languages', accent: 'from-yellow-500/20 to-transparent' },
-          { icon: Heart, label: 'Saved', value: String(favorites.length), sub: 'your favorites', accent: 'from-rose-500/20 to-transparent' },
-        ].map((s, i) => (
-          <motion.div
-            key={s.label}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.06 }}
-            className="group relative overflow-hidden rounded-2xl border border-border/50 bg-card/40 backdrop-blur-xl p-4 hover:border-border transition-colors"
-          >
-            <div className={`absolute inset-0 bg-gradient-to-br ${s.accent} opacity-60 group-hover:opacity-100 transition-opacity`} />
-            <div className="relative">
-              <div className="flex items-center gap-2 text-muted-foreground mb-2">
-                <s.icon className="size-3.5" />
-                <span className="text-[10px] uppercase tracking-[0.15em]">{s.label}</span>
-              </div>
-              <p className="text-xl md:text-2xl font-semibold tabular-nums">{s.value}</p>
-              <p className="text-[11px] text-muted-foreground mt-1">{s.sub}</p>
-            </div>
-          </motion.div>
-        ))}
-      </motion.div>
-
-      {/* Joke of the day */}
-      {dailyJoke && (
+    <div className="mx-auto max-w-6xl px-4 sm:px-6">
+      {/* Hero */}
+      <header className="pb-8 sm:pb-10">
         <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-wrap items-center gap-x-3 gap-y-2"
+        >
+          <span className="inline-block h-2 w-2" style={{ background: 'var(--jk-cue)' }} aria-hidden />
+          <p
+            className="font-[family-name:var(--font-jk-mono)] text-[10px] uppercase tracking-[0.32em]"
+            style={{ color: 'var(--jk-mute)' }}
+          >
+            Open mic · {totalJokes.toLocaleString()} bits · {favorites.length} saved
+          </p>
+        </motion.div>
+
+        <motion.h1
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-2xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 via-card/80 to-orange-500/5 p-5 md:p-6 relative overflow-hidden"
+          transition={{ duration: 0.65, delay: 0.04 }}
+          className="mt-4 font-[family-name:var(--font-jk-mark)] text-[clamp(3.5rem,14vw,7.5rem)] font-extrabold leading-[0.85] tracking-tighter"
+        >
+          BIT
+          <span style={{ color: 'var(--jk-hot)' }}>.</span>
+        </motion.h1>
+
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.12 }}
+          className="mt-4 max-w-md font-[family-name:var(--font-jk-display)] text-lg sm:text-xl italic leading-snug"
+          style={{ color: 'var(--jk-mute)' }}
+        >
+          One setup. One punchline. Spin a lane or pull the next bit.
+        </motion.p>
+      </header>
+
+      {error && (
+        <p
+          className="mb-6 border px-4 py-3 font-[family-name:var(--font-jk-mono)] text-sm"
+          style={{
+            borderColor: 'var(--jk-hot)',
+            background: 'var(--jk-hot-soft)',
+            color: 'var(--jk-hot)',
+          }}
+        >
+          {error}
+        </p>
+      )}
+
+      {/* Stage + wheel */}
+      {tab === 'feed' && (
+        <div className="grid gap-4 lg:grid-cols-[1fr_240px] lg:items-stretch mb-6 sm:mb-8">
+          <div className="min-w-0 space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p
+                className="font-[family-name:var(--font-jk-mono)] text-[10px] uppercase tracking-[0.24em]"
+                style={{ color: 'var(--jk-mute)' }}
+              >
+                On stage
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={randomJoke}
+                  disabled={randomLoading}
+                  className="inline-flex h-9 items-center gap-2 px-3 font-[family-name:var(--font-jk-mono)] text-[11px] uppercase tracking-[0.14em] cursor-pointer disabled:opacity-50"
+                  style={{ background: 'var(--jk-fg)', color: 'var(--jk-on-fg)' }}
+                >
+                  <RefreshCw className={cn('size-3.5', randomLoading && 'animate-spin')} />
+                  {randomLoading ? 'Finding' : 'Next bit'}
+                </button>
+              </div>
+            </div>
+            {heroJoke && (
+              <JokeCard
+                joke={heroJoke}
+                large
+                stage
+                favorites={favorites}
+                onToggleFavorite={toggleFavorite}
+                revealed={heroRevealed}
+                onReveal={() => setHeroRevealed(true)}
+              />
+            )}
+          </div>
+
+          <motion.aside
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="border flex flex-col items-center justify-center gap-5 p-5 sm:p-6"
+            style={{ borderColor: 'var(--jk-line)', background: 'var(--jk-panel)' }}
+          >
+            <p
+              className="font-[family-name:var(--font-jk-mono)] text-[10px] uppercase tracking-[0.24em]"
+              style={{ color: 'var(--jk-mute)' }}
+            >
+              Wheel
+            </p>
+            <SpinWheel spinning={spinning} landed={spinLanded} onSpin={spinForJoke} />
+          </motion.aside>
+        </div>
+      )}
+
+      {/* Desk controls */}
+      <section
+        className="border mb-6 sm:mb-8"
+        style={{ borderColor: 'var(--jk-line)', background: 'var(--jk-panel)' }}
+      >
+        <div
+          className="flex flex-col sm:flex-row sm:items-center gap-3 border-b px-4 py-3 sm:px-5"
+          style={{ borderColor: 'var(--jk-line-soft)' }}
+        >
+          <div className="relative flex-1">
+            <Search
+              className="absolute left-0 top-1/2 -translate-y-1/2 size-3.5"
+              style={{ color: 'var(--jk-mute)' }}
+            />
+            <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && randomJoke()}
+              placeholder="Search bits… bar, python, cat"
+              className="w-full bg-transparent pl-6 pr-2 py-2 font-[family-name:var(--font-jk-mono)] text-sm outline-none placeholder:opacity-50"
+              style={{ color: 'var(--jk-fg)' }}
+            />
+          </div>
+          <div className="flex gap-1.5 shrink-0">
+            {(
+              [
+                { key: 'feed' as const, label: 'Set list', icon: Infinity },
+                { key: 'favorites' as const, label: `Saved (${favorites.length})`, icon: Heart },
+              ] as const
+            ).map(t => (
+              <button
+                key={t.key}
+                type="button"
+                onClick={() => setTab(t.key)}
+                className="inline-flex items-center gap-1.5 h-9 px-3 font-[family-name:var(--font-jk-mono)] text-[10px] uppercase tracking-[0.14em] border cursor-pointer transition-colors"
+                style={
+                  tab === t.key
+                    ? { background: 'var(--jk-fg)', color: 'var(--jk-on-fg)', borderColor: 'var(--jk-fg)' }
+                    : {
+                        background: 'transparent',
+                        color: 'var(--jk-mute)',
+                        borderColor: 'var(--jk-line)',
+                      }
+                }
+              >
+                <t.icon className="size-3" />
+                {t.label}
+              </button>
+            ))}
+            {tab === 'favorites' && favorites.length > 0 && (
+              <button
+                type="button"
+                onClick={clearFavorites}
+                className="inline-flex items-center gap-1.5 h-9 px-3 font-[family-name:var(--font-jk-mono)] text-[10px] uppercase tracking-[0.14em] border cursor-pointer"
+                style={{ borderColor: 'var(--jk-hot)', color: 'var(--jk-hot)' }}
+              >
+                <Trash2 className="size-3" />
+                Clear
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className="flex gap-0 overflow-x-auto px-2 py-1 sm:px-3 scrollbar-none">
+          {CATEGORIES.map(c => (
+            <button
+              key={c.key}
+              type="button"
+              onClick={() => changeCategory(c.key)}
+              className="relative shrink-0 px-3 py-3 font-[family-name:var(--font-jk-mono)] text-[11px] uppercase tracking-[0.14em] cursor-pointer transition-opacity"
+              style={{
+                color: category === c.key ? 'var(--jk-fg)' : 'var(--jk-mute)',
+                opacity: category === c.key ? 1 : 0.75,
+              }}
+            >
+              <span className="mr-1.5" style={{ color: category === c.key ? c.color : undefined }}>
+                {c.mark}
+              </span>
+              {c.label}
+              {category === c.key && (
+                <motion.span
+                  layoutId="jk-cat"
+                  className="absolute bottom-0 left-2 right-2 h-0.5"
+                  style={{ background: 'var(--jk-hot)' }}
+                />
+              )}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* Daily — compact strip, not a second hero */}
+      {dailyJoke && tab === 'feed' && (
+        <section
+          className="mb-6 sm:mb-8 border"
+          style={{ borderColor: 'var(--jk-line)', background: 'var(--jk-panel)' }}
         >
           <div
-            className="absolute inset-0 opacity-[0.04]"
-            style={{
-              backgroundImage:
-                'linear-gradient(var(--foreground) 1px, transparent 1px), linear-gradient(90deg, var(--foreground) 1px, transparent 1px)',
-              backgroundSize: '20px 20px',
-            }}
-          />
-          <div className="relative">
-            <div className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-muted-foreground mb-4 px-3 py-1.5 rounded-full border border-border/70 bg-card/60">
-              <Calendar className="size-3" />
-              Joke of the day
-            </div>
+            className="flex items-center gap-2 border-b px-4 py-2.5 sm:px-5"
+            style={{ borderColor: 'var(--jk-line-soft)' }}
+          >
+            <Calendar className="size-3.5" style={{ color: 'var(--jk-hot)' }} />
+            <p
+              className="font-[family-name:var(--font-jk-mono)] text-[10px] uppercase tracking-[0.22em]"
+              style={{ color: 'var(--jk-mute)' }}
+            >
+              Bit of the day
+            </p>
+          </div>
+          <div className="p-3 sm:p-4">
             <JokeCard
               joke={dailyJoke}
               favorites={favorites}
@@ -535,122 +766,18 @@ export function JokesHub() {
               revealed
             />
           </div>
-        </motion.div>
+        </section>
       )}
 
-      {/* Toolbar */}
-      <div className="rounded-2xl border border-border/50 bg-card/30 backdrop-blur-xl p-4 md:p-5 space-y-4">
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1">
-            <Laugh className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-            <Input
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && randomJoke()}
-              placeholder="Search jokes… (e.g. bar, python, cat)"
-              className="pl-10 h-11 rounded-2xl bg-card/50 border-border/60"
-            />
-          </div>
-          <button
-            type="button"
-            onClick={randomJoke}
-            disabled={randomLoading}
-            className="inline-flex items-center justify-center gap-2 h-11 px-5 rounded-2xl border border-border/60 bg-card/50 text-sm hover:bg-muted/30 transition-all shrink-0 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            <RefreshCw className={`size-4 ${randomLoading ? 'animate-spin' : ''}`} />
-            {randomLoading ? 'Finding…' : 'Random joke'}
-          </button>
-        </div>
-
-        <div className="flex flex-wrap gap-1.5">
-          {CATEGORIES.map(c => (
-            <button
-              key={c.key}
-              type="button"
-              onClick={() => changeCategory(c.key)}
-              className={`text-[11px] px-3 py-1.5 rounded-full border transition-all inline-flex items-center gap-1.5 cursor-pointer ${
-                category === c.key
-                  ? 'bg-foreground text-background border-foreground font-medium'
-                  : 'bg-card/40 text-muted-foreground border-border/60 hover:text-foreground'
-              }`}
-            >
-              <span>{c.emoji}</span>
-              {c.label}
-            </button>
-          ))}
-        </div>
-
-        <div className="flex gap-1.5">
-          {[
-            { key: 'feed' as const, label: 'Infinite feed', icon: Infinity },
-            { key: 'favorites' as const, label: `Favorites (${favorites.length})`, icon: Heart },
-          ].map(t => (
-            <button
-              key={t.key}
-              type="button"
-              onClick={() => setTab(t.key)}
-              className={`text-[11px] px-3 py-1.5 rounded-full border transition-all inline-flex items-center gap-1.5 cursor-pointer ${
-                tab === t.key
-                  ? 'bg-foreground text-background border-foreground'
-                  : 'bg-card/40 text-muted-foreground border-border/60 hover:text-foreground'
-              }`}
-            >
-              <t.icon className="size-3" />
-              {t.label}
-            </button>
-          ))}
-          {tab === 'favorites' && favorites.length > 0 && (
-            <button
-              type="button"
-              onClick={clearFavorites}
-              className="text-[11px] px-3 py-1.5 rounded-full border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-all inline-flex items-center gap-1.5 ml-auto cursor-pointer"
-            >
-              <Trash2 className="size-3" />
-              Clear all
-            </button>
-          )}
-        </div>
-      </div>
-
-      {error && (
-        <p className="text-sm text-red-400 text-center rounded-xl border border-red-500/20 bg-red-500/10 py-2 px-4">
-          {error}
-        </p>
-      )}
-
-      {/* Featured joke + Spin wheel — side by side */}
-      {tab === 'feed' && (
-        <div className="grid lg:grid-cols-[1fr_auto] gap-4 items-stretch">
-          {heroJoke && (
-            <div className="min-w-0">
-              <p className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground mb-3 px-1">Featured</p>
-              <JokeCard
-                joke={heroJoke}
-                large
-                favorites={favorites}
-                onToggleFavorite={toggleFavorite}
-                revealed={heroRevealed}
-                onReveal={() => setHeroRevealed(true)}
-              />
-            </div>
-          )}
-
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="rounded-2xl border border-border/50 bg-card/40 backdrop-blur-xl p-5 md:p-6 flex flex-col items-center justify-center lg:w-72"
-          >
-            <p className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground mb-6">Spin the wheel</p>
-            <SpinWheel spinning={spinning} landed={spinLanded} onSpin={spinForJoke} />
-          </motion.div>
-        </div>
-      )}
-
-      {/* Feed or favorites */}
+      {/* Set list / favorites */}
       {tab === 'feed' ? (
-        <div className="space-y-3">
-          <p className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground px-1 flex items-center gap-2">
-            <Infinity className="size-3" /> Keep scrolling for more
+        <section className="space-y-3">
+          <p
+            className="font-[family-name:var(--font-jk-mono)] text-[10px] uppercase tracking-[0.22em] flex items-center gap-2"
+            style={{ color: 'var(--jk-mute)' }}
+          >
+            <Infinity className="size-3" />
+            Keep scrolling the set
           </p>
           <AnimatePresence mode="popLayout">
             {feed.map((joke, i) => (
@@ -664,16 +791,24 @@ export function JokesHub() {
             ))}
           </AnimatePresence>
           <div ref={feedEndRef} className="flex justify-center py-6">
-            {feedLoading && <RefreshCw className="size-5 text-muted-foreground animate-spin" />}
-            {!feedLoading && <ChevronDown className="size-5 text-muted-foreground/40 animate-bounce" />}
+            {feedLoading ? (
+              <RefreshCw className="size-5 animate-spin" style={{ color: 'var(--jk-mute)' }} />
+            ) : (
+              <ChevronDown className="size-5 animate-bounce opacity-40" style={{ color: 'var(--jk-mute)' }} />
+            )}
           </div>
-        </div>
+        </section>
       ) : (
-        <div className="space-y-3">
+        <section className="space-y-3">
           {favoriteJokes.length === 0 ? (
-            <div className="text-center py-16 text-muted-foreground rounded-2xl border border-dashed border-border/50">
-              <Heart className="size-10 mx-auto mb-3 opacity-30" />
-              <p className="text-sm">No favorites yet. Tap the heart on any joke.</p>
+            <div
+              className="border border-dashed py-16 text-center"
+              style={{ borderColor: 'var(--jk-line)', color: 'var(--jk-mute)' }}
+            >
+              <Heart className="size-8 mx-auto mb-3 opacity-40" />
+              <p className="font-[family-name:var(--font-jk-mono)] text-sm">
+                No saved bits yet. Heart one from the stage.
+              </p>
             </div>
           ) : (
             favoriteJokes.map(joke => (
@@ -686,20 +821,25 @@ export function JokesHub() {
               />
             ))
           )}
-        </div>
+        </section>
       )}
 
-      <p className="text-center text-[11px] text-muted-foreground">
+      <p
+        className="mt-10 text-center font-[family-name:var(--font-jk-mono)] text-[11px]"
+        style={{ color: 'var(--jk-mute)' }}
+      >
         Powered by{' '}
         <a
           href="https://v2.jokeapi.dev"
           target="_blank"
           rel="noopener noreferrer"
-          className="underline hover:text-foreground transition-colors"
+          className="underline underline-offset-2 hover:opacity-80"
+          style={{ color: 'var(--jk-fg)' }}
         >
           JokeAPI
         </a>
-        {' '}· safe mode on · no API key needed
+        {' '}
+        · safe mode on
       </p>
     </div>
   )
