@@ -9,8 +9,9 @@ import { cn } from '@/lib/utils'
 
 const SAVED_KEY = 'daily-poetry-saved'
 
+/** Fixed locale so SSR and client always match (avoids hydration mismatch). */
 function todayLabel() {
-  return new Date().toLocaleDateString(undefined, {
+  return new Date().toLocaleDateString('en-US', {
     weekday: 'long',
     month: 'long',
     day: 'numeric',
@@ -24,6 +25,11 @@ export function DailyPoetry() {
   const [error, setError] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [dateLabel, setDateLabel] = useState('')
+
+  useEffect(() => {
+    setDateLabel(todayLabel())
+  }, [])
 
   const loadPoem = useCallback(async (opts?: { next?: boolean; mood?: PoetryMood | null }) => {
     setLoading(true)
@@ -120,7 +126,7 @@ export function DailyPoetry() {
             className="font-[family-name:var(--font-py-mono)] text-[10px] uppercase tracking-[0.32em]"
             style={{ color: 'var(--py-mute)' }}
           >
-            {todayLabel()}
+            {dateLabel || 'Today'}
             {mood ? ` · ${MOODS.find(m => m.id === mood)?.label}` : ' · Today\'s press'}
           </p>
         </motion.div>

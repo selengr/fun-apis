@@ -5,6 +5,9 @@ import {
   POETRYDB,
   normalizePoem,
   pickDailyIndex,
+  pickFallbackPoem,
+  pickRandomFallback,
+  fallbackByMood,
 } from '@/lib/poetry'
 import type { PoetryMood, PoetryPoem } from '@/types/poetry'
 
@@ -12,14 +15,25 @@ export const dynamic = 'force-dynamic'
 
 const UA = 'fun-apis/1.0 (Daily Poetry; contact@example.com)'
 
-async function poetryFetch(path: string) {
+async function poetryFetch(path: string, attempt = 0): Promise<unknown> {
   const res = await fetch(`${POETRYDB}${path}`, {
     headers: { Accept: 'application/json', 'User-Agent': UA },
-    next: { revalidate: 3600 },
+    cache: 'no-store',
   })
   const json = await res.json().catch(() => null)
-  if (!res.ok || (json && json.status === 404)) {
-    throw new Error(json?.reason ?? `PoetryDB error ${res.status}`)
+
+  // Retry once on transient upstream failures
+  if ((res.status === 503 || res.status === 502 || res.status === 429) && attempt < 1) {
+    await new Promise(r => setTimeout(r, 400))
+    return poetryFetch(path, attempt + 1)
+  }
+
+  if (!res.ok || (json && typeof json === 'object' && 'status' in json && json.status === 404)) {
+    const reason =
+      json && typeof json === 'object' && 'reason' in json && typeof json.reason === 'string'
+        ? json.reason
+        : `PoetryDB error ${res.status}`
+    throw new Error(reason)
   }
   return json
 }
@@ -38,54 +52,94 @@ export async function GET(request: NextRequest) {
 
   try {
     if (action === 'authors') {
-      const data = await poetryFetch('/author')
-      return NextResponse.json({ authors: data.authors ?? FEATURED_POETS })
+      try {
+        const data = (await poetryFetch('/author')) as { authors?: string[] }
+        return NextResponse.json({ authors: data.authors ?? FEATURED_POETS })
+      } catch {
+        return NextResponse.json({ authors: FEATURED_POETS, source: 'fallback' })
+      }
     }
 
     if (action === 'today') {
-      // Stable daily poem: pull a pool from a featured poet, pick by date seed
       const poet = FEATURED_POETS[pickDailyIndex(FEATURED_POETS.length, 'poet')]
-      const pool = asPoems(await poetryFetch(`/author/${encodeURIComponent(poet)}`))
-      const poem = pool[pickDailyIndex(pool.length, poet)] ?? pool[0]
-      if (!poem) {
-        const fallback = asPoems(await poetryFetch('/random/1'))
-        return NextResponse.json({ poem: fallback[0] ?? null, poet, source: 'random' })
+      try {
+        const pool = asPoems(await poetryFetch(`/author/${encodeURIComponent(poet)}`))
+        const poem = pool[pickDailyIndex(pool.length, poet)] ?? pool[0]
+        if (!poem) {
+          const fallback = asPoems(await poetryFetch('/random/1'))
+          return NextResponse.json({
+            poem: fallback[0] ?? pickFallbackPoem(null, 'today'),
+            poet,
+            source: fallback[0] ? 'random' : 'fallback',
+          })
+        }
+        return NextResponse.json({ poem, poet, source: 'daily' })
+      } catch {
+        return NextResponse.json({
+          poem: pickFallbackPoem(null, 'today'),
+          poet,
+          source: 'fallback',
+        })
       }
-      return NextResponse.json({ poem, poet, source: 'daily' })
     }
 
     if (action === 'random' || action === 'next') {
       const mood = searchParams.get('mood') as PoetryMood | null
-      if (mood) {
-        const q = MOODS.find(m => m.id === mood)?.query ?? 'love'
-        const data = asPoems(
-          await poetryFetch(`/lines,poemcount/${encodeURIComponent(q)};12`),
-        )
-        if (data.length) {
-          const poem = data[Math.floor(Math.random() * data.length)]
-          return NextResponse.json({ poem, mood })
+      try {
+        if (mood) {
+          const q = MOODS.find(m => m.id === mood)?.query ?? 'love'
+          const data = asPoems(
+            await poetryFetch(`/lines,poemcount/${encodeURIComponent(q)};12`),
+          )
+          if (data.length) {
+            const poem = data[Math.floor(Math.random() * data.length)]
+            return NextResponse.json({ poem, mood })
+          }
         }
+        const data = asPoems(await poetryFetch('/random/1'))
+        return NextResponse.json({
+          poem: data[0] ?? pickRandomFallback(mood),
+          mood: mood ?? null,
+          source: data[0] ? 'poetrydb' : 'fallback',
+        })
+      } catch {
+        return NextResponse.json({
+          poem: pickRandomFallback(mood),
+          mood: mood ?? null,
+          source: 'fallback',
+        })
       }
-      const data = asPoems(await poetryFetch('/random/1'))
-      return NextResponse.json({ poem: data[0] ?? null, mood: mood ?? null })
     }
 
     if (action === 'mood') {
       const mood = (searchParams.get('mood') ?? 'romantic') as PoetryMood
-      const q = MOODS.find(m => m.id === mood)?.query ?? 'love'
-      const data = asPoems(
-        await poetryFetch(`/lines,poemcount/${encodeURIComponent(q)};16`),
-      )
-      const poem = data[Math.floor(Math.random() * Math.max(data.length, 1))] ?? null
-      return NextResponse.json({ poem, poems: data.slice(0, 8), mood })
+      try {
+        const q = MOODS.find(m => m.id === mood)?.query ?? 'love'
+        const data = asPoems(
+          await poetryFetch(`/lines,poemcount/${encodeURIComponent(q)};16`),
+        )
+        const poem = data[Math.floor(Math.random() * Math.max(data.length, 1))] ?? null
+        if (poem) {
+          return NextResponse.json({ poem, poems: data.slice(0, 8), mood })
+        }
+        throw new Error('empty')
+      } catch {
+        const poems = fallbackByMood(mood)
+        return NextResponse.json({
+          poem: poems[Math.floor(Math.random() * poems.length)] ?? pickRandomFallback(mood),
+          poems: poems.slice(0, 8),
+          mood,
+          source: 'fallback',
+        })
+      }
     }
 
     if (action === 'discover') {
       const [love, nature, hope, random] = await Promise.all([
-        poetryFetch('/lines,poemcount/love;6').then(asPoems).catch(() => []),
-        poetryFetch('/lines,poemcount/nature;6').then(asPoems).catch(() => []),
-        poetryFetch('/lines,poemcount/hope;6').then(asPoems).catch(() => []),
-        poetryFetch('/random/6').then(asPoems).catch(() => []),
+        poetryFetch('/lines,poemcount/love;6').then(asPoems).catch(() => fallbackByMood('romantic').slice(0, 6)),
+        poetryFetch('/lines,poemcount/nature;6').then(asPoems).catch(() => fallbackByMood('nature').slice(0, 6)),
+        poetryFetch('/lines,poemcount/hope;6').then(asPoems).catch(() => fallbackByMood('inspirational').slice(0, 6)),
+        poetryFetch('/random/6').then(asPoems).catch(() => fallbackByMood().slice(0, 6)),
       ])
       return NextResponse.json({
         popular: love.slice(0, 6),
@@ -98,19 +152,31 @@ export async function GET(request: NextRequest) {
 
     if (action === 'author') {
       const name = searchParams.get('name') ?? 'Emily Dickinson'
-      const poems = asPoems(await poetryFetch(`/author/${encodeURIComponent(name)}`))
-      return NextResponse.json({
-        author: name,
-        poems: poems.slice(0, 8),
-        count: poems.length,
-      })
+      try {
+        const poems = asPoems(await poetryFetch(`/author/${encodeURIComponent(name)}`))
+        return NextResponse.json({
+          author: name,
+          poems: poems.slice(0, 8),
+          count: poems.length,
+        })
+      } catch {
+        const poems = fallbackByMood().filter(p => p.author === name)
+        return NextResponse.json({
+          author: name,
+          poems: (poems.length ? poems : fallbackByMood()).slice(0, 8),
+          count: poems.length,
+          source: 'fallback',
+        })
+      }
     }
 
     return NextResponse.json({ error: 'Unknown action' }, { status: 400 })
   } catch (err) {
-    return NextResponse.json(
-      { error: err instanceof Error ? err.message : 'Poetry fetch failed' },
-      { status: 502 },
-    )
+    // Last resort — never leave the page empty if we have local verse
+    return NextResponse.json({
+      poem: pickFallbackPoem(null, 'error'),
+      source: 'fallback',
+      warning: err instanceof Error ? err.message : 'Poetry fetch failed',
+    })
   }
 }
