@@ -3,23 +3,10 @@
 import { useCallback, useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Swords } from 'lucide-react'
-import { Cormorant_Garamond, Instrument_Sans } from 'next/font/google'
 import { FactionCard } from '@/components/animal-facts/FactionCard'
 import { ScoreBoard } from '@/components/animal-facts/ScoreBoard'
 import type { CatFact, DogFact, Faction } from '@/types/animal-facts'
 import { cn } from '@/lib/utils'
-
-const display = Cormorant_Garamond({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600'],
-  variable: '--font-battle-display',
-})
-
-const ui = Instrument_Sans({
-  subsets: ['latin'],
-  weight: ['400', '500'],
-  variable: '--font-battle-ui',
-})
 
 export function AnimalFactsBattle() {
   const [catFact, setCatFact] = useState('')
@@ -94,69 +81,96 @@ export function AnimalFactsBattle() {
   const battling = catLoading || dogLoading
 
   return (
-    <div className={cn(display.variable, ui.variable, 'relative min-h-screen overflow-hidden')}>
-      {/* Atmosphere */}
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute top-[-12%] left-[-8%] h-[520px] w-[520px] rounded-full bg-rose-300/25 dark:bg-rose-900/20 blur-[130px]" />
-        <div className="absolute top-[20%] right-[-10%] h-[480px] w-[480px] rounded-full bg-amber-300/20 dark:bg-amber-900/15 blur-[120px]" />
-        <div className="absolute bottom-[-10%] left-1/3 h-[360px] w-[360px] rounded-full bg-stone-300/20 dark:bg-stone-700/10 blur-[100px]" />
-        <div
-          className="absolute inset-0 opacity-[0.03] dark:opacity-[0.04]"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
-          }}
-        />
-      </div>
-
-      {/* Hero */}
-      <header className="px-5 pt-6 pb-10 text-center sm:pt-8 sm:pb-14">
-        <motion.p
-          initial={{ opacity: 0, y: 8 }}
+    <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
+      {/* Hero — one composition */}
+      <header className="relative pb-8 sm:pb-12">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="font-[family-name:var(--font-battle-ui)] text-[10px] uppercase tracking-[0.35em] text-stone-400 dark:text-stone-500"
+          className="flex flex-wrap items-center gap-x-3 gap-y-2"
         >
-          A salon of curious truths
-        </motion.p>
+          <span
+            className="inline-block h-2 w-2"
+            style={{ background: 'var(--af-signal)' }}
+            aria-hidden
+          />
+          <p
+            className="font-[family-name:var(--font-af-mono)] text-[10px] uppercase tracking-[0.32em]"
+            style={{ color: 'var(--af-mute)' }}
+          >
+            Live bout · session only
+          </p>
+        </motion.div>
 
         <motion.h1
-          initial={{ opacity: 0, y: 14 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.65, delay: 0.05 }}
-          className="mt-4 font-[family-name:var(--font-battle-display)] text-[clamp(3rem,10vw,5.5rem)] font-light leading-[0.92] tracking-tight text-stone-900 dark:text-stone-50"
+          transition={{ duration: 0.65, delay: 0.04 }}
+          className="mt-4 font-[family-name:var(--font-af-mark)] text-[clamp(3.5rem,14vw,7.5rem)] font-extrabold leading-[0.85] tracking-tighter"
         >
-          Cat{' '}
-          <span className="italic text-stone-400 dark:text-stone-500 font-normal">versus</span>
-          <br className="sm:hidden" /> Dog
+          RING
+          <span style={{ color: 'var(--af-signal)' }}>.</span>
         </motion.h1>
 
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.15 }}
-          className="mx-auto mt-5 max-w-md font-[family-name:var(--font-battle-ui)] text-sm leading-relaxed text-stone-500 dark:text-stone-400"
+          transition={{ duration: 0.55, delay: 0.12 }}
+          className="mt-4 max-w-md font-[family-name:var(--font-af-display)] text-lg sm:text-xl italic leading-snug"
+          style={{ color: 'var(--af-mute)' }}
         >
-          Two factions. One question. Whose fact stays with you longer?
+          Cat corner versus dog corner. Pull a fact. Award the better one.
         </motion.p>
 
+        {/* Live score strip */}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.22 }}
-          className="mt-7 inline-flex items-center gap-4 rounded-full border border-stone-900/[0.06] dark:border-white/[0.06] bg-white/50 dark:bg-white/[0.03] px-5 py-2.5 backdrop-blur-md"
+          transition={{ duration: 0.45, delay: 0.18 }}
+          className="mt-7 flex flex-wrap items-stretch border"
+          style={{ borderColor: 'var(--af-line)', background: 'var(--af-panel)' }}
         >
-          <span className="font-[family-name:var(--font-battle-ui)] text-xs tracking-wide text-rose-800/70 dark:text-rose-200/70">
-            Cat <span className="ml-1 tabular-nums font-medium text-rose-900 dark:text-rose-100">{catWins}</span>
-          </span>
-          <span className="h-3 w-px bg-stone-300/70 dark:bg-stone-600" />
-          <span className="font-[family-name:var(--font-battle-ui)] text-xs tracking-wide text-amber-900/70 dark:text-amber-100/70">
-            Dog <span className="ml-1 tabular-nums font-medium text-amber-950 dark:text-amber-50">{dogWins}</span>
-          </span>
+          <div className="flex items-center gap-3 px-4 py-3 sm:px-5">
+            <span
+              className="font-[family-name:var(--font-af-mono)] text-[10px] uppercase tracking-[0.2em]"
+              style={{ color: 'var(--af-cat)' }}
+            >
+              Cat
+            </span>
+            <span
+              className="font-[family-name:var(--font-af-mark)] text-2xl font-extrabold tabular-nums"
+              style={{ color: 'var(--af-cat)' }}
+            >
+              {catWins}
+            </span>
+          </div>
+          <div
+            className="flex items-center px-3 border-x font-[family-name:var(--font-af-mono)] text-[10px] uppercase tracking-[0.2em]"
+            style={{ borderColor: 'var(--af-line)', color: 'var(--af-mute)' }}
+          >
+            vs
+          </div>
+          <div className="flex items-center gap-3 px-4 py-3 sm:px-5">
+            <span
+              className="font-[family-name:var(--font-af-mono)] text-[10px] uppercase tracking-[0.2em]"
+              style={{ color: 'var(--af-dog)' }}
+            >
+              Dog
+            </span>
+            <span
+              className="font-[family-name:var(--font-af-mark)] text-2xl font-extrabold tabular-nums"
+              style={{ color: 'var(--af-dog)' }}
+            >
+              {dogWins}
+            </span>
+          </div>
         </motion.div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
-        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:gap-7">
+      <main>
+        {/* Desktop: two corners with center duel control; mobile: stacked with duel between */}
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_auto_1fr] lg:gap-5 lg:items-stretch">
           <div className="order-1">
             <FactionCard
               faction="cat"
@@ -173,32 +187,40 @@ export function AnimalFactsBattle() {
             />
           </div>
 
-          <div className="order-2 flex items-center justify-center py-1 lg:order-3 lg:col-span-2 lg:py-3">
+          <div className="order-2 flex items-center justify-center py-2 lg:py-0 lg:px-1">
             <motion.button
               type="button"
               disabled={battling}
               onClick={() => void fetchBoth()}
-              whileHover={battling ? undefined : { scale: 1.02 }}
-              whileTap={battling ? undefined : { scale: 0.98 }}
+              whileHover={battling ? undefined : { scale: 1.03 }}
+              whileTap={battling ? undefined : { scale: 0.97 }}
               className={cn(
-                'group relative inline-flex items-center gap-3 overflow-hidden rounded-full px-8 py-4',
-                'font-[family-name:var(--font-battle-ui)] text-sm font-medium tracking-[0.08em]',
-                'text-stone-50 dark:text-stone-950',
-                'bg-stone-900 dark:bg-stone-100',
-                'shadow-[0_20px_50px_-20px_rgba(0,0,0,0.45)]',
-                'disabled:opacity-45 cursor-pointer disabled:cursor-not-allowed',
+                'group relative inline-flex flex-col items-center justify-center gap-2',
+                'h-20 w-full max-w-xs lg:h-28 lg:w-28 lg:max-w-none',
+                'font-[family-name:var(--font-af-mono)] text-[11px] font-medium uppercase tracking-[0.16em]',
+                'cursor-pointer disabled:cursor-not-allowed disabled:opacity-45',
                 'transition-opacity duration-300',
               )}
+              style={{
+                background: 'var(--af-fg)',
+                color: 'var(--af-on-fg)',
+              }}
             >
-              <span className="pointer-events-none absolute inset-0 bg-gradient-to-r from-rose-500/25 via-transparent to-amber-500/25 opacity-80" />
-              <Swords className={cn('relative size-4', battling && 'animate-pulse')} />
-              <span className="relative">
-                {battling ? 'Dueling…' : 'Battle — refresh both'}
-              </span>
+              <Swords className={cn('size-5', battling && 'animate-pulse')} />
+              <span>{battling ? 'Dueling' : 'Duel'}</span>
+              {!battling && (
+                <span
+                  className="pointer-events-none absolute -inset-px opacity-0 group-hover:opacity-100 transition-opacity"
+                  style={{
+                    boxShadow: '0 0 0 2px var(--af-signal)',
+                  }}
+                  aria-hidden
+                />
+              )}
             </motion.button>
           </div>
 
-          <div className="order-3 lg:order-2">
+          <div className="order-3">
             <FactionCard
               faction="dog"
               fact={dogFact}
@@ -215,7 +237,7 @@ export function AnimalFactsBattle() {
           </div>
         </div>
 
-        <div className="mt-12 sm:mt-16">
+        <div className="mt-8 sm:mt-12">
           <ScoreBoard
             catWins={catWins}
             dogWins={dogWins}

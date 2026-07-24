@@ -17,52 +17,24 @@ interface FactionCardProps {
   onWin: () => void
 }
 
-const THEME = {
+const META = {
   cat: {
-    panel:
-      'bg-gradient-to-b from-[#faf5f8] via-[#f7eef4] to-[#f3e8ef] dark:from-[#1a1218] dark:via-[#161014] dark:to-[#120e12]',
-    accent: 'text-rose-700/80 dark:text-rose-300/80',
-    accentSoft: 'text-rose-600/50 dark:text-rose-300/40',
-    ring: 'ring-rose-900/8 dark:ring-rose-200/10',
-    glow: 'bg-rose-300/30 dark:bg-rose-900/25',
-    factBg: 'bg-white/55 dark:bg-white/[0.03] border-rose-900/8 dark:border-rose-100/8',
-    nextBtn:
-      'bg-rose-900 text-[#faf5f8] hover:bg-rose-800 dark:bg-rose-200 dark:text-rose-950 dark:hover:bg-rose-100',
-    winBtn:
-      'border-rose-900/15 text-rose-800/70 hover:bg-rose-900/[0.04] dark:border-rose-200/15 dark:text-rose-200/70 dark:hover:bg-rose-100/[0.06]',
-    winnerBadge: 'bg-rose-900 text-[#faf5f8] dark:bg-rose-200 dark:text-rose-950',
-    skeleton: 'bg-rose-900/8 dark:bg-rose-100/10',
-    name: 'Feline',
-    label: 'Cat',
-    emoji: '🐱',
-    nextLabel: 'Next fact',
-    winLabel: 'Award point',
-    error: 'The cat slipped away. Try again.',
+    corner: 'CORNER A',
+    label: 'CAT',
+    mark: 'C',
+    accent: 'var(--af-cat)',
+    soft: 'var(--af-cat-soft)',
+    error: 'Cat corner went quiet. Try again.',
     loadingHint: null as string | null,
-    floatDelay: 'delay-0',
   },
   dog: {
-    panel:
-      'bg-gradient-to-b from-[#faf7f2] via-[#f6f0e6] to-[#f2ebe0] dark:from-[#1a1612] dark:via-[#161310] dark:to-[#12100e]',
-    accent: 'text-amber-800/80 dark:text-amber-200/80',
-    accentSoft: 'text-amber-700/50 dark:text-amber-200/40',
-    ring: 'ring-amber-900/8 dark:ring-amber-100/10',
-    glow: 'bg-amber-300/25 dark:bg-amber-900/20',
-    factBg: 'bg-white/55 dark:bg-white/[0.03] border-amber-900/8 dark:border-amber-100/8',
-    nextBtn:
-      'bg-amber-900 text-[#faf7f2] hover:bg-amber-800 dark:bg-amber-100 dark:text-amber-950 dark:hover:bg-amber-50',
-    winBtn:
-      'border-amber-900/15 text-amber-900/70 hover:bg-amber-900/[0.04] dark:border-amber-100/15 dark:text-amber-100/70 dark:hover:bg-amber-100/[0.06]',
-    winnerBadge: 'bg-amber-900 text-[#faf7f2] dark:bg-amber-100 dark:text-amber-950',
-    skeleton: 'bg-amber-900/8 dark:bg-amber-100/10',
-    name: 'Canine',
-    label: 'Dog',
-    emoji: '🐶',
-    nextLabel: 'Next fact',
-    winLabel: 'Award point',
-    error: 'The dog is still dreaming. Try again.',
-    loadingHint: 'Waking the kennel… may take a moment',
-    floatDelay: '[animation-delay:150ms]',
+    corner: 'CORNER B',
+    label: 'DOG',
+    mark: 'D',
+    accent: 'var(--af-dog)',
+    soft: 'var(--af-dog-soft)',
+    error: 'Dog corner still warming up. Try again.',
+    loadingHint: 'Kennel cold-start — may take 10–30s',
   },
 } as const
 
@@ -77,117 +49,134 @@ export function FactionCard({
   onNext,
   onWin,
 }: FactionCardProps) {
-  const t = THEME[faction]
+  const t = META[faction]
 
   return (
     <motion.article
-      initial={{ opacity: 0, y: 18 }}
+      initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-      className={cn(
-        'relative min-h-[420px] overflow-hidden rounded-[1.75rem]',
-        'ring-1',
-        t.ring,
-        t.panel,
-      )}
+      className="relative flex min-h-[380px] flex-col overflow-hidden border"
+      style={{
+        background: 'var(--af-panel)',
+        borderColor: 'var(--af-line)',
+      }}
     >
-      {/* Soft atmospheric orb */}
       <div
-        className={cn(
-          'pointer-events-none absolute -top-16 right-[-10%] h-56 w-56 rounded-full blur-3xl',
-          t.glow,
-        )}
+        className="pointer-events-none absolute -top-20 -right-16 h-48 w-48 rounded-full blur-3xl"
+        style={{ background: t.soft }}
+        aria-hidden
+      />
+
+      <div
+        className="absolute left-0 top-0 bottom-0 w-1"
+        style={{ background: t.accent }}
         aria-hidden
       />
 
       <AnimatePresence>
         {isBattleWinner && (
           <motion.div
-            initial={{ opacity: 0, y: -8, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -6 }}
-            className={cn(
-              'absolute top-5 right-5 z-10 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[10px] font-medium tracking-[0.16em] uppercase',
-              t.winnerBadge,
-            )}
+            initial={{ opacity: 0, x: 12 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0 }}
+            className="absolute top-4 right-4 z-10 inline-flex items-center gap-1.5 px-2.5 py-1 font-[family-name:var(--font-af-mono)] text-[10px] font-medium uppercase tracking-[0.18em]"
+            style={{
+              background: 'var(--af-signal)',
+              color: 'var(--af-on-fg)',
+            }}
           >
             <Trophy className="size-3" />
-            Victor
+            Round
           </motion.div>
         )}
       </AnimatePresence>
 
-      <div className="relative flex h-full min-h-[420px] flex-col p-7 sm:p-8">
-        <div className="flex items-start justify-between gap-4">
+      <div className="relative flex flex-1 flex-col p-5 sm:p-7">
+        <div className="flex items-start justify-between gap-3">
           <div>
             <p
-              className={cn(
-                'font-[family-name:var(--font-battle-ui)] text-[10px] uppercase tracking-[0.28em]',
-                t.accentSoft,
-              )}
+              className="font-[family-name:var(--font-af-mono)] text-[10px] uppercase tracking-[0.28em]"
+              style={{ color: 'var(--af-mute)' }}
             >
-              {t.name} salon
+              {t.corner}
             </p>
             <h2
-              className={cn(
-                'mt-2 font-[family-name:var(--font-battle-display)] text-4xl sm:text-5xl font-light tracking-tight leading-none',
-                t.accent,
-              )}
+              className="mt-1.5 font-[family-name:var(--font-af-mark)] text-3xl sm:text-4xl font-extrabold tracking-tight leading-none"
+              style={{ color: t.accent }}
             >
               {t.label}
             </h2>
           </div>
           <span
-            className={cn('text-5xl select-none animate-float opacity-90', t.floatDelay)}
+            className="select-none font-[family-name:var(--font-af-mark)] text-5xl sm:text-6xl font-extrabold leading-none opacity-20"
+            style={{ color: t.accent }}
             aria-hidden
           >
-            {t.emoji}
+            {t.mark}
           </span>
         </div>
 
         {showColdStart && faction === 'dog' && (
-          <p className="mt-5 rounded-xl border border-amber-800/10 bg-amber-900/[0.04] px-3.5 py-2.5 font-[family-name:var(--font-battle-ui)] text-[11px] leading-relaxed text-amber-900/60 dark:border-amber-100/10 dark:bg-amber-100/[0.04] dark:text-amber-100/55">
+          <p
+            className="mt-4 border px-3 py-2 font-[family-name:var(--font-af-mono)] text-[11px] leading-relaxed"
+            style={{
+              borderColor: 'var(--af-line)',
+              color: 'var(--af-mute)',
+              background: t.soft,
+            }}
+          >
             First fetch may take 10–30s while the kennel wakes.
           </p>
         )}
 
         <div
-          className={cn(
-            'mt-6 flex-1 rounded-2xl border p-6 backdrop-blur-sm',
-            t.factBg,
-          )}
+          className="mt-5 flex-1 border p-5 sm:p-6"
+          style={{
+            borderColor: 'var(--af-line-soft)',
+            background: 'color-mix(in srgb, var(--af-bg) 55%, transparent)',
+          }}
         >
           {loading ? (
             <div className="space-y-3 pt-1">
-              <div className={cn('h-3.5 w-full animate-pulse rounded-full', t.skeleton)} />
-              <div className={cn('h-3.5 w-[92%] animate-pulse rounded-full', t.skeleton)} />
-              <div className={cn('h-3.5 w-[76%] animate-pulse rounded-full', t.skeleton)} />
+              <div className="h-3 w-full animate-pulse" style={{ background: t.soft }} />
+              <div className="h-3 w-[90%] animate-pulse" style={{ background: t.soft }} />
+              <div className="h-3 w-[72%] animate-pulse" style={{ background: t.soft }} />
               {t.loadingHint && (
-                <p className="pt-4 flex items-center gap-2 font-[family-name:var(--font-battle-ui)] text-xs text-amber-800/55 dark:text-amber-100/50">
+                <p
+                  className="pt-4 flex items-center gap-2 font-[family-name:var(--font-af-mono)] text-xs"
+                  style={{ color: 'var(--af-mute)' }}
+                >
                   <Loader2 className="size-3.5 animate-spin" />
                   {t.loadingHint}
                 </p>
               )}
             </div>
           ) : error ? (
-            <p className="font-[family-name:var(--font-battle-display)] text-xl font-light leading-relaxed text-stone-500 dark:text-stone-400">
+            <p
+              className="font-[family-name:var(--font-af-display)] text-xl font-normal italic leading-relaxed"
+              style={{ color: 'var(--af-mute)' }}
+            >
               {t.error}
             </p>
           ) : (
             <AnimatePresence mode="wait">
               <motion.div
                 key={fact}
-                initial={{ opacity: 0, y: 6 }}
+                initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -4 }}
                 transition={{ duration: 0.28 }}
               >
-                <p className="font-[family-name:var(--font-battle-display)] text-[1.35rem] sm:text-[1.5rem] font-light leading-[1.45] tracking-tight text-stone-800 dark:text-stone-100">
+                <p className="font-[family-name:var(--font-af-display)] text-[1.3rem] sm:text-[1.55rem] leading-[1.4] tracking-tight">
                   {fact}
                 </p>
                 {typeof length === 'number' && length > 0 && (
-                  <p className="mt-5 font-[family-name:var(--font-battle-ui)] text-[10px] uppercase tracking-[0.2em] text-stone-400 dark:text-stone-500">
-                    {length} characters
+                  <p
+                    className="mt-5 font-[family-name:var(--font-af-mono)] text-[10px] uppercase tracking-[0.2em]"
+                    style={{ color: 'var(--af-mute)' }}
+                  >
+                    {length} chars
                   </p>
                 )}
               </motion.div>
@@ -195,30 +184,38 @@ export function FactionCard({
           )}
         </div>
 
-        <div className="mt-6 flex flex-col gap-2.5 sm:flex-row">
+        <div className="mt-5 flex flex-col gap-2 sm:flex-row">
           <button
             type="button"
             onClick={onNext}
             disabled={loading}
             className={cn(
-              'inline-flex flex-1 items-center justify-center gap-2 h-12 rounded-full text-sm font-medium tracking-wide transition-all duration-300 cursor-pointer disabled:opacity-40',
-              t.nextBtn,
+              'inline-flex flex-1 items-center justify-center gap-2 h-11 text-sm font-medium tracking-wide transition-opacity cursor-pointer disabled:opacity-40',
+              'font-[family-name:var(--font-af-mono)]',
             )}
+            style={{
+              background: t.accent,
+              color: 'var(--af-on-fg)',
+            }}
           >
             <RefreshCw className={cn('size-3.5', loading && 'animate-spin')} />
-            {t.nextLabel}
+            Next fact
           </button>
           <button
             type="button"
             onClick={onWin}
             disabled={loading || error || !fact}
             className={cn(
-              'inline-flex flex-1 items-center justify-center gap-2 h-12 rounded-full border text-sm font-medium tracking-wide transition-all duration-300 cursor-pointer disabled:opacity-40 bg-transparent',
-              t.winBtn,
+              'inline-flex flex-1 items-center justify-center gap-2 h-11 border text-sm font-medium tracking-wide transition-opacity cursor-pointer disabled:opacity-40 bg-transparent',
+              'font-[family-name:var(--font-af-mono)]',
             )}
+            style={{
+              borderColor: 'var(--af-line)',
+              color: 'var(--af-fg)',
+            }}
           >
             <Trophy className="size-3.5" />
-            {t.winLabel}
+            Award point
           </button>
         </div>
       </div>
