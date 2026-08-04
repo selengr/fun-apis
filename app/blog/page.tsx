@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react'
 import Link from 'next/link'
-import { ArrowRight, Check, Circle } from 'lucide-react'
+import { Check, Circle } from 'lucide-react'
 import { getBlogConfigStatus } from '@/lib/blog'
-import { ThemeToggle } from '@/components/theme-toggle'
+import { GlassNav } from '@/components/glass-nav'
 
 export const metadata = {
   title: 'Blog',
@@ -16,23 +16,9 @@ export default async function BlogPage() {
 
   return (
     <main className="relative min-h-screen bg-background text-foreground overflow-x-clip">
-      <div className="fixed top-4 inset-x-0 z-50 flex justify-center px-4 pointer-events-none">
-        <div className="pointer-events-auto w-full max-w-3xl flex items-center justify-between px-5 py-3 rounded-2xl border border-border/60 bg-background/80 backdrop-blur-xl">
-          <ThemeToggle />
-          <span className="font-pixel text-[10px] tracking-[0.2em] text-muted-foreground hidden sm:inline">
-            BLOG
-          </span>
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-[11px] px-3 py-2 rounded-xl border border-border text-muted-foreground hover:text-foreground transition-colors tracking-wide"
-          >
-            Back home
-            <ArrowRight className="size-3.5" />
-          </Link>
-        </div>
-      </div>
+      <GlassNav label="BLOG" />
 
-      <div className="mx-auto max-w-3xl px-4 sm:px-6 pt-28 pb-20">
+      <div className="mx-auto max-w-3xl px-4 sm:px-6 pt-10 pb-20">
         <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-muted-foreground">
           Notion CMS · setup
         </p>
