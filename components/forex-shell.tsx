@@ -6,12 +6,9 @@ import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { ForexMarket } from '@/components/forex-market'
+import { NAV_GLASS, NAV_GLASS_CLASS } from '@/lib/nav-glass'
 
-const NAV_GLASS = {
-  backdropFilter: 'blur(16px)',
-  WebkitBackdropFilter: 'blur(16px)',
-  boxShadow: '0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.06)',
-} as const
+
 
 export function ForexShell({ fontVars }: { fontVars: string }) {
   const { resolvedTheme } = useTheme()
@@ -88,8 +85,8 @@ export function ForexShell({ fontVars }: { fontVars: string }) {
       <div className="fixed top-4 inset-x-0 z-50 flex justify-center px-4 pointer-events-none">
         <div className="pointer-events-auto w-full max-w-3xl">
           <div
-            className="flex items-center justify-between px-5 py-3 rounded-2xl border border-black/[0.06] dark:border-white/[0.08]"
-            style={{ ...NAV_GLASS, background: 'var(--fx-nav)' }}
+            className={`flex items-center justify-between px-5 py-3 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] ${NAV_GLASS_CLASS}`}
+            style={NAV_GLASS}
           >
             <ThemeToggle />
             <span className="inline-flex items-center gap-2 font-pixel text-[10px] tracking-[0.2em] text-black/50 dark:text-white/50 hidden sm:inline">

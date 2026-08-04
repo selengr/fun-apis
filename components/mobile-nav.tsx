@@ -32,7 +32,7 @@ export function MobileNav() {
         {/* Main bar */}
         <nav
           className="flex items-center justify-between px-5 py-3 rounded-2xl border border-black/[0.06] dark:border-white/[0.08]"
-          style={NAV_STYLE}
+          style={NAV_GLASS}
         >
           <span className="font-pixel text-xs tracking-[0.25em] text-black/70 dark:text-white/70">REZA KARBAKHSH</span>
 
@@ -99,7 +99,7 @@ export function MobileNav() {
         >
           <div
             className="rounded-2xl border border-black/[0.06] dark:border-white/[0.08] px-2 py-2 flex flex-col"
-            style={NAV_STYLE}
+            style={NAV_GLASS}
           >
             {NAV_LINKS.map(l => (
               <a

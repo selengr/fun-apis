@@ -3,6 +3,7 @@ import { Suspense } from 'react'
 import { ArrowRight } from 'lucide-react'
 import { PhotoDiscovery } from '@/components/photos/photo-discovery'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { NAV_GLASS, NAV_GLASS_CLASS } from '@/lib/nav-glass'
 
 function PhotoDiscoveryFallback() {
   return (
@@ -25,12 +26,7 @@ export const metadata = {
   description: 'Discover beautiful high-quality photos from creators around the world.',
 }
 
-const NAV_GLASS = {
-  backdropFilter: 'blur(16px)',
-  WebkitBackdropFilter: 'blur(16px)',
-  background: 'var(--is-dark) ? rgba(26,26,26,0.30) : rgba(245,244,240,0.30)',
-  boxShadow: '0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.06)',
-} as const
+
 
 export default function PhotosPage() {
   return (
@@ -42,7 +38,7 @@ export default function PhotosPage() {
 
       <div className="fixed top-4 inset-x-0 z-[70] flex justify-center px-4 pointer-events-none">
         <div
-          className="pointer-events-auto w-full max-w-3xl flex items-center justify-between px-4 py-2.5 rounded-2xl border border-white/[0.08]"
+          className={`pointer-events-auto w-full max-w-3xl flex items-center justify-between px-4 py-2.5 rounded-2xl border border-white/[0.08] ${NAV_GLASS_CLASS}`}
           style={NAV_GLASS}
         >
           <ThemeToggle />

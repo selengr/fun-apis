@@ -3,6 +3,7 @@ import { ArrowRight } from 'lucide-react'
 import { Instrument_Serif } from 'next/font/google'
 import { ClassicDictionary } from '@/components/classic-dictionary'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { NAV_GLASS, NAV_GLASS_CLASS } from '@/lib/nav-glass'
 
 const display = Instrument_Serif({
   subsets: ['latin'],
@@ -16,12 +17,7 @@ export const metadata = {
   description: 'Look up English words — definitions, pronunciation, and examples',
 }
 
-const NAV_GLASS = {
-  backdropFilter: 'blur(16px)',
-  WebkitBackdropFilter: 'blur(16px)',
-  background: 'var(--is-dark) ? rgba(26,26,26,0.30) : rgba(245,244,240,0.30)',
-  boxShadow: '0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.06)',
-} as const
+
 
 export default function DictionaryPage() {
   return (
@@ -40,7 +36,7 @@ export default function DictionaryPage() {
 
       <div className="fixed top-4 inset-x-0 z-50 flex justify-center px-4 pointer-events-none">
         <div
-          className="pointer-events-auto w-full max-w-3xl flex items-center justify-between px-4 py-2.5 rounded-2xl border border-black/[0.06] dark:border-white/[0.08]"
+          className={`pointer-events-auto w-full max-w-3xl flex items-center justify-between px-4 py-2.5 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] ${NAV_GLASS_CLASS}`}
           style={NAV_GLASS}
         >
           <ThemeToggle />
