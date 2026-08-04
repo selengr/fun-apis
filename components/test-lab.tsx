@@ -108,7 +108,10 @@ export function TestLab() {
   return (
     <div className="relative min-h-screen bg-background text-foreground">
       <div className="fixed top-4 inset-x-0 z-50 flex justify-center px-4 pointer-events-none">
-        <div className="pointer-events-auto w-full max-w-3xl flex items-center justify-between gap-3 px-5 py-3 rounded-2xl border border-border/60 bg-background/80 backdrop-blur-xl">
+        <div
+          className={`pointer-events-auto w-full max-w-3xl flex items-center justify-between gap-3 px-5 py-3 rounded-2xl border border-border/60 ${NAV_GLASS_CLASS}`}
+          style={NAV_GLASS}
+        >
           <ThemeToggle />
           <span className="font-pixel text-[10px] tracking-[0.2em] text-muted-foreground hidden sm:inline">
             TEST LAB
