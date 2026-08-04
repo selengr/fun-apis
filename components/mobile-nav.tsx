@@ -4,6 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { MapPin } from "lucide-react"
 import { ThemeToggle } from "./theme-toggle"
+import { NAV_GLASS, NAV_GLASS_CLASS } from "@/lib/nav-glass"
 
 const NAV_LINKS = [
   { label: "Markets",      href: "#markets" },
@@ -12,13 +13,6 @@ const NAV_LINKS = [
   { label: "Tools",        href: "#tools" },
   { label: "World",        href: "#countries" },
 ]
-
-const NAV_STYLE = {
-  backdropFilter: "blur(16px)",
-  WebkitBackdropFilter: "blur(16px)",
-  background: "var(--is-dark) ? rgba(26,26,26,0.30) : rgba(245,244,240,0.30)",
-  boxShadow: "0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.06)",
-} as const
 
 export function MobileNav() {
   const [open, setOpen] = useState(false)
@@ -31,7 +25,7 @@ export function MobileNav() {
 
         {/* Main bar */}
         <nav
-          className="flex items-center justify-between px-5 py-3 rounded-2xl border border-black/[0.06] dark:border-white/[0.08]"
+          className={`flex items-center justify-between px-5 py-3 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] ${NAV_GLASS_CLASS}`}
           style={NAV_GLASS}
         >
           <span className="font-pixel text-xs tracking-[0.25em] text-black/70 dark:text-white/70">REZA KARBAKHSH</span>
