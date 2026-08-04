@@ -1,48 +1,40 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import Link from "next/link"
-import { MapPin } from "lucide-react"
-import { ThemeToggle } from "./theme-toggle"
+import { useState } from 'react'
+import Link from 'next/link'
+import { MapPin } from 'lucide-react'
+import { ThemeToggle } from './theme-toggle'
+import { GLASS_NAV_STYLE, GLASS_SURFACE_STYLE } from '@/components/glass-nav'
 
 const NAV_LINKS = [
-  { label: "Markets",      href: "#markets" },
-  { label: "Photos",       href: "#photos" },
-  { label: "English",      href: "#english" },
-  { label: "Tools",        href: "#tools" },
-  { label: "World",        href: "#countries" },
+  { label: 'Markets', href: '#markets' },
+  { label: 'Photos', href: '#photos' },
+  { label: 'English', href: '#english' },
+  { label: 'Tools', href: '#tools' },
+  { label: 'World', href: '#countries' },
 ]
-
-const NAV_STYLE = {
-  backdropFilter: "blur(16px)",
-  WebkitBackdropFilter: "blur(16px)",
-  background: "var(--is-dark) ? rgba(26,26,26,0.30) : rgba(245,244,240,0.30)",
-  boxShadow: "0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.06)",
-} as const
 
 export function MobileNav() {
   const [open, setOpen] = useState(false)
-
   const close = () => setOpen(false)
 
   return (
-    <div className="fixed top-4 inset-x-0 z-50 flex justify-center px-4 pointer-events-none">
-      <div className="pointer-events-auto w-full max-w-3xl">
+    <>
+      <header className="glass-nav text-foreground" style={GLASS_NAV_STYLE}>
+        <div className="flex w-full max-w-5xl items-center justify-between px-4 sm:px-6">
+          <span className="font-pixel text-xs tracking-[0.25em] text-foreground/70">
+            REZA KARBAKHSH
+          </span>
 
-        {/* Main bar */}
-        <nav
-          className="flex items-center justify-between px-5 py-3 rounded-2xl border border-black/[0.06] dark:border-white/[0.08]"
-          style={NAV_STYLE}
-        >
-          <span className="font-pixel text-xs tracking-[0.25em] text-black/70 dark:text-white/70">REZA KARBAKHSH</span>
-
-          {/* Desktop links */}
-          <div className="hidden md:flex items-center gap-7" style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}>
+          <div
+            className="hidden md:flex items-center gap-7"
+            style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
+          >
             {NAV_LINKS.map(l => (
               <a
                 key={l.label}
                 href={l.href}
-                className="text-[11px] text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white transition-colors duration-200 tracking-wide"
+                className="text-[11px] text-foreground/60 hover:text-foreground transition-colors duration-200 tracking-wide"
               >
                 {l.label}
               </a>
@@ -53,71 +45,76 @@ export function MobileNav() {
             <ThemeToggle />
             <Link
               href="/location"
-              className="text-[11px] px-4 py-2 rounded-xl border border-black/10 dark:border-white/20 text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white hover:border-black/20 dark:hover:border-white/30 hover:bg-black/[0.03] dark:hover:bg-white/[0.08] transition-all duration-200 tracking-wide hidden md:inline-flex items-center gap-1.5"
-              style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
+              className="text-[11px] px-3 py-1.5 text-foreground/60 hover:text-foreground transition-colors tracking-wide hidden md:inline-flex items-center gap-1.5"
+              style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
             >
               <MapPin className="size-3.5" />
               WHERE AM I?
             </Link>
 
-            {/* Burger — mobile only */}
             <button
+              type="button"
               onClick={() => setOpen(v => !v)}
-              className="md:hidden flex flex-col justify-center items-center w-8 h-8 gap-[5px] rounded-lg hover:bg-black/[0.04] dark:hover:bg-white/[0.08] transition-colors"
-              aria-label={open ? "Close menu" : "Open menu"}
+              className="md:hidden flex flex-col justify-center items-center w-8 h-8 gap-[5px] rounded-lg hover:bg-foreground/[0.04] transition-colors"
+              aria-label={open ? 'Close menu' : 'Open menu'}
             >
               <span
-                className="block h-px bg-black/60 dark:bg-white/60 transition-all duration-300 origin-center"
+                className="block h-px bg-foreground/60 transition-all duration-300 origin-center"
                 style={{
-                  width: "18px",
-                  transform: open ? "translateY(6px) rotate(45deg)" : "none",
+                  width: '18px',
+                  transform: open ? 'translateY(6px) rotate(45deg)' : 'none',
                 }}
               />
               <span
-                className="block h-px bg-black/60 dark:bg-white/60 transition-all duration-300"
+                className="block h-px bg-foreground/60 transition-all duration-300"
                 style={{
-                  width: "18px",
+                  width: '18px',
                   opacity: open ? 0 : 1,
-                  transform: open ? "scaleX(0)" : "none",
+                  transform: open ? 'scaleX(0)' : 'none',
                 }}
               />
               <span
-                className="block h-px bg-black/60 dark:bg-white/60 transition-all duration-300 origin-center"
+                className="block h-px bg-foreground/60 transition-all duration-300 origin-center"
                 style={{
-                  width: "18px",
-                  transform: open ? "translateY(-6px) rotate(-45deg)" : "none",
+                  width: '18px',
+                  transform: open ? 'translateY(-6px) rotate(-45deg)' : 'none',
                 }}
               />
             </button>
           </div>
-        </nav>
+        </div>
+      </header>
 
-        {/* Mobile dropdown */}
+      {/* Mobile dropdown under the glass bar */}
+      <div
+        className="md:hidden fixed left-0 right-0 z-[99998] px-3 pointer-events-none"
+        style={{ top: 54 }}
+      >
         <div
-          className="md:hidden mt-2 overflow-hidden transition-all duration-300 ease-in-out"
-          style={{ maxHeight: open ? "560px" : "0px", opacity: open ? 1 : 0 }}
+          className="pointer-events-auto overflow-hidden transition-all duration-300 ease-in-out"
+          style={{ maxHeight: open ? '560px' : '0px', opacity: open ? 1 : 0 }}
         >
           <div
-            className="rounded-2xl border border-black/[0.06] dark:border-white/[0.08] px-2 py-2 flex flex-col"
-            style={NAV_STYLE}
+            className="glass-nav mt-0 border-b border-foreground/10 px-2 py-2 flex flex-col"
+            style={GLASS_SURFACE_STYLE}
           >
             {NAV_LINKS.map(l => (
               <a
                 key={l.label}
                 href={l.href}
                 onClick={close}
-                className="px-4 py-3 text-sm text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white hover:bg-black/[0.03] dark:hover:bg-white/[0.08] rounded-xl transition-colors tracking-wide"
-                style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
+                className="px-4 py-3 text-sm text-foreground/60 hover:text-foreground hover:bg-foreground/[0.04] rounded-xl transition-colors tracking-wide"
+                style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
               >
                 {l.label}
               </a>
             ))}
-            <div className="mt-1 px-2 pb-1 flex flex-col gap-1.5">
+            <div className="mt-1 px-2 pb-1">
               <Link
                 href="/location"
                 onClick={close}
-                className="w-full flex items-center justify-center gap-1.5 text-[11px] px-4 py-2.5 rounded-xl border border-black/10 dark:border-white/20 text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white hover:border-black/20 dark:hover:border-white/30 hover:bg-black/[0.03] dark:hover:bg-white/[0.08] transition-all duration-200 tracking-wide"
-                style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
+                className="w-full flex items-center justify-center gap-1.5 text-[11px] px-4 py-2.5 text-foreground/60 hover:text-foreground transition-colors tracking-wide"
+                style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
               >
                 <MapPin className="size-3.5" />
                 WHERE AM I?
@@ -125,8 +122,9 @@ export function MobileNav() {
             </div>
           </div>
         </div>
-
       </div>
-    </div>
+
+      <div aria-hidden style={{ height: 54 }} />
+    </>
   )
 }
