@@ -46,10 +46,10 @@ const COMMITS = [
   { hash: "e2c9d56", msg: "feat: add guardrails to executor-agent",      time: "1h ago"   },
 ]
 
-// Activity graph data — 7 cols x 5 rows like GitHub contributions
-const ACTIVITY_SEED = Array.from({ length: 35 }, () => ({
-  level: Math.random() > 0.4 ? Math.floor(Math.random() * 4) + 1 : 0,
-}))
+// Activity graph — fixed pattern so SSR and client match (no Math.random at module scope)
+const ACTIVITY_SEED = [
+  0, 2, 4, 1, 0, 3, 1, 4, 0, 2, 3, 3, 0, 1, 3, 0, 0, 4, 1, 1, 0, 0, 0, 1, 2, 3, 0, 0, 1, 0, 0, 2, 0, 4, 2,
+].map(level => ({ level }))
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
