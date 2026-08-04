@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import Link from 'next/link'
 import { ArrowRight, Check, Circle } from 'lucide-react'
 import { getBlogConfigStatus } from '@/lib/blog'
@@ -127,7 +128,7 @@ function Step({
   title: string
   done: boolean
   active: boolean
-  children: React.ReactNode
+  children: ReactNode
 }) {
   return (
     <li
