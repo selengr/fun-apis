@@ -3,6 +3,7 @@ import { ArrowRight } from 'lucide-react'
 import { MusicExplorer } from '@/components/music-explorer'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { NAV_GLASS, NAV_GLASS_CLASS } from '@/lib/nav-glass'
+import { NAV_GLASS, NAV_GLASS_CLASS } from '@/lib/nav-glass'
 
 export const metadata = {
   title: 'Music Explorer — Listening Room',
