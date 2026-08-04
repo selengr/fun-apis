@@ -19,37 +19,38 @@ export const GLASS_NAV_STYLE = {
   alignItems: 'center' as const,
   justifyContent: 'space-around' as const,
   background: 'transparent',
+  boxShadow: 'inset 0 -1px 0 0 rgba(0,0,0,.1)',
   WebkitBackdropFilter: 'saturate(180%) blur(8px)',
   backdropFilter: 'saturate(180%) blur(8px)',
   fontSize: 14,
   zIndex: 99999,
 }
 
-/** Shared glass surface for dropdowns that sit under the bar (e.g. homepage menu). */
-export const GLASS_SURFACE_STYLE = {
-  background: 'transparent',
-  WebkitBackdropFilter: 'saturate(180%) blur(8px)',
-  backdropFilter: 'saturate(180%) blur(8px)',
-  boxShadow: 'inset 0 -1px 0 0 rgba(0,0,0,.08)',
-} as const
-
 export function GlassNav({
   label,
   backHref = '/',
   backLabel = 'Back home',
-  spacer = true,
   children,
 }: {
   label?: string
   backHref?: string
   backLabel?: string
-  /** Reserve 54px so content clears the fixed bar. Default true. */
-  spacer?: boolean
   children?: ReactNode
 }) {
   return (
     <>
-      <header className="glass-nav text-foreground" style={GLASS_NAV_STYLE}>
+      <header
+        className="glass-nav text-foreground"
+        style={GLASS_NAV_STYLE}
+      >
+        <style>{`
+          .glass-nav {
+            box-shadow: inset 0 -1px 0 0 rgba(0, 0, 0, 0.1);
+          }
+          .dark .glass-nav {
+            box-shadow: inset 0 -1px 0 0 rgba(255, 255, 255, 0.1);
+          }
+        `}</style>
         <div className="flex w-full max-w-5xl items-center justify-between px-4 sm:px-6">
           <ThemeToggle />
           {label ? (
@@ -70,7 +71,8 @@ export function GlassNav({
           )}
         </div>
       </header>
-      {spacer ? <div aria-hidden style={{ height: 54 }} /> : null}
+      {/* spacer so content clears the fixed bar */}
+      <div aria-hidden style={{ height: 54 }} />
     </>
   )
 }
