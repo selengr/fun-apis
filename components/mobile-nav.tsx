@@ -92,7 +92,7 @@ export function MobileNav() {
           style={{ maxHeight: open ? "560px" : "0px", opacity: open ? 1 : 0 }}
         >
           <div
-            className="rounded-2xl border border-black/[0.06] dark:border-white/[0.08] px-2 py-2 flex flex-col"
+            className={`rounded-2xl border border-black/[0.06] dark:border-white/[0.08] px-2 py-2 flex flex-col ${NAV_GLASS_CLASS}`}
             style={NAV_GLASS}
           >
             {NAV_LINKS.map(l => (
