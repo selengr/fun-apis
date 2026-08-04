@@ -2,15 +2,7 @@
 
 import { useEffect, useState, type ReactNode } from 'react'
 import { useTheme } from 'next-themes'
-import Link from 'next/link'
-import { ArrowRight } from 'lucide-react'
-import { ThemeToggle } from '@/components/theme-toggle'
-
-const NAV_GLASS = {
-  backdropFilter: 'blur(16px)',
-  WebkitBackdropFilter: 'blur(16px)',
-  boxShadow: '0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.06)',
-} as const
+import { GlassNav } from '@/components/glass-nav'
 
 export function JokesShell({
   fontVars,
@@ -85,28 +77,9 @@ export function JokesShell({
         />
       </div>
 
-      <div className="fixed top-4 inset-x-0 z-50 flex justify-center px-4 pointer-events-none">
-        <div className="pointer-events-auto w-full max-w-3xl">
-          <div
-            className="flex items-center justify-between px-5 py-3 rounded-2xl border border-black/[0.06] dark:border-white/[0.08]"
-            style={{ ...NAV_GLASS, background: 'var(--jk-nav)' }}
-          >
-            <ThemeToggle />
-            <span className="font-pixel text-[10px] tracking-[0.2em] text-black/50 dark:text-white/50 hidden sm:inline">
-              BIT
-            </span>
-            <Link
-              href="/"
-              className="inline-flex items-center gap-2 text-[11px] px-3 py-2 rounded-xl border border-black/10 dark:border-white/20 text-black/70 dark:text-white/70 hover:text-black dark:hover:text-white hover:border-black/20 dark:hover:border-white/30 hover:bg-black/[0.03] dark:hover:bg-white/[0.08] transition-all tracking-wide cursor-pointer"
-            >
-              Back home
-              <ArrowRight className="size-3.5" />
-            </Link>
-          </div>
-        </div>
-      </div>
+      <GlassNav label="BIT" spacer={false} />
 
-      <div className="pt-24 md:pt-28 pb-16 md:pb-20">{children}</div>
+      <div className="pt-16 pb-16 md:pb-20">{children}</div>
     </main>
   )
 }
