@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { MusicExplorer } from '@/components/music-explorer'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { NAV_GLASS, NAV_GLASS_CLASS } from '@/lib/nav-glass'
 
 export const metadata = {
   title: 'Music Explorer — Listening Room',
@@ -12,7 +13,10 @@ export default function MusicPage() {
   return (
     <main className="relative min-h-screen overflow-x-clip bg-[#f3efe8] dark:bg-[#0c0b0a] text-stone-900 dark:text-stone-100">
       <div className="fixed top-0 inset-x-0 z-50 flex justify-center px-4 pt-5 pointer-events-none">
-        <div className="pointer-events-auto w-full max-w-2xl flex items-center justify-between px-4 py-2.5 rounded-full border border-stone-900/8 dark:border-white/8 bg-[#f3efe8]/75 dark:bg-[#0c0b0a]/75 backdrop-blur-xl">
+        <div
+          className={`pointer-events-auto w-full max-w-2xl flex items-center justify-between px-4 py-2.5 rounded-full border border-stone-900/8 dark:border-white/8 ${NAV_GLASS_CLASS}`}
+          style={NAV_GLASS}
+        >
           <ThemeToggle />
           <span className="font-pixel text-[9px] tracking-[0.22em] text-stone-400/80 hidden sm:inline">
             LISTENING ROOM

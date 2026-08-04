@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { MetExplorer } from '@/components/met-explorer'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { NAV_GLASS, NAV_GLASS_CLASS } from '@/lib/nav-glass'
 
 export const metadata = {
   title: 'Artwork Explorer — The Met',
@@ -24,7 +25,10 @@ export default function ArtPage() {
       </div>
 
       <div className="fixed top-0 inset-x-0 z-50 flex justify-center px-4 pt-5 pointer-events-none">
-        <div className="pointer-events-auto w-full max-w-2xl flex items-center justify-between px-4 py-2.5 rounded-full border border-stone-900/8 dark:border-amber-100/8 bg-[#f4efe6]/80 dark:bg-[#12100e]/80 backdrop-blur-xl">
+        <div
+          className={`pointer-events-auto w-full max-w-2xl flex items-center justify-between px-4 py-2.5 rounded-full border border-stone-900/8 dark:border-amber-100/8 ${NAV_GLASS_CLASS}`}
+          style={NAV_GLASS}
+        >
           <ThemeToggle />
           <span className="font-pixel text-[9px] tracking-[0.22em] text-stone-400/80 hidden sm:inline">
             THE MET

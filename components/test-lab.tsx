@@ -15,6 +15,7 @@ import { SocialLogin } from '@/components/auth/social-login'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { PageHeader } from '@/components/page-header'
 import { Button } from '@/components/ui/button'
+import { NAV_GLASS, NAV_GLASS_CLASS } from '@/lib/nav-glass'
 
 function SamplePlaceholder({ label }: { label: string }) {
   return (
