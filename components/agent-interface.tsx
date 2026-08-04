@@ -302,18 +302,32 @@ function LiveDot() {
   )
 }
 
-// Activity heatmap cell
+// Activity heatmap cell — string styles avoid SSR/client style serialization mismatches
 function HeatCell({ level, animDelay }: { level: number; animDelay: number }) {
   const [visible, setVisible] = useState(false)
-  useEffect(() => { const t = setTimeout(() => setVisible(true), animDelay); return () => clearTimeout(t) }, [animDelay])
-  const colors = ["rgba(0,0,0,0.05)", "rgba(0,0,0,0.15)", "rgba(0,0,0,0.32)", "rgba(0,0,0,0.55)", "rgba(0,0,0,0.8)"]
+  useEffect(() => {
+    const t = setTimeout(() => setVisible(true), animDelay)
+    return () => clearTimeout(t)
+  }, [animDelay])
+  const colors = [
+    'rgba(0,0,0,0.05)',
+    'rgba(0,0,0,0.15)',
+    'rgba(0,0,0,0.32)',
+    'rgba(0,0,0,0.55)',
+    'rgba(0,0,0,0.8)',
+  ]
   return (
-    <div style={{
-      width: 9, height: 9, borderRadius: 2,
-      background: colors[level],
-      opacity: visible ? 1 : 0,
-      transition: `opacity 0.4s ease`,
-    }} />
+    <div
+      suppressHydrationWarning
+      style={{
+        width: '9px',
+        height: '9px',
+        borderRadius: '2px',
+        backgroundColor: colors[level] ?? colors[0],
+        opacity: visible ? 1 : 0,
+        transition: 'opacity 0.4s ease',
+      }}
+    />
   )
 }
 
@@ -361,7 +375,8 @@ export function AgentInterface({ revealDelay = 0 }: { revealDelay?: number }) {
   const [reviewFileIdx, setReviewFileIdx] = useState(0)
   const [reviewFilePcts, setReviewFilePcts] = useState([72, 45, 88, 31, 60])
   const [reviewLineIdx, setReviewLineIdx]   = useState(0)
-  const [activity, setActivity]       = useState(ACTIVITY_SEED)
+  // Clone so interval mutations never touch the shared seed array
+  const [activity, setActivity] = useState(() => ACTIVITY_SEED.map(c => ({ ...c })))
 
   // Slide-up reveal synced to intro animation end
   useEffect(() => {

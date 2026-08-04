@@ -1,11 +1,9 @@
 'use client'
 
 import { useState, type FormEvent, type ReactNode } from 'react'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
-import { AgentInterface } from '@/components/agent-interface'
-import { GlitchBackground } from '@/components/glitch-background'
-import TimeMachine from '@/components/time-machine'
 import { GradientBackground } from '@/components/views/GradientBackground'
 import { DictionaryContent } from '@/components/views/DictionaryContent'
 import CatFactModal from '@/components/views/CatFactModal'
@@ -17,6 +15,28 @@ import { SocialLogin } from '@/components/auth/social-login'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { PageHeader } from '@/components/page-header'
 import { Button } from '@/components/ui/button'
+
+function SamplePlaceholder({ label }: { label: string }) {
+  return (
+    <div className="flex h-full min-h-[200px] items-center justify-center font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+      Loading {label}…
+    </div>
+  )
+}
+
+/** Animated / WebGL samples — client-only to avoid SSR hydration noise. */
+const AgentInterface = dynamic(
+  () => import('@/components/agent-interface').then(m => m.AgentInterface),
+  { ssr: false, loading: () => <SamplePlaceholder label="AgentInterface" /> },
+)
+const GlitchBackground = dynamic(
+  () => import('@/components/glitch-background').then(m => m.GlitchBackground),
+  { ssr: false },
+)
+const TimeMachine = dynamic(() => import('@/components/time-machine'), {
+  ssr: false,
+  loading: () => <SamplePlaceholder label="TimeMachine" />,
+})
 
 function SampleBlock({
   id,
