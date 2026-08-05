@@ -241,7 +241,8 @@ export async function getBlogConfigStatus(): Promise<BlogConfigStatus> {
         userName,
         workspaceName,
         step: 2,
-        message: 'Blog database not set — run setup to create it',
+        message:
+          'NOTION_BLOG_DATABASE_ID is missing. Set it in Vercel → Settings → Environment Variables (Production), or in .env.local for local dev.',
       }
     }
 
