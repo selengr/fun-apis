@@ -9,6 +9,10 @@ import {
 
 export const NOTION_BLOG_VERSION = NOTION_VERSION
 
+const DEFAULT_AUTHOR = 'Reza Karbakhsh'
+const DEFAULT_AUTHOR_IMAGE = '/LOGO/rk-light-logo.png'
+const DEFAULT_BANNER = '/images/banners/https___west.avif'
+
 function getDatabaseId() {
   return process.env.NOTION_BLOG_DATABASE_ID?.trim() || null
 }
@@ -58,7 +62,6 @@ function parseStatus(raw: Record<string, unknown> | null): BlogPostStatus {
     const name = (raw.select as { name?: string }).name
     if (name?.toLowerCase() === 'published') return 'Published'
   }
-  if (raw.type === 'checkbox' && raw.checkbox === true) return 'Published'
   return 'Draft'
 }
 
@@ -66,6 +69,22 @@ function parseTags(raw: Record<string, unknown> | null): string[] {
   if (!raw || raw.type !== 'multi_select') return []
   const list = raw.multi_select as { name?: string }[] | undefined
   return (list ?? []).map(t => t.name ?? '').filter(Boolean)
+}
+
+function parseUrl(raw: Record<string, unknown> | null): string | null {
+  if (!raw) return null
+  if (raw.type === 'url' && typeof raw.url === 'string') return raw.url
+  if (raw.type === 'files' && Array.isArray(raw.files) && raw.files[0]) {
+    const f = raw.files[0] as { type?: string; file?: { url?: string }; external?: { url?: string } }
+    if (f.type === 'external') return f.external?.url ?? null
+    if (f.type === 'file') return f.file?.url ?? null
+  }
+  return null
+}
+
+function parseNumber(raw: Record<string, unknown> | null): number | null {
+  if (!raw || raw.type !== 'number') return null
+  return typeof raw.number === 'number' ? raw.number : null
 }
 
 function parseCover(page: {
@@ -76,6 +95,16 @@ function parseCover(page: {
   if (c.type === 'external') return c.external?.url ?? null
   if (c.type === 'file') return c.file?.url ?? null
   return null
+}
+
+function slugify(title: string, fallbackId: string) {
+  return (
+    title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '')
+      .slice(0, 80) || fallbackId.replace(/-/g, '').slice(0, 12)
+  )
 }
 
 export function mapNotionPageToMeta(page: {
@@ -90,7 +119,15 @@ export function mapNotionPageToMeta(page: {
   const statusProp = prop(page.properties, ['Status', 'Published', 'status'])
   const dateProp = prop(page.properties, ['Date', 'Published At', 'date'])
   const tagsProp = prop(page.properties, ['Tags', 'tags'])
-  const excerptProp = prop(page.properties, ['Excerpt', 'Summary', 'excerpt'])
+  const summaryProp = prop(page.properties, ['Summary', 'Excerpt', 'summary'])
+  const introProp = prop(page.properties, ['Introduction', 'Intro', 'introduction'])
+  const conclusionProp = prop(page.properties, ['Conclusion', 'conclusion'])
+  const authorNameProp = prop(page.properties, ['Author Name', 'Author', 'author'])
+  const authorImageProp = prop(page.properties, ['Author Image', 'AuthorImage'])
+  const bannerProp = prop(page.properties, ['Banner Image', 'Banner', 'banner'])
+  const viewsProp = prop(page.properties, ['Views', 'views'])
+  const readingProp = prop(page.properties, ['Reading Minutes', 'Reading Time', 'reading'])
+  const featuredProp = prop(page.properties, ['Featured', 'featured'])
 
   const title =
     titleProp?.type === 'title' ? plain(titleProp.title as { plain_text?: string }[]) : 'Untitled'
@@ -98,31 +135,43 @@ export function mapNotionPageToMeta(page: {
   let slug =
     slugProp?.type === 'rich_text'
       ? plain(slugProp.rich_text as { plain_text?: string }[])
-      : slugProp?.type === 'formula' &&
-          slugProp.formula &&
-          typeof slugProp.formula === 'object' &&
-          (slugProp.formula as { type?: string; string?: string }).type === 'string'
-        ? ((slugProp.formula as { string?: string }).string ?? '')
-        : ''
+      : ''
 
-  if (!slug) {
-    slug =
-      title
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-|-$/g, '')
-        .slice(0, 80) || page.id.replace(/-/g, '').slice(0, 12)
-  }
+  if (!slug) slug = slugify(title, page.id)
 
   const date =
     dateProp?.type === 'date' && dateProp.date && typeof dateProp.date === 'object'
       ? ((dateProp.date as { start?: string }).start ?? null)
       : null
 
-  const excerpt =
-    excerptProp?.type === 'rich_text'
-      ? plain(excerptProp.rich_text as { plain_text?: string }[]) || null
+  const summary =
+    summaryProp?.type === 'rich_text'
+      ? plain(summaryProp.rich_text as { plain_text?: string }[]) || null
       : null
+
+  const introduction =
+    introProp?.type === 'rich_text'
+      ? plain(introProp.rich_text as { plain_text?: string }[]) || null
+      : null
+
+  const conclusion =
+    conclusionProp?.type === 'rich_text'
+      ? plain(conclusionProp.rich_text as { plain_text?: string }[]) || null
+      : null
+
+  const authorName =
+    authorNameProp?.type === 'rich_text'
+      ? plain(authorNameProp.rich_text as { plain_text?: string }[]) || DEFAULT_AUTHOR
+      : DEFAULT_AUTHOR
+
+  const authorImage = parseUrl(authorImageProp) || DEFAULT_AUTHOR_IMAGE
+  const bannerFromProp = parseUrl(bannerProp)
+  const coverUrl = parseCover(page)
+  const bannerImage = bannerFromProp || coverUrl || DEFAULT_BANNER
+
+  const views = parseNumber(viewsProp) ?? 0
+  const readingMinutes = parseNumber(readingProp)
+  const featured = featuredProp?.type === 'checkbox' ? Boolean(featuredProp.checkbox) : false
 
   return {
     id: page.id,
@@ -131,8 +180,16 @@ export function mapNotionPageToMeta(page: {
     status: parseStatus(statusProp),
     date,
     tags: parseTags(tagsProp),
-    excerpt,
-    coverUrl: parseCover(page),
+    summary,
+    introduction,
+    conclusion,
+    authorName,
+    authorImage,
+    bannerImage,
+    views,
+    readingMinutes,
+    featured,
+    coverUrl,
     url: page.url ?? notionPageUrl(page.id),
     lastEdited: page.last_edited_time ?? new Date().toISOString(),
   }
@@ -183,7 +240,7 @@ export async function getBlogConfigStatus(): Promise<BlogConfigStatus> {
         userName,
         workspaceName,
         step: 2,
-        message: 'Create a Blog database in Notion, then set NOTION_BLOG_DATABASE_ID',
+        message: 'Blog database not set — run setup to create it',
       }
     }
 
@@ -194,7 +251,8 @@ export async function getBlogConfigStatus(): Promise<BlogConfigStatus> {
       userName,
       workspaceName,
       step: 3,
-      message: 'Ready to query posts',
+      message: 'Ready',
+      databaseId: getDatabaseId(),
     }
   } catch (err) {
     return {
@@ -209,30 +267,97 @@ export async function getBlogConfigStatus(): Promise<BlogConfigStatus> {
   }
 }
 
+/** Create Blog database + initial data source with full professional schema. */
+export async function createBlogDatabase() {
+  const res = await fetch('https://api.notion.com/v1/databases', {
+    method: 'POST',
+    headers: notionHeaders(),
+    body: JSON.stringify({
+      parent: { type: 'workspace', workspace: true },
+      title: [{ type: 'text', text: { content: 'Blog' } }],
+      description: [
+        {
+          type: 'text',
+          text: { content: 'CMS for rezakarbakhsh.ir /blog — managed via Notion API' },
+        },
+      ],
+      icon: { type: 'emoji', emoji: '✍️' },
+      initial_data_source: {
+        properties: {
+          Title: { type: 'title', title: {} },
+          Slug: { type: 'rich_text', rich_text: {} },
+          Status: {
+            type: 'status',
+            status: {
+              options: [
+                { name: 'Draft', color: 'gray', group: 'To-do' },
+                { name: 'Published', color: 'green', group: 'Complete' },
+              ],
+            },
+          },
+          Date: { type: 'date', date: {} },
+          Tags: {
+            type: 'multi_select',
+            multi_select: {
+              options: [
+                { name: 'Engineering', color: 'blue' },
+                { name: 'Design', color: 'purple' },
+                { name: 'AI', color: 'pink' },
+                { name: 'Notes', color: 'yellow' },
+              ],
+            },
+          },
+          Summary: { type: 'rich_text', rich_text: {} },
+          Introduction: { type: 'rich_text', rich_text: {} },
+          Conclusion: { type: 'rich_text', rich_text: {} },
+          'Author Name': { type: 'rich_text', rich_text: {} },
+          'Author Image': { type: 'url', url: {} },
+          'Banner Image': { type: 'url', url: {} },
+          Views: { type: 'number', number: { format: 'number' } },
+          'Reading Minutes': { type: 'number', number: { format: 'number' } },
+          Featured: { type: 'checkbox', checkbox: {} },
+        },
+      },
+    }),
+  })
+
+  const json = await res.json()
+  if (!res.ok) {
+    throw new Error(json.message ?? `Failed to create Blog database (${res.status})`)
+  }
+
+  const databaseId = json.id as string
+  const dataSourceId = (json.data_sources?.[0]?.id as string | undefined) ?? null
+  cachedBlogDataSourceId = dataSourceId
+
+  return {
+    databaseId,
+    dataSourceId,
+    url: json.url as string | undefined,
+  }
+}
+
 async function queryDataSource(body: Record<string, unknown>) {
   const dataSourceId = await blogDataSourceId()
   const res = await fetch(`https://api.notion.com/v1/data_sources/${dataSourceId}/query`, {
     method: 'POST',
     headers: notionHeaders(),
     body: JSON.stringify(body),
-    next: { revalidate: 60 },
+    next: { revalidate: 30 },
   })
   const json = await res.json()
   return { res, json }
 }
 
-export async function listPublishedPosts(limit = 24): Promise<BlogPostMeta[]> {
+export async function listPublishedPosts(limit = 48): Promise<BlogPostMeta[]> {
   if (!getDatabaseId()) throw new Error('NOTION_BLOG_DATABASE_ID is not set')
 
   const { res, json } = await queryDataSource({
     page_size: Math.min(limit, 100),
     sorts: [{ property: 'Date', direction: 'descending' }],
     filter: {
-      or: [
-        { property: 'Status', status: { equals: 'Published' } },
-        { property: 'Status', select: { equals: 'Published' } },
-        { property: 'Published', checkbox: { equals: true } },
-      ],
+      property: 'Status',
+      status: { equals: 'Published' },
     },
   })
 
@@ -242,7 +367,7 @@ export async function listPublishedPosts(limit = 24): Promise<BlogPostMeta[]> {
       sorts: [{ timestamp: 'last_edited_time', direction: 'descending' }],
     })
     if (!retry.res.ok) {
-      throw new Error(retry.json.message ?? json.message ?? 'Failed to query blog data source')
+      throw new Error(retry.json.message ?? json.message ?? 'Failed to query blog')
     }
     return (retry.json.results ?? [])
       .map(mapNotionPageToMeta)
@@ -264,15 +389,14 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
   })
 
   if (!res.ok || !json.results?.length) {
-    const all = await listPublishedPosts(50)
+    const all = await listPublishedPosts(100)
     const meta = all.find(p => p.slug === slug)
     if (!meta) return null
     const markdown = await getPageMarkdown(meta.id)
     return { ...meta, markdown }
   }
 
-  const page = json.results[0]
-  const meta = mapNotionPageToMeta(page)
+  const meta = mapNotionPageToMeta(json.results[0])
   const markdown = await getPageMarkdown(meta.id)
   return { ...meta, markdown }
 }
@@ -280,7 +404,7 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
 export async function getPageMarkdown(pageId: string): Promise<string> {
   const res = await fetch(`https://api.notion.com/v1/pages/${pageId}/markdown`, {
     headers: notionHeaders(),
-    next: { revalidate: 60 },
+    next: { revalidate: 30 },
   })
   const json = await res.json()
   if (!res.ok) {
@@ -290,19 +414,40 @@ export async function getPageMarkdown(pageId: string): Promise<string> {
   return typeof json.markdown === 'string' ? json.markdown : ''
 }
 
-/** Create a blog post row under the Blog data source (markdown body). */
+export async function incrementPostViews(pageId: string, current: number) {
+  const res = await fetch(`https://api.notion.com/v1/pages/${pageId}`, {
+    method: 'PATCH',
+    headers: notionHeaders(),
+    body: JSON.stringify({
+      properties: {
+        Views: { number: current + 1 },
+      },
+    }),
+  })
+  const json = await res.json()
+  if (!res.ok) throw new Error(json.message ?? 'Failed to update views')
+  return current + 1
+}
+
 export async function createBlogPost(input: {
   title: string
   slug: string
   markdown: string
   status?: BlogPostStatus
-  excerpt?: string
+  summary?: string
+  introduction?: string
+  conclusion?: string
+  authorName?: string
+  authorImage?: string
+  bannerImage?: string
   tags?: string[]
   date?: string
+  readingMinutes?: number
+  featured?: boolean
 }) {
   const dataSourceId = await blogDataSourceId()
   const title = input.title.trim() || 'Untitled'
-  const slug = input.slug.trim() || title.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+  const slug = input.slug.trim() || slugify(title, 'post')
   const status = input.status ?? 'Draft'
 
   const properties: Record<string, unknown> = {
@@ -312,26 +457,47 @@ export async function createBlogPost(input: {
     Slug: {
       rich_text: [{ type: 'text', text: { content: slug.slice(0, 200) } }],
     },
-    Status: {
-      status: { name: status },
+    Status: { status: { name: status } },
+    'Author Name': {
+      rich_text: [
+        {
+          type: 'text',
+          text: { content: (input.authorName ?? DEFAULT_AUTHOR).slice(0, 200) },
+        },
+      ],
     },
+    Views: { number: 0 },
+    Featured: { checkbox: Boolean(input.featured) },
   }
 
-  if (input.excerpt) {
-    properties.Excerpt = {
-      rich_text: [{ type: 'text', text: { content: input.excerpt.slice(0, 2000) } }],
+  if (input.summary) {
+    properties.Summary = {
+      rich_text: [{ type: 'text', text: { content: input.summary.slice(0, 2000) } }],
     }
   }
+  if (input.introduction) {
+    properties.Introduction = {
+      rich_text: [{ type: 'text', text: { content: input.introduction.slice(0, 2000) } }],
+    }
+  }
+  if (input.conclusion) {
+    properties.Conclusion = {
+      rich_text: [{ type: 'text', text: { content: input.conclusion.slice(0, 2000) } }],
+    }
+  }
+  if (input.authorImage) properties['Author Image'] = { url: input.authorImage }
+  if (input.bannerImage) properties['Banner Image'] = { url: input.bannerImage }
   if (input.tags?.length) {
-    properties.Tags = {
-      multi_select: input.tags.map(name => ({ name })),
-    }
+    properties.Tags = { multi_select: input.tags.map(name => ({ name })) }
   }
-  if (input.date) {
-    properties.Date = {
-      date: { start: input.date },
-    }
+  if (input.date) properties.Date = { date: { start: input.date } }
+  if (typeof input.readingMinutes === 'number') {
+    properties['Reading Minutes'] = { number: input.readingMinutes }
   }
+
+  const bodyMarkdown = input.markdown.trim().startsWith('#')
+    ? input.markdown
+    : `# ${title}\n\n${input.markdown}`
 
   const res = await fetch('https://api.notion.com/v1/pages', {
     method: 'POST',
@@ -339,32 +505,14 @@ export async function createBlogPost(input: {
     body: JSON.stringify({
       parent: { type: 'data_source_id', data_source_id: dataSourceId },
       properties,
-      markdown: input.markdown.includes(title)
-        ? input.markdown
-        : `# ${title}\n\n${input.markdown}`,
+      cover: input.bannerImage
+        ? { type: 'external', external: { url: input.bannerImage } }
+        : undefined,
+      markdown: bodyMarkdown,
     }),
   })
 
   const json = await res.json()
-  if (!res.ok) {
-    // Retry Status as select if status property type differs
-    if (String(json.message ?? '').toLowerCase().includes('status')) {
-      properties.Status = { select: { name: status } }
-      const retry = await fetch('https://api.notion.com/v1/pages', {
-        method: 'POST',
-        headers: notionHeaders(),
-        body: JSON.stringify({
-          parent: { type: 'data_source_id', data_source_id: dataSourceId },
-          properties,
-          markdown: input.markdown,
-        }),
-      })
-      const retryJson = await retry.json()
-      if (!retry.ok) throw new Error(retryJson.message ?? json.message ?? 'Failed to create post')
-      return mapNotionPageToMeta(retryJson)
-    }
-    throw new Error(json.message ?? 'Failed to create post')
-  }
-
+  if (!res.ok) throw new Error(json.message ?? 'Failed to create post')
   return mapNotionPageToMeta(json)
 }
