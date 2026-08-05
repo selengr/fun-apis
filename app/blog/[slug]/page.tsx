@@ -62,7 +62,7 @@ export default async function BlogPostPage({ params }: Props) {
 
   const date = formatDate(post.date)
   const banner = post.bannerImage || '/images/banners/https___west.avif'
-  const author = post.authorImage || '/LOGO/rk-light-logo.png'
+  const author = post.authorImage || '/images/authors/reza.jpg'
 
   return (
     <main
