@@ -1,28 +1,31 @@
 import type { BlogConfigStatus, BlogPost, BlogPostMeta, BlogPostStatus } from '@/types/blog'
+import {
+  NOTION_VERSION,
+  notionApiKey,
+  notionHeaders,
+  notionPageUrl,
+  resolveDataSourceId,
+} from '@/lib/notion-client'
 
-/** Current Notion API version (markdown endpoints + PAT). */
-export const NOTION_BLOG_VERSION = '2026-03-11'
-
-function getApiKey() {
-  return process.env.NOTION_API_KEY?.trim() || null
-}
+export const NOTION_BLOG_VERSION = NOTION_VERSION
 
 function getDatabaseId() {
   return process.env.NOTION_BLOG_DATABASE_ID?.trim() || null
 }
 
 export function blogHeaders() {
-  const key = getApiKey()
-  if (!key) throw new Error('NOTION_API_KEY is not set')
-  return {
-    Authorization: `Bearer ${key}`,
-    'Notion-Version': NOTION_BLOG_VERSION,
-    'Content-Type': 'application/json',
-  }
+  return notionHeaders()
 }
 
-function notionPageUrl(id: string) {
-  return `https://www.notion.so/${id.replace(/-/g, '')}`
+let cachedBlogDataSourceId: string | null = null
+
+async function blogDataSourceId() {
+  const databaseId = getDatabaseId()
+  if (!databaseId) throw new Error('NOTION_BLOG_DATABASE_ID is not set')
+  if (!cachedBlogDataSourceId) {
+    cachedBlogDataSourceId = await resolveDataSourceId(databaseId)
+  }
+  return cachedBlogDataSourceId
 }
 
 function plain(rich?: { plain_text?: string }[] | null) {
@@ -37,7 +40,6 @@ function prop(
   for (const name of names) {
     if (properties[name]) return properties[name] as Record<string, unknown>
   }
-  // case-insensitive fallback
   const entries = Object.entries(properties)
   for (const name of names) {
     const hit = entries.find(([k]) => k.toLowerCase() === name.toLowerCase())
@@ -104,11 +106,12 @@ export function mapNotionPageToMeta(page: {
         : ''
 
   if (!slug) {
-    slug = title
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '')
-      .slice(0, 80) || page.id.replace(/-/g, '').slice(0, 12)
+    slug =
+      title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '')
+        .slice(0, 80) || page.id.replace(/-/g, '').slice(0, 12)
   }
 
   const date =
@@ -135,9 +138,8 @@ export function mapNotionPageToMeta(page: {
   }
 }
 
-/** Step 1 health check — PAT works? Database id set? */
 export async function getBlogConfigStatus(): Promise<BlogConfigStatus> {
-  const hasApiKey = Boolean(getApiKey())
+  const hasApiKey = Boolean(notionApiKey())
   const hasDatabaseId = Boolean(getDatabaseId())
 
   if (!hasApiKey) {
@@ -154,7 +156,7 @@ export async function getBlogConfigStatus(): Promise<BlogConfigStatus> {
 
   try {
     const res = await fetch('https://api.notion.com/v1/users/me', {
-      headers: blogHeaders(),
+      headers: notionHeaders(),
       cache: 'no-store',
     })
     const json = await res.json()
@@ -170,8 +172,7 @@ export async function getBlogConfigStatus(): Promise<BlogConfigStatus> {
       }
     }
 
-    const userName =
-      json.bot?.owner?.user?.name ?? json.name ?? 'Notion user'
+    const userName = json.bot?.owner?.user?.name ?? json.name ?? 'Notion user'
     const workspaceName = json.bot?.workspace_name ?? null
 
     if (!hasDatabaseId) {
@@ -208,47 +209,42 @@ export async function getBlogConfigStatus(): Promise<BlogConfigStatus> {
   }
 }
 
-export async function listPublishedPosts(limit = 24): Promise<BlogPostMeta[]> {
-  const databaseId = getDatabaseId()
-  if (!databaseId) throw new Error('NOTION_BLOG_DATABASE_ID is not set')
-
-  const res = await fetch(`https://api.notion.com/v1/databases/${databaseId}/query`, {
+async function queryDataSource(body: Record<string, unknown>) {
+  const dataSourceId = await blogDataSourceId()
+  const res = await fetch(`https://api.notion.com/v1/data_sources/${dataSourceId}/query`, {
     method: 'POST',
-    headers: blogHeaders(),
-    body: JSON.stringify({
-      page_size: Math.min(limit, 100),
-      sorts: [{ property: 'Date', direction: 'descending' }],
-      // Prefer Status = Published when the property exists; Notion errors if missing —
-      // caller can fall back without filter.
-      filter: {
-        or: [
-          { property: 'Status', status: { equals: 'Published' } },
-          { property: 'Status', select: { equals: 'Published' } },
-          { property: 'Published', checkbox: { equals: true } },
-        ],
-      },
-    }),
+    headers: notionHeaders(),
+    body: JSON.stringify(body),
     next: { revalidate: 60 },
   })
-
   const json = await res.json()
+  return { res, json }
+}
 
-  // If filter fails (property type mismatch), retry unfiltered and filter client-side
+export async function listPublishedPosts(limit = 24): Promise<BlogPostMeta[]> {
+  if (!getDatabaseId()) throw new Error('NOTION_BLOG_DATABASE_ID is not set')
+
+  const { res, json } = await queryDataSource({
+    page_size: Math.min(limit, 100),
+    sorts: [{ property: 'Date', direction: 'descending' }],
+    filter: {
+      or: [
+        { property: 'Status', status: { equals: 'Published' } },
+        { property: 'Status', select: { equals: 'Published' } },
+        { property: 'Published', checkbox: { equals: true } },
+      ],
+    },
+  })
+
   if (!res.ok) {
-    const retry = await fetch(`https://api.notion.com/v1/databases/${databaseId}/query`, {
-      method: 'POST',
-      headers: blogHeaders(),
-      body: JSON.stringify({
-        page_size: Math.min(limit, 100),
-        sorts: [{ timestamp: 'last_edited_time', direction: 'descending' }],
-      }),
-      next: { revalidate: 60 },
+    const retry = await queryDataSource({
+      page_size: Math.min(limit, 100),
+      sorts: [{ timestamp: 'last_edited_time', direction: 'descending' }],
     })
-    const retryJson = await retry.json()
-    if (!retry.ok) {
-      throw new Error(retryJson.message ?? json.message ?? 'Failed to query blog database')
+    if (!retry.res.ok) {
+      throw new Error(retry.json.message ?? json.message ?? 'Failed to query blog data source')
     }
-    return (retryJson.results ?? [])
+    return (retry.json.results ?? [])
       .map(mapNotionPageToMeta)
       .filter((p: BlogPostMeta) => p.status === 'Published')
   }
@@ -257,26 +253,17 @@ export async function listPublishedPosts(limit = 24): Promise<BlogPostMeta[]> {
 }
 
 export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
-  const databaseId = getDatabaseId()
-  if (!databaseId) throw new Error('NOTION_BLOG_DATABASE_ID is not set')
+  if (!getDatabaseId()) throw new Error('NOTION_BLOG_DATABASE_ID is not set')
 
-  const res = await fetch(`https://api.notion.com/v1/databases/${databaseId}/query`, {
-    method: 'POST',
-    headers: blogHeaders(),
-    body: JSON.stringify({
-      page_size: 1,
-      filter: {
-        property: 'Slug',
-        rich_text: { equals: slug },
-      },
-    }),
-    next: { revalidate: 60 },
+  const { res, json } = await queryDataSource({
+    page_size: 1,
+    filter: {
+      property: 'Slug',
+      rich_text: { equals: slug },
+    },
   })
 
-  let json = await res.json()
-
   if (!res.ok || !json.results?.length) {
-    // Fallback: fetch recent and match slug client-side
     const all = await listPublishedPosts(50)
     const meta = all.find(p => p.slug === slug)
     if (!meta) return null
@@ -292,14 +279,92 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
 
 export async function getPageMarkdown(pageId: string): Promise<string> {
   const res = await fetch(`https://api.notion.com/v1/pages/${pageId}/markdown`, {
-    headers: blogHeaders(),
+    headers: notionHeaders(),
     next: { revalidate: 60 },
   })
   const json = await res.json()
   if (!res.ok) {
-    // Older fallbacks: empty body rather than hard fail listing
     if (res.status === 404 || res.status === 400) return ''
     throw new Error(json.message ?? `Failed to load markdown (${res.status})`)
   }
   return typeof json.markdown === 'string' ? json.markdown : ''
+}
+
+/** Create a blog post row under the Blog data source (markdown body). */
+export async function createBlogPost(input: {
+  title: string
+  slug: string
+  markdown: string
+  status?: BlogPostStatus
+  excerpt?: string
+  tags?: string[]
+  date?: string
+}) {
+  const dataSourceId = await blogDataSourceId()
+  const title = input.title.trim() || 'Untitled'
+  const slug = input.slug.trim() || title.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+  const status = input.status ?? 'Draft'
+
+  const properties: Record<string, unknown> = {
+    Title: {
+      title: [{ type: 'text', text: { content: title.slice(0, 2000) } }],
+    },
+    Slug: {
+      rich_text: [{ type: 'text', text: { content: slug.slice(0, 200) } }],
+    },
+    Status: {
+      status: { name: status },
+    },
+  }
+
+  if (input.excerpt) {
+    properties.Excerpt = {
+      rich_text: [{ type: 'text', text: { content: input.excerpt.slice(0, 2000) } }],
+    }
+  }
+  if (input.tags?.length) {
+    properties.Tags = {
+      multi_select: input.tags.map(name => ({ name })),
+    }
+  }
+  if (input.date) {
+    properties.Date = {
+      date: { start: input.date },
+    }
+  }
+
+  const res = await fetch('https://api.notion.com/v1/pages', {
+    method: 'POST',
+    headers: notionHeaders(),
+    body: JSON.stringify({
+      parent: { type: 'data_source_id', data_source_id: dataSourceId },
+      properties,
+      markdown: input.markdown.includes(title)
+        ? input.markdown
+        : `# ${title}\n\n${input.markdown}`,
+    }),
+  })
+
+  const json = await res.json()
+  if (!res.ok) {
+    // Retry Status as select if status property type differs
+    if (String(json.message ?? '').toLowerCase().includes('status')) {
+      properties.Status = { select: { name: status } }
+      const retry = await fetch('https://api.notion.com/v1/pages', {
+        method: 'POST',
+        headers: notionHeaders(),
+        body: JSON.stringify({
+          parent: { type: 'data_source_id', data_source_id: dataSourceId },
+          properties,
+          markdown: input.markdown,
+        }),
+      })
+      const retryJson = await retry.json()
+      if (!retry.ok) throw new Error(retryJson.message ?? json.message ?? 'Failed to create post')
+      return mapNotionPageToMeta(retryJson)
+    }
+    throw new Error(json.message ?? 'Failed to create post')
+  }
+
+  return mapNotionPageToMeta(json)
 }

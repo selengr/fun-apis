@@ -1,20 +1,13 @@
 import type { NotionNote } from '@/types/notion'
+import {
+  notionHeaders,
+  notionPageUrl,
+  notionApiKey,
+  resolveDataSourceId,
+  retrieveNotionPage,
+} from '@/lib/notion-client'
 
-const NOTION_VERSION = '2022-06-28'
-
-function getHeaders() {
-  const key = process.env.NOTION_API_KEY
-  if (!key) throw new Error('Notion API key not configured')
-  return {
-    Authorization: `Bearer ${key}`,
-    'Notion-Version': NOTION_VERSION,
-    'Content-Type': 'application/json',
-  }
-}
-
-function notionPageUrl(id: string) {
-  return `https://www.notion.so/${id.replace(/-/g, '')}`
-}
+export { retrieveNotionPage }
 
 function getParent() {
   const databaseId = process.env.NOTION_DATABASE_ID
@@ -22,31 +15,6 @@ function getParent() {
   if (databaseId) return { type: 'database' as const, id: databaseId }
   if (pageId) return { type: 'page' as const, id: pageId }
   throw new Error('Set NOTION_DATABASE_ID or NOTION_PARENT_PAGE_ID in .env.local')
-}
-
-function bodyToBlocks(body: string) {
-  const paragraphs = body
-    .split(/\n{2,}/)
-    .map(p => p.trim())
-    .filter(Boolean)
-
-  if (!paragraphs.length) {
-    return [
-      {
-        object: 'block',
-        type: 'paragraph',
-        paragraph: { rich_text: [] },
-      },
-    ]
-  }
-
-  return paragraphs.map(text => ({
-    object: 'block',
-    type: 'paragraph',
-    paragraph: {
-      rich_text: [{ type: 'text', text: { content: text.slice(0, 2000) } }],
-    },
-  }))
 }
 
 function extractTitle(properties: Record<string, unknown>): string {
@@ -60,7 +28,7 @@ function extractTitle(properties: Record<string, unknown>): string {
 }
 
 export function getNotionConfigStatus() {
-  const hasKey = Boolean(process.env.NOTION_API_KEY)
+  const hasKey = Boolean(notionApiKey())
   const hasDb = Boolean(process.env.NOTION_DATABASE_ID)
   const hasPage = Boolean(process.env.NOTION_PARENT_PAGE_ID)
   return {
@@ -69,30 +37,40 @@ export function getNotionConfigStatus() {
   }
 }
 
+/**
+ * Create a note page under a data source (database) or parent page.
+ * Uses markdown body (2026 API) instead of manual children blocks.
+ */
 export async function createNotionNote(title: string, body: string) {
   const parent = getParent()
   const safeTitle = title.trim() || 'Untitled'
-  const headers = getHeaders()
+  const headers = notionHeaders()
 
-  const payload: Record<string, unknown> = {
-    parent:
-      parent.type === 'database'
-        ? { database_id: parent.id }
-        : { page_id: parent.id },
-    children: bodyToBlocks(body),
-  }
+  const markdown = `# ${safeTitle}\n\n${body.trim()}`
+
+  let parentPayload: Record<string, unknown>
+  let properties: Record<string, unknown>
 
   if (parent.type === 'database') {
+    const dataSourceId = await resolveDataSourceId(parent.id)
+    parentPayload = {
+      type: 'data_source_id',
+      data_source_id: dataSourceId,
+    }
     const titleProp = process.env.NOTION_TITLE_PROPERTY || 'Name'
-    payload.properties = {
+    properties = {
       [titleProp]: {
-        title: [{ text: { content: safeTitle.slice(0, 2000) } }],
+        title: [{ type: 'text', text: { content: safeTitle.slice(0, 2000) } }],
       },
     }
   } else {
-    payload.properties = {
+    parentPayload = {
+      type: 'page_id',
+      page_id: parent.id,
+    }
+    properties = {
       title: {
-        title: [{ text: { content: safeTitle.slice(0, 2000) } }],
+        title: [{ type: 'text', text: { content: safeTitle.slice(0, 2000) } }],
       },
     }
   }
@@ -100,7 +78,11 @@ export async function createNotionNote(title: string, body: string) {
   const res = await fetch('https://api.notion.com/v1/pages', {
     method: 'POST',
     headers,
-    body: JSON.stringify(payload),
+    body: JSON.stringify({
+      parent: parentPayload,
+      properties,
+      markdown,
+    }),
   })
 
   const json = await res.json()
@@ -117,7 +99,7 @@ export async function createNotionNote(title: string, body: string) {
 
 export async function listNotionNotes(limit = 12): Promise<NotionNote[]> {
   const parent = getParent()
-  const headers = getHeaders()
+  const headers = notionHeaders()
 
   if (parent.type === 'page') {
     const res = await fetch(
@@ -137,7 +119,8 @@ export async function listNotionNotes(limit = 12): Promise<NotionNote[]> {
       }))
   }
 
-  const res = await fetch(`https://api.notion.com/v1/databases/${parent.id}/query`, {
+  const dataSourceId = await resolveDataSourceId(parent.id)
+  const res = await fetch(`https://api.notion.com/v1/data_sources/${dataSourceId}/query`, {
     method: 'POST',
     headers,
     body: JSON.stringify({
@@ -148,10 +131,15 @@ export async function listNotionNotes(limit = 12): Promise<NotionNote[]> {
   })
 
   const json = await res.json()
-  if (!res.ok) throw new Error(json.message ?? 'Failed to query database')
+  if (!res.ok) throw new Error(json.message ?? 'Failed to query data source')
 
   return (json.results ?? []).map(
-    (page: { id: string; properties: Record<string, unknown>; created_time?: string; url?: string }) => ({
+    (page: {
+      id: string
+      properties: Record<string, unknown>
+      created_time?: string
+      url?: string
+    }) => ({
       id: page.id,
       title: extractTitle(page.properties),
       url: page.url ?? notionPageUrl(page.id),
