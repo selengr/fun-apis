@@ -79,7 +79,7 @@ export default async function BlogPage() {
       <section className="relative">
         <Banner
           banner="/images/banners/https___west.avif"
-          user="/LOGO/rk-light-logo.png"
+          user="/images/authors/reza.jpg"
           blog
           title="Blog"
           videoReady
