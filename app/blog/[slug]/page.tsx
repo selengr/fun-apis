@@ -67,6 +67,7 @@ export default async function BlogPostPage({ params }: Props) {
   return (
     <main
       className="relative min-h-screen bg-background text-foreground overflow-x-clip"
+      dir="ltr"
       style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif' }}
     >
       <BlogNav label="POST" />

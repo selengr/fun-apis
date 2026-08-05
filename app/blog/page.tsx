@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic'
 
 function BlogListNav() {
   return (
-    <div className="fixed top-4 inset-x-0 z-50 flex justify-center px-4 pointer-events-none">
+    <div className="fixed top-4 inset-x-0 z-50 flex justify-center px-4 pointer-events-none" dir="ltr">
       <div
         className={`pointer-events-auto w-full max-w-3xl flex items-center justify-between px-4 py-2.5 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] ${NAV_GLASS_CLASS}`}
         style={NAV_GLASS}
@@ -72,6 +72,7 @@ export default async function BlogPage() {
   return (
     <main
       className="relative min-h-screen bg-background text-foreground overflow-x-clip"
+      dir="ltr"
       style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif' }}
     >
       <BlogListNav />
@@ -84,7 +85,10 @@ export default async function BlogPage() {
           title="Blog"
           videoReady
         >
-          <p className="text-[17px] sm:text-[19px] leading-[1.5] text-muted-foreground tracking-[-0.01em]">
+          <p
+            className="text-center text-[17px] sm:text-[19px] leading-[1.5] text-muted-foreground tracking-[-0.01em]"
+            dir="ltr"
+          >
             Notes, builds, and ideas from the playground.
           </p>
         </Banner>
