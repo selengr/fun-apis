@@ -7,7 +7,15 @@ export interface BlogPostMeta {
   status: BlogPostStatus
   date: string | null
   tags: string[]
-  excerpt: string | null
+  summary: string | null
+  introduction: string | null
+  conclusion: string | null
+  authorName: string
+  authorImage: string | null
+  bannerImage: string | null
+  views: number
+  readingMinutes: number | null
+  featured: boolean
   coverUrl: string | null
   url: string
   lastEdited: string
@@ -25,4 +33,6 @@ export interface BlogConfigStatus {
   workspaceName: string | null
   step: 1 | 2 | 3
   message: string
+  databaseId?: string | null
+  dataSourceId?: string | null
 }
