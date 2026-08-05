@@ -7,7 +7,6 @@ import { ThemeToggle } from "./theme-toggle"
 import { NAV_GLASS, NAV_GLASS_CLASS } from "@/lib/nav-glass"
 
 const NAV_LINKS = [
-  { label: "Blog",         href: "/blog" },
   { label: "Markets",      href: "#markets" },
   { label: "Photos",       href: "#photos" },
   { label: "English",      href: "#english" },
