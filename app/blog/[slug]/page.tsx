@@ -1,8 +1,9 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
-import Banner from '@/components/views/banner/banner'
 import { BlogMarkdown } from '@/components/blog/blog-markdown'
+import { BlogHero } from '@/components/blog/blog-hero'
 import { BlogNav } from '@/components/blog/blog-nav'
+import { BlogTag } from '@/components/blog/blog-tag'
 import { ViewCounter } from '@/components/blog/view-counter'
 import { getPostBySlug, listPublishedPosts } from '@/lib/blog'
 
@@ -64,85 +65,93 @@ export default async function BlogPostPage({ params }: Props) {
   const author = post.authorImage || '/LOGO/rk-light-logo.png'
 
   return (
-    <main className="relative min-h-screen bg-background text-foreground overflow-x-clip">
+    <main
+      className="relative min-h-screen bg-background text-foreground overflow-x-clip"
+      style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif' }}
+    >
       <BlogNav label="POST" />
 
-      <section className="relative pt-8">
-        <Banner banner={banner} user={author} blog title={post.title} videoReady>
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] font-mono text-muted-foreground tracking-wide">
-              <span>{post.authorName}</span>
-              {date && (
-                <>
-                  <span aria-hidden>·</span>
-                  <time dateTime={post.date ?? undefined}>{date}</time>
-                </>
-              )}
-              {post.readingMinutes != null && (
-                <>
-                  <span aria-hidden>·</span>
-                  <span>{post.readingMinutes} min read</span>
-                </>
-              )}
-              <span aria-hidden>·</span>
-              <ViewCounter pageId={post.id} initial={post.views} />
-            </div>
-
-            {post.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {post.tags.map(tag => (
-                  <span
-                    key={tag}
-                    className="text-[10px] font-mono uppercase tracking-[0.14em] border border-border/60 px-2.5 py-1 rounded-md text-muted-foreground"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
+      <BlogHero banner={banner} authorImage={author} title={post.title}>
+        <div className="flex flex-col items-center gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-[13px] sm:text-[14px] text-muted-foreground tracking-wide">
+            <span className="text-foreground/80 font-medium">{post.authorName}</span>
+            {date && (
+              <>
+                <span className="opacity-35" aria-hidden>
+                  ·
+                </span>
+                <time dateTime={post.date ?? undefined}>{date}</time>
+              </>
             )}
-
-            {post.summary && (
-              <p className="text-base sm:text-lg leading-relaxed text-muted-foreground">
-                {post.summary}
-              </p>
+            {post.readingMinutes != null && (
+              <>
+                <span className="opacity-35" aria-hidden>
+                  ·
+                </span>
+                <span>{post.readingMinutes} min read</span>
+              </>
             )}
+            <span className="opacity-35" aria-hidden>
+              ·
+            </span>
+            <ViewCounter pageId={post.id} initial={post.views} />
           </div>
-        </Banner>
-      </section>
 
-      <article className="mx-auto max-w-2xl px-4 sm:px-6 pb-24 pt-4">
+          {post.tags.length > 0 && (
+            <div className="flex flex-wrap justify-center gap-2">
+              {post.tags.map(tag => (
+                <BlogTag key={tag} tag={tag} />
+              ))}
+            </div>
+          )}
+
+          {post.summary && (
+            <p className="text-[17px] sm:text-[19px] leading-[1.5] text-muted-foreground tracking-[-0.01em] text-balance">
+              {post.summary}
+            </p>
+          )}
+        </div>
+      </BlogHero>
+
+      <article className="mx-auto w-full max-w-[680px] px-5 sm:px-8 pt-10 sm:pt-14 pb-28">
         {post.introduction && (
-          <section className="mb-10">
-            <h2 className="text-xs font-mono uppercase tracking-[0.22em] text-muted-foreground mb-3">
+          <section className="mb-12">
+            <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground mb-3">
               Introduction
             </h2>
-            <p className="text-base leading-relaxed">{post.introduction}</p>
+            <p className="text-[17px] sm:text-[18px] leading-[1.65] tracking-[-0.01em]">
+              {post.introduction}
+            </p>
           </section>
         )}
 
-        <BlogMarkdown markdown={post.markdown} />
+        <div className="text-[17px] sm:text-[18px] leading-[1.65] tracking-[-0.01em] [&_.blog-prose]:text-[inherit] [&_.blog-prose]:leading-[inherit]">
+          <BlogMarkdown markdown={post.markdown} />
+        </div>
 
         {post.conclusion && (
-          <section className="mt-12 pt-10 border-t border-border/50">
-            <h2 className="text-xs font-mono uppercase tracking-[0.22em] text-muted-foreground mb-3">
+          <section className="mt-14 pt-10 border-t border-border/40">
+            <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground mb-3">
               Conclusion
             </h2>
-            <p className="text-base leading-relaxed">{post.conclusion}</p>
+            <p className="text-[17px] sm:text-[18px] leading-[1.65] tracking-[-0.01em]">
+              {post.conclusion}
+            </p>
           </section>
         )}
 
-        <footer className="mt-14 flex items-center gap-3 pt-8 border-t border-border/40">
+        <footer className="mt-16 flex items-center gap-3.5 pt-10 border-t border-border/35">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={author}
             alt=""
-            width={48}
-            height={48}
-            className="size-12 rounded-full object-cover bg-[#f7f6f3]"
+            width={52}
+            height={52}
+            className="size-[52px] rounded-full object-cover bg-[#f5f5f7]"
           />
           <div>
-            <p className="text-sm font-medium">{post.authorName}</p>
-            <p className="text-xs text-muted-foreground">Author</p>
+            <p className="text-[15px] font-semibold tracking-tight">{post.authorName}</p>
+            <p className="text-[13px] text-muted-foreground">Author</p>
           </div>
         </footer>
       </article>

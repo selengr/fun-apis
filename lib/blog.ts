@@ -207,7 +207,8 @@ export async function getBlogConfigStatus(): Promise<BlogConfigStatus> {
       userName: null,
       workspaceName: null,
       step: 1,
-      message: 'Add NOTION_API_KEY to .env.local',
+      message:
+        'NOTION_API_KEY is missing. Set it in Vercel → Settings → Environment Variables (Production), or in .env.local for local dev.',
     }
   }
 

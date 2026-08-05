@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { getBlogConfigStatus, listPublishedPosts } from '@/lib/blog'
-import Banner from '@/components/views/banner/banner'
 import { BlogCard } from '@/components/blog/blog-card'
+import { BlogHero } from '@/components/blog/blog-hero'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { NAV_GLASS, NAV_GLASS_CLASS } from '@/lib/nav-glass'
 
@@ -44,17 +44,18 @@ export default async function BlogPage() {
     return (
       <main className="relative min-h-screen bg-background text-foreground">
         <BlogListNav />
-        <div className="mx-auto max-w-xl px-4 pt-32 pb-20">
-          <h1 className="text-3xl font-medium tracking-tight">Blog setup</h1>
-          <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{status.message}</p>
-          {status.step === 2 && (
-            <p className="mt-6 text-sm text-muted-foreground">
-              Create the database via{' '}
-              <code className="text-foreground">POST /api/blog/setup</code>, then add{' '}
-              <code className="text-foreground">NOTION_BLOG_DATABASE_ID</code> to{' '}
-              <code className="text-foreground">.env.local</code>.
-            </p>
-          )}
+        <div
+          className="mx-auto max-w-lg px-6 pt-36 pb-20 text-center"
+          style={{ fontFamily: '-apple-system, BlinkMacSystemFont, system-ui, sans-serif' }}
+        >
+          <h1 className="text-3xl font-semibold tracking-tight">Blog unavailable</h1>
+          <p className="mt-4 text-[15px] text-muted-foreground leading-relaxed">{status.message}</p>
+          <p className="mt-6 text-[13px] text-muted-foreground leading-relaxed">
+            On Vercel: Project → Settings → Environment Variables → add{' '}
+            <code className="text-foreground">NOTION_API_KEY</code> and{' '}
+            <code className="text-foreground">NOTION_BLOG_DATABASE_ID</code> for Production, then
+            redeploy.
+          </p>
         </div>
       </main>
     )
@@ -69,35 +70,31 @@ export default async function BlogPage() {
   }
 
   return (
-    <main className="relative min-h-screen bg-background text-foreground overflow-x-clip">
+    <main
+      className="relative min-h-screen bg-background text-foreground overflow-x-clip"
+      style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif' }}
+    >
       <BlogListNav />
 
-      <section className="relative pt-8 pb-6">
-        <Banner
-          banner="/images/banners/https___west.avif"
-          user="/LOGO/rk-light-logo.png"
-          blog
-          title="Blog"
-          videoReady
-        >
-          <div className="flex flex-col gap-3 text-sm sm:text-base leading-relaxed">
-            <span>Notes, builds, and ideas from the playground.</span>
-            <span className="text-muted-foreground">
-              Click a card to open the full post — each one has its own banner and author image.
-            </span>
-          </div>
-        </Banner>
-      </section>
+      <BlogHero
+        banner="/images/banners/https___west.avif"
+        authorImage="/LOGO/rk-light-logo.png"
+        title="Blog"
+      >
+        <p className="text-[17px] sm:text-[19px] leading-[1.5] text-muted-foreground tracking-[-0.01em]">
+          Notes, builds, and ideas from the playground.
+        </p>
+      </BlogHero>
 
-      <section className="mx-auto max-w-5xl px-4 sm:px-6 pb-24">
+      <section className="mx-auto w-full max-w-[980px] px-5 sm:px-8 pt-10 sm:pt-14 pb-28">
         {error ? (
-          <p className="text-sm text-red-500">{error}</p>
+          <p className="text-sm text-red-500 text-center">{error}</p>
         ) : posts.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-16">
-            No published posts yet. Set Status to Published in Notion.
+          <p className="text-[15px] text-muted-foreground text-center py-20">
+            No published posts yet.
           </p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-7">
             {posts.map(post => (
               <BlogCard key={post.id} post={post} />
             ))}
