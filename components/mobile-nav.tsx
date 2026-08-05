@@ -106,17 +106,29 @@ export function MobileNav() {
             className={`rounded-2xl border border-black/[0.06] dark:border-white/[0.08] px-2 py-2 flex flex-col ${NAV_GLASS_CLASS}`}
             style={NAV_GLASS}
           >
-            {NAV_LINKS.map(l => (
-              <a
-                key={l.label}
-                href={l.href}
-                onClick={close}
-                className="px-4 py-3 text-sm text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white hover:bg-black/[0.03] dark:hover:bg-white/[0.08] rounded-xl transition-colors tracking-wide"
-                style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
-              >
-                {l.label}
-              </a>
-            ))}
+            {NAV_LINKS.map(l =>
+              l.href.startsWith('/') ? (
+                <Link
+                  key={l.label}
+                  href={l.href}
+                  onClick={close}
+                  className="px-4 py-3 text-sm text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white hover:bg-black/[0.03] dark:hover:bg-white/[0.08] rounded-xl transition-colors tracking-wide"
+                  style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
+                >
+                  {l.label}
+                </Link>
+              ) : (
+                <a
+                  key={l.label}
+                  href={l.href}
+                  onClick={close}
+                  className="px-4 py-3 text-sm text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white hover:bg-black/[0.03] dark:hover:bg-white/[0.08] rounded-xl transition-colors tracking-wide"
+                  style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
+                >
+                  {l.label}
+                </a>
+              ),
+            )}
             <div className="mt-1 px-2 pb-1 flex flex-col gap-1.5">
               <Link
                 href="/location"
