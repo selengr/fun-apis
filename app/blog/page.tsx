@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { getBlogConfigStatus, listPublishedPosts } from '@/lib/blog'
+import Banner from '@/components/views/banner/banner'
 import { BlogCard } from '@/components/blog/blog-card'
-import { BlogHero } from '@/components/blog/blog-hero'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { NAV_GLASS, NAV_GLASS_CLASS } from '@/lib/nav-glass'
 
@@ -76,17 +76,21 @@ export default async function BlogPage() {
     >
       <BlogListNav />
 
-      <BlogHero
-        banner="/images/banners/https___west.avif"
-        authorImage="/LOGO/rk-light-logo.png"
-        title="Blog"
-      >
-        <p className="text-[17px] sm:text-[19px] leading-[1.5] text-muted-foreground tracking-[-0.01em]">
-          Notes, builds, and ideas from the playground.
-        </p>
-      </BlogHero>
+      <section className="relative">
+        <Banner
+          banner="/images/banners/https___west.avif"
+          user="/LOGO/rk-light-logo.png"
+          blog
+          title="Blog"
+          videoReady
+        >
+          <p className="text-[17px] sm:text-[19px] leading-[1.5] text-muted-foreground tracking-[-0.01em]">
+            Notes, builds, and ideas from the playground.
+          </p>
+        </Banner>
+      </section>
 
-      <section className="mx-auto w-full max-w-[980px] px-5 sm:px-8 pt-10 sm:pt-14 pb-28">
+      <section className="mx-auto w-full max-w-[1200px] px-5 sm:px-8 pt-10 sm:pt-14 pb-28">
         {error ? (
           <p className="text-sm text-red-500 text-center">{error}</p>
         ) : posts.length === 0 ? (
@@ -94,7 +98,7 @@ export default async function BlogPage() {
             No published posts yet.
           </p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-7">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-5 sm:gap-7 xl:gap-8">
             {posts.map(post => (
               <BlogCard key={post.id} post={post} />
             ))}
