@@ -85,6 +85,12 @@
   overflow: hidden;
 }
 
+@media (max-width: 576px) {
+  .landing-title {
+    font-size: 2em;
+  }
+}
+
 
 .landing-article {
     display: flex;
