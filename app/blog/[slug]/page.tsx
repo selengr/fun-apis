@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
+import Banner from '@/components/views/banner/banner'
 import { BlogMarkdown } from '@/components/blog/blog-markdown'
-import { BlogHero } from '@/components/blog/blog-hero'
 import { BlogNav } from '@/components/blog/blog-nav'
 import { BlogTag } from '@/components/blog/blog-tag'
 import { ViewCounter } from '@/components/blog/view-counter'
@@ -71,49 +71,51 @@ export default async function BlogPostPage({ params }: Props) {
     >
       <BlogNav label="POST" />
 
-      <BlogHero banner={banner} authorImage={author} title={post.title}>
-        <div className="flex flex-col items-center gap-4">
-          <div className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-[13px] sm:text-[14px] text-muted-foreground tracking-wide">
-            <span className="text-foreground/80 font-medium">{post.authorName}</span>
-            {date && (
-              <>
-                <span className="opacity-35" aria-hidden>
-                  ·
-                </span>
-                <time dateTime={post.date ?? undefined}>{date}</time>
-              </>
-            )}
-            {post.readingMinutes != null && (
-              <>
-                <span className="opacity-35" aria-hidden>
-                  ·
-                </span>
-                <span>{post.readingMinutes} min read</span>
-              </>
-            )}
-            <span className="opacity-35" aria-hidden>
-              ·
-            </span>
-            <ViewCounter pageId={post.id} initial={post.views} />
-          </div>
-
-          {post.tags.length > 0 && (
-            <div className="flex flex-wrap justify-center gap-2">
-              {post.tags.map(tag => (
-                <BlogTag key={tag} tag={tag} />
-              ))}
+      <section className="relative">
+        <Banner banner={banner} user={author} blog title={post.title} videoReady>
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[13px] sm:text-[14px] text-muted-foreground tracking-wide">
+              <span className="text-foreground/80 font-medium">{post.authorName}</span>
+              {date && (
+                <>
+                  <span className="opacity-35" aria-hidden>
+                    ·
+                  </span>
+                  <time dateTime={post.date ?? undefined}>{date}</time>
+                </>
+              )}
+              {post.readingMinutes != null && (
+                <>
+                  <span className="opacity-35" aria-hidden>
+                    ·
+                  </span>
+                  <span>{post.readingMinutes} min read</span>
+                </>
+              )}
+              <span className="opacity-35" aria-hidden>
+                ·
+              </span>
+              <ViewCounter pageId={post.id} initial={post.views} />
             </div>
-          )}
 
-          {post.summary && (
-            <p className="text-[17px] sm:text-[19px] leading-[1.5] text-muted-foreground tracking-[-0.01em] text-balance">
-              {post.summary}
-            </p>
-          )}
-        </div>
-      </BlogHero>
+            {post.tags.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {post.tags.map(tag => (
+                  <BlogTag key={tag} tag={tag} />
+                ))}
+              </div>
+            )}
 
-      <article className="mx-auto w-full max-w-[680px] px-5 sm:px-8 pt-10 sm:pt-14 pb-28">
+            {post.summary && (
+              <p className="text-[17px] sm:text-[19px] leading-[1.5] text-muted-foreground tracking-[-0.01em]">
+                {post.summary}
+              </p>
+            )}
+          </div>
+        </Banner>
+      </section>
+
+      <article className="mx-auto w-full max-w-[860px] px-5 sm:px-8 pt-10 sm:pt-14 pb-28">
         {post.introduction && (
           <section className="mb-12">
             <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground mb-3">
