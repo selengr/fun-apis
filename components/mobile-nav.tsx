@@ -33,15 +33,25 @@ export function MobileNav() {
 
           {/* Desktop links */}
           <div className="hidden md:flex items-center gap-7" style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}>
-            {NAV_LINKS.map(l => (
-              <a
-                key={l.label}
-                href={l.href}
-                className="text-[11px] text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white transition-colors duration-200 tracking-wide"
-              >
-                {l.label}
-              </a>
-            ))}
+            {NAV_LINKS.map(l =>
+              l.href.startsWith('/') ? (
+                <Link
+                  key={l.label}
+                  href={l.href}
+                  className="text-[11px] text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white transition-colors duration-200 tracking-wide"
+                >
+                  {l.label}
+                </Link>
+              ) : (
+                <a
+                  key={l.label}
+                  href={l.href}
+                  className="text-[11px] text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white transition-colors duration-200 tracking-wide"
+                >
+                  {l.label}
+                </a>
+              ),
+            )}
           </div>
 
           <div className="flex items-center gap-2">
