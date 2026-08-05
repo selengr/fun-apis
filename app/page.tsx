@@ -201,9 +201,6 @@ export default function AgenticPage() {
         </div>
       </section> */}
 
-      {/* ── MARKETS (crypto & finance) ─────────────────────────────────────── */}
-
-
       <section id="markets" className="relative py-32 px-6 md:px-12 lg:px-20 overflow-hidden">
         <div className="relative max-w-6xl mx-auto">
           <div className="mb-16">
