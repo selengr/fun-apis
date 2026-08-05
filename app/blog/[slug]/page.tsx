@@ -73,8 +73,8 @@ export default async function BlogPostPage({ params }: Props) {
 
       <section className="relative">
         <Banner banner={banner} user={author} blog title={post.title} videoReady>
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[13px] sm:text-[14px] text-muted-foreground tracking-wide">
+          <div className="flex flex-col items-center text-center gap-4" dir="ltr">
+            <div className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-[13px] sm:text-[14px] text-muted-foreground tracking-wide">
               <span className="text-foreground/80 font-medium">{post.authorName}</span>
               {date && (
                 <>
@@ -99,7 +99,7 @@ export default async function BlogPostPage({ params }: Props) {
             </div>
 
             {post.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap justify-center gap-2">
                 {post.tags.map(tag => (
                   <BlogTag key={tag} tag={tag} />
                 ))}
@@ -107,7 +107,7 @@ export default async function BlogPostPage({ params }: Props) {
             )}
 
             {post.summary && (
-              <p className="text-[17px] sm:text-[19px] leading-[1.5] text-muted-foreground tracking-[-0.01em]">
+              <p className="max-w-[640px] text-[17px] sm:text-[19px] leading-[1.5] text-muted-foreground tracking-[-0.01em] text-balance">
                 {post.summary}
               </p>
             )}

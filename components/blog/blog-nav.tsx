@@ -5,7 +5,7 @@ import { NAV_GLASS, NAV_GLASS_CLASS } from '@/lib/nav-glass'
 
 export function BlogNav({ label = 'Blog' }: { label?: string }) {
   return (
-    <div className="fixed top-4 inset-x-0 z-50 flex justify-center px-4 pointer-events-none">
+    <div className="fixed top-4 inset-x-0 z-50 flex justify-center px-4 pointer-events-none" dir="ltr">
       <div
         className={`pointer-events-auto w-full max-w-3xl flex items-center justify-between px-5 py-3 rounded-2xl border border-border/60 ${NAV_GLASS_CLASS}`}
         style={NAV_GLASS}

@@ -26,7 +26,7 @@ export function BlogTag({ tag, size = 'md' }: { tag: string; size?: 'sm' | 'md' 
 
   return (
     <span
-      className={`inline-flex items-center rounded-full border font-medium uppercase ${sizing} ${tone.bg} ${tone.text} ${tone.border}`}
+      className={`inline-flex items-center rounded-md border font-medium uppercase ${sizing} ${tone.bg} ${tone.text} ${tone.border}`}
       style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif' }}
     >
       {tag}
