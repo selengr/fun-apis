@@ -1,8 +1,10 @@
 import Link from 'next/link'
+import { ArrowRight } from 'lucide-react'
 import { getBlogConfigStatus, listPublishedPosts } from '@/lib/blog'
 import Banner from '@/components/views/banner/banner'
 import { BlogCard } from '@/components/blog/blog-card'
-import { BlogNav } from '@/components/blog/blog-nav'
+import { ThemeToggle } from '@/components/theme-toggle'
+import { NAV_GLASS, NAV_GLASS_CLASS } from '@/lib/nav-glass'
 
 export const metadata = {
   title: 'Blog',
@@ -11,13 +13,37 @@ export const metadata = {
 
 export const dynamic = 'force-dynamic'
 
+function BlogListNav() {
+  return (
+    <div className="fixed top-4 inset-x-0 z-50 flex justify-center px-4 pointer-events-none">
+      <div
+        className={`pointer-events-auto w-full max-w-3xl flex items-center justify-between px-4 py-2.5 rounded-2xl border border-black/[0.06] dark:border-white/[0.08] ${NAV_GLASS_CLASS}`}
+        style={NAV_GLASS}
+      >
+        <ThemeToggle />
+        <span className="font-pixel text-[10px] tracking-[0.2em] text-black/50 dark:text-white/50 hidden sm:inline">
+          BLOG
+        </span>
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-[11px] px-3 py-2 rounded-xl border border-black/10 dark:border-white/20 text-black/70 dark:text-white/70 hover:text-black dark:hover:text-white hover:border-black/20 dark:hover:border-white/30 hover:bg-black/[0.03] dark:hover:bg-white/[0.08] transition-all duration-200 tracking-wide"
+          style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
+        >
+          Back home
+          <ArrowRight className="size-3.5" />
+        </Link>
+      </div>
+    </div>
+  )
+}
+
 export default async function BlogPage() {
   const status = await getBlogConfigStatus()
 
   if (!status.ready) {
     return (
       <main className="relative min-h-screen bg-background text-foreground">
-        <BlogNav />
+        <BlogListNav />
         <div className="mx-auto max-w-xl px-4 pt-32 pb-20">
           <h1 className="text-3xl font-medium tracking-tight">Blog setup</h1>
           <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{status.message}</p>
@@ -29,12 +55,6 @@ export default async function BlogPage() {
               <code className="text-foreground">.env.local</code>.
             </p>
           )}
-          <Link
-            href="/"
-            className="inline-block mt-8 text-sm underline underline-offset-4 text-muted-foreground hover:text-foreground"
-          >
-            Back home
-          </Link>
         </div>
       </main>
     )
@@ -50,7 +70,7 @@ export default async function BlogPage() {
 
   return (
     <main className="relative min-h-screen bg-background text-foreground overflow-x-clip">
-      <BlogNav />
+      <BlogListNav />
 
       <section className="relative pt-8 pb-6">
         <Banner
