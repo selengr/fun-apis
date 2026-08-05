@@ -6,7 +6,7 @@ export function BlogMarkdown({ markdown }: { markdown: string }) {
   const blocks = splitBlocks(markdown.trim())
 
   return (
-    <div className="blog-prose space-y-4 text-base leading-relaxed">
+    <div className="blog-prose space-y-5 text-[17px] sm:text-[18px] leading-[1.65] tracking-[-0.01em]">
       {blocks.map((block, i) => (
         <Block key={i} block={block} />
       ))}
@@ -192,10 +192,10 @@ function Block({ block }: { block: Block }) {
     case 'h': {
       const cls =
         block.level === 1
-          ? 'text-2xl font-medium tracking-tight mt-8 mb-3'
+          ? 'text-[1.65rem] sm:text-[1.85rem] font-semibold tracking-[-0.03em] mt-10 mb-3'
           : block.level === 2
-            ? 'text-xl font-medium tracking-tight mt-8 mb-3'
-            : 'text-lg font-medium tracking-tight mt-6 mb-2'
+            ? 'text-[1.35rem] sm:text-[1.5rem] font-semibold tracking-[-0.025em] mt-10 mb-3'
+            : 'text-[1.15rem] sm:text-[1.25rem] font-semibold tracking-[-0.02em] mt-8 mb-2'
       const Tag = (`h${Math.min(block.level + 1, 4)}` as 'h2')
       return <Tag className={cls}>{inline(block.text)}</Tag>
     }
