@@ -14,8 +14,8 @@ import {
 
 export const NOTION_BLOG_VERSION = NOTION_VERSION
 
-const DEFAULT_AUTHOR = 'Reza Karbakhsh'
-const DEFAULT_AUTHOR_IMAGE = '/images/authors/reza.jpg'
+const DEFAULT_AUTHOR = BLOG_AUTHOR_NAME
+const DEFAULT_AUTHOR_IMAGE = BLOG_AUTHOR_IMAGE
 const DEFAULT_BANNER = '/images/banners/https___west.avif'
 
 function getDatabaseId() {
@@ -170,13 +170,7 @@ export function mapNotionPageToMeta(page: {
       : DEFAULT_AUTHOR
 
   const authorFromProp = parseUrl(authorImageProp)
-  // Prefer site author photo; rewrite CDN/absolute self URLs to local public path
-  const authorImage =
-    !authorFromProp ||
-    /unsplash\.com/i.test(authorFromProp) ||
-    authorFromProp.includes('/images/authors/reza')
-      ? DEFAULT_AUTHOR_IMAGE
-      : authorFromProp
+  const authorImage = resolveAuthorImage(authorFromProp)
   const bannerFromProp = parseUrl(bannerProp)
   const coverUrl = parseCover(page)
   const bannerImage = bannerFromProp || coverUrl || DEFAULT_BANNER

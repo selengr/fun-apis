@@ -56,15 +56,15 @@ const Banner = ({ title, banner, user, home, blog, videoReady, children }: Props
         />
 
         {showAuthorRing && (
-          <div className={`${styles['landing-div-rounded']} bg-[#f7f6f3]`}>
+          <div className={`${styles['landing-div-rounded']} bg-[#f7f6f3] overflow-hidden`}>
             <Image
               src={authorSrc}
               alt={blog ? 'Author' : 'Logo'}
-              width={90}
-              height={90}
-              className={styles['landing-div-rounded-home']}
-              unoptimized={authorSrc.startsWith('http')}
-              style={blog ? { objectFit: 'cover', borderRadius: '50%' } : undefined}
+              width={124}
+              height={124}
+              className={`${styles['landing-div-rounded-home']} ${blog ? styles['landing-div-rounded-avatar'] : ''}`}
+              unoptimized={authorSrc.startsWith('http') || blog}
+              style={blog ? { objectFit: 'cover' } : undefined}
             />
           </div>
         )}

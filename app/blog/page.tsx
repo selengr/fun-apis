@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { getBlogConfigStatus, listPublishedPosts } from '@/lib/blog'
+import { BLOG_AUTHOR_IMAGE } from '@/lib/blog-author'
 import Banner from '@/components/views/banner/banner'
 import { BlogCard } from '@/components/blog/blog-card'
 import { ThemeToggle } from '@/components/theme-toggle'
@@ -80,7 +81,7 @@ export default async function BlogPage() {
       <section className="relative">
         <Banner
           banner="/images/banners/https___west.avif"
-          user="/images/authors/reza.jpg"
+          user={BLOG_AUTHOR_IMAGE}
           blog
           title="Blog"
           videoReady

@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import type { BlogPostMeta } from '@/types/blog'
+import { BLOG_AUTHOR_IMAGE } from '@/lib/blog-author'
 import { BlogTag } from '@/components/blog/blog-tag'
 
 function formatDate(iso: string | null) {
@@ -80,11 +81,11 @@ export function BlogCard({ post }: { post: BlogPostMeta }) {
         <div className="mt-auto flex items-center gap-2.5 pt-2">
           <div className="relative size-8 shrink-0 overflow-hidden rounded-full bg-[#e8e8ed]">
             <Image
-              src={post.authorImage || '/LOGO/rk-light-logo.png'}
+              src={post.authorImage || BLOG_AUTHOR_IMAGE}
               alt=""
               fill
-              className="object-cover"
-              unoptimized={(post.authorImage || '').startsWith('http')}
+              className="object-cover object-[center_20%]"
+              unoptimized
             />
           </div>
           <span className="text-[13px] text-muted-foreground truncate">{post.authorName}</span>

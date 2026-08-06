@@ -6,6 +6,7 @@ import { BlogNav } from '@/components/blog/blog-nav'
 import { BlogTag } from '@/components/blog/blog-tag'
 import { ViewCounter } from '@/components/blog/view-counter'
 import { getPostBySlug, listPublishedPosts } from '@/lib/blog'
+import { BLOG_AUTHOR_IMAGE } from '@/lib/blog-author'
 
 export const dynamic = 'force-dynamic'
 
@@ -62,7 +63,7 @@ export default async function BlogPostPage({ params }: Props) {
 
   const date = formatDate(post.date)
   const banner = post.bannerImage || '/images/banners/https___west.avif'
-  const author = post.authorImage || '/images/authors/reza.jpg'
+  const author = post.authorImage || BLOG_AUTHOR_IMAGE
 
   return (
     <main

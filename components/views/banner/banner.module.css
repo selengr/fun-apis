@@ -51,6 +51,11 @@
   padding-right: 0px;
 }
 
+.landing-div-rounded-avatar {
+  object-fit: cover;
+  object-position: center 20%;
+}
+
 @media (max-width: 720px) {
   .landing-div-rounded {
     width: 114px;
