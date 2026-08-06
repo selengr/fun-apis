@@ -13,12 +13,12 @@
   padding: 0;
   border: none;
   margin: auto;
-  object-position: center ;
+  object-position: center 50%;
   width: 100% !important;
   max-width: 1200px !important;
   border-radius: 24px;
   height: 30vh !important;
-  object-fit: cover;
+  object-fit: fill;
   box-shadow: 2px 2px 8px 4px hsla(0, 0%, 6%, 0.1);
 }
 

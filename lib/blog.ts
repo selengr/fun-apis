@@ -1,5 +1,10 @@
 import type { BlogConfigStatus, BlogPost, BlogPostMeta, BlogPostStatus } from '@/types/blog'
 import {
+  BLOG_AUTHOR_IMAGE,
+  BLOG_AUTHOR_NAME,
+  resolveAuthorImage,
+} from '@/lib/blog-author'
+import {
   NOTION_VERSION,
   notionApiKey,
   notionHeaders,
