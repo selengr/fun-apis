@@ -290,7 +290,7 @@ export function TestLab() {
             </div>
           </SampleBlock>
         </div> */}
-
+{/* 
         <SampleBlock
           id="password"
           title="PasswordStrength"
@@ -306,7 +306,7 @@ export function TestLab() {
             />
             <PasswordStrength password={password} />
           </div>
-        </SampleBlock>
+        </SampleBlock> */}
 
         <SampleBlock
           id="social"
