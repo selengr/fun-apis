@@ -256,7 +256,7 @@ export function TestLab() {
           </div>
         </SampleBlock>
 
-        <div className="grid gap-8 lg:grid-cols-2">
+        {/* <div className="grid gap-8 lg:grid-cols-2">
           <SampleBlock
             id="sign-in"
             title="SignInForm"
@@ -289,7 +289,7 @@ export function TestLab() {
               />
             </div>
           </SampleBlock>
-        </div>
+        </div> */}
 
         <SampleBlock
           id="password"
