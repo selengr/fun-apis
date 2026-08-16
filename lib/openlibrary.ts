@@ -129,16 +129,6 @@ export const FEATURED_HOMEPAGE_BOOKS: BookCard[] = [
     popularity: 92,
   },
   {
-    workKey: 'OL27979586W',
-    title: 'Ikigai',
-    authors: ['Héctor García', 'Francesc Miralles'],
-    authorKeys: [],
-    year: 2016,
-    coverImage: `${BOOK_COVERS}/ikigai.jpg`,
-    isbn: '9781529001960',
-    popularity: 91,
-  },
-  {
     workKey: 'OL14933414W',
     title: 'The Midnight Library',
     authors: ['Matt Haig'],
