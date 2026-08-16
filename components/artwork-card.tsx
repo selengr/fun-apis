@@ -17,9 +17,11 @@ interface ArtworkCardProps {
 
 export function ArtworkCard({ artwork, isActive, dragOffset, index, currentIndex, onSelect }: ArtworkCardProps) {
   const [isHovered, setIsHovered] = useState(false)
+  const [imgSrc, setImgSrc] = useState(artwork.image)
   const [imgFailed, setImgFailed] = useState(false)
 
   useEffect(() => {
+    setImgSrc(artwork.image)
     setImgFailed(false)
   }, [artwork.image])
   const distance = index - currentIndex
@@ -66,8 +68,8 @@ export function ArtworkCard({ artwork, isActive, dragOffset, index, currentIndex
         <div className="relative h-[300px] w-[300px] overflow-hidden rounded-2xl p-3 md:h-[350px] md:w-[350px]">
           {!imgFailed ? (
             <motion.img
-              key={artwork.image}
-              src={artwork.image}
+              key={imgSrc}
+              src={imgSrc}
               alt={artwork.title}
               className="h-full w-full rounded-xl object-cover bg-stone-800"
               animate={{
@@ -75,7 +77,13 @@ export function ArtworkCard({ artwork, isActive, dragOffset, index, currentIndex
               }}
               transition={{ duration: 0.4, ease: "easeOut" }}
               draggable={false}
-              onError={() => setImgFailed(true)}
+              onError={() => {
+                if (artwork.coverFallback && imgSrc !== artwork.coverFallback) {
+                  setImgSrc(artwork.coverFallback)
+                  return
+                }
+                setImgFailed(true)
+              }}
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center rounded-xl bg-gradient-to-br from-violet-900/40 to-amber-900/30 p-6 text-center">

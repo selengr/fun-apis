@@ -1,9 +1,9 @@
 import type { BookCard } from '@/types/openlibrary'
 import type { Artwork } from '@/types/artwork'
-import { coverUrl } from '@/lib/openlibrary'
+import { resolveBookCoverImage } from '@/lib/openlibrary'
 
 export function bookToSlide(book: BookCard, index: number): Artwork | null {
-  const image = coverUrl(book.coverId, 'L', book.isbn?.[0])
+  const image = resolveBookCoverImage(book, 'L')
   if (!image) return null
 
   return {
@@ -14,6 +14,11 @@ export function bookToSlide(book: BookCard, index: number): Artwork | null {
     image,
     searchQuery: book.title,
     workKey: book.workKey,
+    coverFallback: book.isbn
+      ? `https://covers.openlibrary.org/b/isbn/${book.isbn}-L.jpg?default=false`
+      : book.coverId
+        ? `https://covers.openlibrary.org/b/id/${book.coverId}-L.jpg?default=false`
+        : undefined,
   }
 }
 

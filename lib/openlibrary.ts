@@ -4,7 +4,9 @@ export const OL_API = 'https://openlibrary.org'
 export const OL_COVERS = 'https://covers.openlibrary.org'
 export const OL_UA = 'fun-apis/1.0 (Book Explorer; contact@example.com)'
 
-/** Eye-catching bestsellers for homepage slider & offline fallback — verified cover IDs */
+const BOOK_COVERS = '/images/books'
+
+/** Eye-catching bestsellers for homepage slider — local cover art for reliability */
 export const FEATURED_HOMEPAGE_BOOKS: BookCard[] = [
   {
     workKey: 'OL82586W',
@@ -12,7 +14,8 @@ export const FEATURED_HOMEPAGE_BOOKS: BookCard[] = [
     authors: ['J. K. Rowling'],
     authorKeys: [],
     year: 1997,
-    coverId: 10521270,
+    coverImage: `${BOOK_COVERS}/harry-potter.jpg`,
+    isbn: '9780747532699',
     popularity: 99,
   },
   {
@@ -21,7 +24,8 @@ export const FEATURED_HOMEPAGE_BOOKS: BookCard[] = [
     authors: ['Suzanne Collins'],
     authorKeys: [],
     year: 2008,
-    coverId: 8739161,
+    coverImage: `${BOOK_COVERS}/hunger-games.jpg`,
+    isbn: '9780439023481',
     popularity: 98,
   },
   {
@@ -30,7 +34,8 @@ export const FEATURED_HOMEPAGE_BOOKS: BookCard[] = [
     authors: ['James Clear'],
     authorKeys: [],
     year: 2018,
-    coverId: 12546781,
+    coverImage: `${BOOK_COVERS}/atomic-habits.jpg`,
+    isbn: '9780735211292',
     popularity: 97,
   },
   {
@@ -39,7 +44,8 @@ export const FEATURED_HOMEPAGE_BOOKS: BookCard[] = [
     authors: ['J. R. R. Tolkien'],
     authorKeys: [],
     year: 1954,
-    coverId: 14627563,
+    coverImage: `${BOOK_COVERS}/lotr.jpg`,
+    isbn: '9780547928210',
     popularity: 97,
   },
   {
@@ -48,7 +54,8 @@ export const FEATURED_HOMEPAGE_BOOKS: BookCard[] = [
     authors: ['George R. R. Martin'],
     authorKeys: [],
     year: 1996,
-    coverId: 9267647,
+    coverImage: `${BOOK_COVERS}/got.jpg`,
+    isbn: '9780553103540',
     popularity: 96,
   },
   {
@@ -57,7 +64,8 @@ export const FEATURED_HOMEPAGE_BOOKS: BookCard[] = [
     authors: ['Morgan Housel'],
     authorKeys: [],
     year: 2020,
-    coverId: 11130366,
+    coverImage: `${BOOK_COVERS}/psychology-of-money.jpg`,
+    isbn: '9780857197685',
     popularity: 95,
   },
   {
@@ -66,7 +74,8 @@ export const FEATURED_HOMEPAGE_BOOKS: BookCard[] = [
     authors: ['Delia Owens'],
     authorKeys: [],
     year: 2018,
-    coverId: 10396129,
+    coverImage: `${BOOK_COVERS}/crawdads.jpg`,
+    isbn: '9780735219090',
     popularity: 95,
   },
   {
@@ -75,7 +84,8 @@ export const FEATURED_HOMEPAGE_BOOKS: BookCard[] = [
     authors: ['Paulo Coelho'],
     authorKeys: [],
     year: 1988,
-    coverId: 11153225,
+    coverImage: `${BOOK_COVERS}/alchemist.jpg`,
+    isbn: '9780062315007',
     popularity: 94,
   },
   {
@@ -84,7 +94,8 @@ export const FEATURED_HOMEPAGE_BOOKS: BookCard[] = [
     authors: ['Frank Herbert'],
     authorKeys: [],
     year: 1965,
-    coverId: 9251996,
+    coverImage: `${BOOK_COVERS}/dune.jpg`,
+    isbn: '9780441172719',
     popularity: 94,
   },
   {
@@ -93,7 +104,8 @@ export const FEATURED_HOMEPAGE_BOOKS: BookCard[] = [
     authors: ['Andy Weir'],
     authorKeys: [],
     year: 2021,
-    coverId: 12392519,
+    coverImage: `${BOOK_COVERS}/project-hail-mary.jpg`,
+    isbn: '9780593135204',
     popularity: 93,
   },
   {
@@ -102,7 +114,8 @@ export const FEATURED_HOMEPAGE_BOOKS: BookCard[] = [
     authors: ['Yuval Noah Harari'],
     authorKeys: [],
     year: 2011,
-    coverId: 8370633,
+    coverImage: `${BOOK_COVERS}/sapiens.jpg`,
+    isbn: '9780062316097',
     popularity: 93,
   },
   {
@@ -111,7 +124,8 @@ export const FEATURED_HOMEPAGE_BOOKS: BookCard[] = [
     authors: ['Dan Brown'],
     authorKeys: [],
     year: 2003,
-    coverId: 8734772,
+    coverImage: `${BOOK_COVERS}/da-vinci-code.jpg`,
+    isbn: '9780307474278',
     popularity: 92,
   },
   {
@@ -120,7 +134,8 @@ export const FEATURED_HOMEPAGE_BOOKS: BookCard[] = [
     authors: ['Héctor García', 'Francesc Miralles'],
     authorKeys: [],
     year: 2016,
-    coverId: 10382595,
+    coverImage: `${OL_COVERS}/b/isbn/9781529001960-L.jpg?default=false`,
+    isbn: '9781529001960',
     popularity: 91,
   },
   {
@@ -129,7 +144,8 @@ export const FEATURED_HOMEPAGE_BOOKS: BookCard[] = [
     authors: ['Matt Haig'],
     authorKeys: [],
     year: 2020,
-    coverId: 10520960,
+    coverImage: `${BOOK_COVERS}/midnight-library.jpg`,
+    isbn: '9780525559474',
     popularity: 91,
   },
   {
@@ -138,7 +154,8 @@ export const FEATURED_HOMEPAGE_BOOKS: BookCard[] = [
     authors: ['Taylor Jenkins Reid'],
     authorKeys: [],
     year: 2017,
-    coverId: 10521294,
+    coverImage: `${BOOK_COVERS}/evelyn-hugo.jpg`,
+    isbn: '9781501139239',
     popularity: 90,
   },
 ]
@@ -163,6 +180,17 @@ export function coverUrl(coverId?: number, size: 'S' | 'M' | 'L' = 'L', isbn?: s
   if (coverId) params.set('id', String(coverId))
   else if (isbn) params.set('isbn', isbn)
   return `/api/covers?${params}`
+}
+
+/** Best cover source for sliders — local assets first, then direct Open Library CDN */
+export function resolveBookCoverImage(
+  book: Pick<BookCard, 'coverImage' | 'coverId' | 'isbn'>,
+  size: 'S' | 'M' | 'L' = 'L',
+): string | null {
+  if (book.coverImage) return book.coverImage
+  if (book.isbn) return `${OL_COVERS}/b/isbn/${book.isbn}-${size}.jpg?default=false`
+  if (book.coverId) return `${OL_COVERS}/b/id/${book.coverId}-${size}.jpg?default=false`
+  return coverUrl(book.coverId, size, book.isbn)
 }
 
 export function authorPhotoUrl(photoId?: number, size: 'S' | 'M' | 'L' = 'M') {
