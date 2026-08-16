@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import {
   OL_API,
   OL_UA,
+  FEATURED_HOMEPAGE_BOOKS,
   FALLBACK_TRENDING,
   mapSearchDoc,
   mapWorkDetail,
@@ -54,35 +55,42 @@ async function olFetch(path: string, retries = 2): Promise<unknown> {
 }
 
 /**
- * Fetch trending books without verifying covers via download.
- * Cover HEAD/GET checks were the main failure behind VPN/proxy.
+ * Homepage featured books — curated bestsellers with strong covers.
+ * Open Library "readinglog" queries often return obscure titles, so we lead with this list
+ * and only enrich from OL when a quick lookup succeeds.
  */
 async function fetchTrendingBooks(limit: number): Promise<{ books: BookCard[]; fallback: boolean }> {
-  const fetchLimit = Math.min(Math.max(limit * 2, 24), 40)
+  const curated = FEATURED_HOMEPAGE_BOOKS.slice(0, limit)
   const fields =
-    'key,title,author_name,author_key,first_publish_year,cover_i,edition_count,language,subject,number_of_pages_median,ratings_average,ratings_count,want_to_read_count,already_read_count,currently_reading_count,isbn'
+    'key,title,author_name,author_key,first_publish_year,cover_i,edition_count,ratings_count,want_to_read_count,already_read_count,currently_reading_count,isbn'
 
-  const attempts = [
-    `/search.json?q=subject:fiction&sort=readinglog&limit=${fetchLimit}&fields=${fields}`,
-    `/search.json?q=subject:literature&sort=readinglog&limit=${fetchLimit}&fields=${fields}`,
-    `/search.json?q=english&sort=readinglog&limit=${fetchLimit}&fields=${fields}`,
-  ]
+  try {
+    const enriched = await Promise.all(
+      curated.map(async book => {
+        try {
+          const data = (await olFetch(
+            `/search.json?q=${encodeURIComponent(book.title)}&limit=2&fields=${fields}`,
+            0,
+          )) as OLSearchResponse
+          const doc = (data.docs ?? []).find(d => d.cover_i && d.title) ?? data.docs?.[0]
+          if (!doc?.cover_i) return book
+          const mapped = mapSearchDoc(doc)
+          return { ...mapped, popularity: Math.max(book.popularity ?? 0, mapped.popularity ?? 0) }
+        } catch {
+          return book
+        }
+      }),
+    )
 
-  for (const path of attempts) {
-    try {
-      const data = (await olFetch(path)) as OLSearchResponse
-      const books = (data.docs ?? [])
-        .map(mapSearchDoc)
-        .filter(b => b.coverId && b.title)
-        .slice(0, limit)
-
-      if (books.length > 0) return { books, fallback: false }
-    } catch {
-      // try next query
+    const withCovers = enriched.filter(b => b.coverId && b.title)
+    if (withCovers.length >= Math.min(10, limit)) {
+      return { books: withCovers.slice(0, limit), fallback: false }
     }
+  } catch {
+    /* use curated */
   }
 
-  return { books: FALLBACK_TRENDING.slice(0, limit), fallback: true }
+  return { books: curated, fallback: true }
 }
 
 export async function GET(request: NextRequest) {
