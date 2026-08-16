@@ -134,7 +134,7 @@ export const FEATURED_HOMEPAGE_BOOKS: BookCard[] = [
     authors: ['Héctor García', 'Francesc Miralles'],
     authorKeys: [],
     year: 2016,
-    coverImage: `${OL_COVERS}/b/isbn/9781529001960-L.jpg?default=false`,
+    coverImage: `${BOOK_COVERS}/ikigai.jpg`,
     isbn: '9781529001960',
     popularity: 91,
   },
