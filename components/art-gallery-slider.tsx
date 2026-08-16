@@ -18,7 +18,7 @@ import { booksToSlides } from "@/lib/book-slides"
 import type { BookCard } from "@/types/openlibrary"
 
 interface ArtGallerySliderProps {
-  /** When true, fetches trending books from Open Library */
+  /** When true, fetches curated bestsellers for the homepage slider */
   variant?: "art" | "books"
   items?: Artwork[]
   onItemSelect?: (item: Artwork) => void
