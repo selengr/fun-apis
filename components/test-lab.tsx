@@ -104,7 +104,7 @@ export function TestLab() {
     setAuthLoading(true)
     setTimeout(() => setAuthLoading(false), 800)
   }
-// tets
+
   return (
     <div className="relative min-h-screen bg-background text-foreground">
       <div className="fixed top-4 inset-x-0 z-50 flex justify-center px-4 pointer-events-none">
