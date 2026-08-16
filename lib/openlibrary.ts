@@ -139,13 +139,13 @@ export const FEATURED_HOMEPAGE_BOOKS: BookCard[] = [
     popularity: 91,
   },
   {
-    workKey: 'OL1541397W',
-    title: 'Sapiens',
-    authors: ['Yuval Noah Harari'],
+    workKey: 'OL254512W',
+    title: 'Code Complete',
+    authors: ['Steve McConnell'],
     authorKeys: [],
-    year: 2011,
-    coverImage: `${BOOK_COVERS}/sapiens.jpg`,
-    isbn: '9780062316097',
+    year: 2004,
+    coverImage: `${BOOK_COVERS}/code-complete.jpg`,
+    isbn: '9780735619678',
     popularity: 91,
   },
   {
@@ -169,8 +169,7 @@ export const POPULAR_SEARCHES = [
   'The Pragmatic Programmer',
   'English Grammar in Use',
   'Thinking, Fast and Slow',
-  'Sapiens',
-  'Deep Work',
+  'Code Complete',
   'Introduction to Algorithms',
 ]
 
