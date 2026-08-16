@@ -56,6 +56,8 @@ export interface BookCard {
   authorKeys: string[]
   year?: number
   coverId?: number
+  /** Local or absolute cover URL — preferred for homepage slider reliability */
+  coverImage?: string
   editionCount?: number
   pages?: number
   languages?: string[]
