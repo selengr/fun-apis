@@ -145,7 +145,7 @@ export default function AgenticPage() {
   }, []);
 
   return (
-    <div className="bg-background text-foreground min-h-screen font-sans antialiased">
+    <div className="bg-background text-foreground min-h-screen font-sans antialiased overflow-x-clip">
       {/* ── INTRO ANIMATION ───────────────────────────────────────────────── */}
       <IntroAnimation onDone={handleIntroDone} />
 
@@ -187,7 +187,7 @@ export default function AgenticPage() {
       </section>
 
 
-      <section className="relative min-h-[520px] h-[55vh] w-screen overflow-hidden border-y border-border">
+      <section className="relative min-h-[520px] h-[55vh] w-full overflow-x-clip border-y border-border">
         <ArtGallerySlider variant="books" />
       </section>
     

@@ -122,10 +122,22 @@ export function ArtGallerySlider({
     [onItemSelect, router],
   )
 
+  useEffect(() => {
+    const el = sliderRef.current
+    if (!el) return
+
+    const blockHorizontalScroll = (e: TouchEvent) => {
+      if (isDragging) e.preventDefault()
+    }
+
+    el.addEventListener("touchmove", blockHorizontalScroll, { passive: false })
+    return () => el.removeEventListener("touchmove", blockHorizontalScroll)
+  }, [isDragging])
+
   const isBooks = variant === "books"
 
   return (
-    <div className="relative h-full w-full overflow-hidden py-10 bg-[#0c0f12] dark:bg-[#080a0c]">
+    <div className="relative h-full w-full overflow-x-clip py-10 bg-[#0c0f12] dark:bg-[#080a0c] overscroll-x-contain">
       {/* Stage atmosphere — cards unchanged */}
       <AnimatePresence mode="wait">
         <motion.div
@@ -203,7 +215,7 @@ export function ArtGallerySlider({
 
       {booksLoading ? (
         <div className="relative flex h-full min-h-[420px] w-full items-center">
-          <div className="flex items-center gap-8 px-[calc(50vw-150px)] md:gap-16 md:px-[calc(50vw-175px)]">
+          <div className="flex items-center gap-8 pl-[calc(50%-150px)] md:gap-16 md:pl-[calc(50%-175px)]">
             <Skeleton className="h-[300px] w-[300px] shrink-0 rounded-2xl bg-white/8 opacity-40 md:h-[350px] md:w-[350px]" />
             <div className="relative shrink-0">
               <Skeleton className="h-[300px] w-[300px] rounded-2xl bg-white/12 md:h-[350px] md:w-[350px]" />
@@ -231,7 +243,8 @@ export function ArtGallerySlider({
       ) : (
         <div
           ref={sliderRef}
-          className="relative flex h-full w-full cursor-grab items-center active:cursor-grabbing"
+          className="relative flex h-full w-full cursor-grab items-center touch-pan-y active:cursor-grabbing"
+          style={{ touchAction: "pan-y pinch-zoom" }}
           onMouseDown={handleDragStart}
           onMouseMove={handleDragMove}
           onMouseUp={handleDragEnd}
@@ -241,7 +254,7 @@ export function ArtGallerySlider({
           onTouchEnd={handleDragEnd}
         >
           <motion.div
-            className="flex items-center gap-8 px-[calc(50vw-150px)] md:gap-16 md:px-[calc(50vw-175px)]"
+            className="flex items-center gap-8 pl-[calc(50%-150px)] will-change-transform md:gap-16 md:pl-[calc(50%-175px)]"
             animate={{
               x: -currentIndex * slideWidth + dragX,
             }}
