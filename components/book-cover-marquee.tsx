@@ -1,93 +1,80 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import Link from "next/link"
-import { ArrowUpRight } from "lucide-react"
-import { resolveBookCoverImage } from "@/lib/openlibrary"
-import type { BookCard } from "@/types/openlibrary"
 import { cn } from "@/lib/utils"
+import type { UnsplashPhotoView } from "@/types/unsplash"
 
-/** Visual weight tiers — staggered columns feel alive */
-const SIZE_TIERS = [
-  { w: "w-[88px] md:w-[108px]", h: "h-[132px] md:h-[162px]", ring: "ring-white/10" },
-  { w: "w-[104px] md:w-[128px]", h: "h-[156px] md:h-[192px]", ring: "ring-white/12" },
-  { w: "w-[120px] md:w-[148px]", h: "h-[180px] md:h-[222px]", ring: "ring-white/15" },
-  { w: "w-[136px] md:w-[168px]", h: "h-[204px] md:h-[252px]", ring: "ring-white/18" },
-  { w: "w-[152px] md:w-[188px]", h: "h-[228px] md:h-[282px]", ring: "ring-white/20" },
-] as const
+/** Compact square tiles — closer to the reference grid */
+const SIZE_PX = [36, 40, 44, 48, 52] as const
 
-/** Column heights — wave silhouette like the reference grid */
-const COLUMN_COUNTS = [5, 8, 6, 9, 7, 8, 5, 9, 6, 8, 7, 5, 8, 6, 9, 7, 8, 5]
+const COLUMN_COUNTS = [4, 6, 5, 7, 4, 6, 5, 7, 4, 6, 5, 7, 4, 6]
 
-type MarqueeBook = BookCard & { coverSrc: string; coverFallback?: string }
+const SEARCH_QUERIES = [
+  "psychology brain",
+  "programming code",
+  "books reading",
+  "science laboratory",
+  "habits journal",
+  "english study",
+  "computer workspace",
+  "mindfulness",
+]
 
-function BookTile({
-  book,
-  sizeIndex,
+type GridPhoto = UnsplashPhotoView & { squareSrc: string }
+
+function squareUrl(url: string, size: number) {
+  const base = url.split("?")[0]
+  return `${base}?auto=format&fit=crop&w=${size}&h=${size}&q=80`
+}
+
+function PhotoTile({
+  photo,
+  sizePx,
   priority,
 }: {
-  book: MarqueeBook
-  sizeIndex: number
+  photo: GridPhoto
+  sizePx: number
   priority?: boolean
 }) {
-  const tier = SIZE_TIERS[sizeIndex % SIZE_TIERS.length]
-  const [src, setSrc] = useState(book.coverSrc)
-
-  useEffect(() => {
-    setSrc(book.coverSrc)
-  }, [book.coverSrc])
+  const src = squareUrl(photo.urls.small, sizePx * 2)
 
   return (
-    <Link
-      href={`/books?q=${encodeURIComponent(book.title)}`}
+    <a
+      href={photo.links.html}
+      target="_blank"
+      rel="noopener noreferrer"
       className={cn(
-        "group relative shrink-0 overflow-hidden rounded-2xl md:rounded-3xl",
-        "bg-neutral-900 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.7)]",
-        "ring-1 transition-all duration-500 ease-out",
-        "hover:z-10 hover:-translate-y-1 hover:scale-[1.04]",
-        "hover:shadow-[0_28px_60px_-16px_rgba(99,102,241,0.35)]",
-        tier.w,
-        tier.h,
-        tier.ring,
+        "group relative shrink-0 overflow-hidden rounded-xl",
+        "bg-neutral-950/90 ring-1 ring-border/40",
+        "transition-transform duration-300 hover:scale-105 hover:ring-border/80",
       )}
-      title={book.title}
+      style={{ width: sizePx, height: sizePx }}
+      title={photo.alt}
     >
       <img
         src={src}
-        alt={book.title}
+        alt={photo.alt}
         loading={priority ? "eager" : "lazy"}
         decoding="async"
         draggable={false}
-        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-        onError={() => {
-          if (book.coverFallback && src !== book.coverFallback) setSrc(book.coverFallback)
-        }}
+        className="h-full w-full object-cover"
       />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 p-2.5 opacity-0 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0 translate-y-1">
-        <p className="line-clamp-2 text-[10px] font-medium leading-tight text-white md:text-[11px]">
-          {book.title}
-        </p>
-      </div>
-      <div className="pointer-events-none absolute right-2 top-2 rounded-full bg-white/10 p-1 opacity-0 backdrop-blur-md transition-opacity group-hover:opacity-100">
-        <ArrowUpRight className="size-3 text-white/90" />
-      </div>
-    </Link>
+    </a>
   )
 }
 
-function buildColumns(books: MarqueeBook[], reverse = false) {
-  if (books.length === 0) return []
+function buildColumns(photos: GridPhoto[], reverse = false) {
+  if (photos.length === 0) return []
 
   const counts = reverse ? [...COLUMN_COUNTS].reverse() : COLUMN_COUNTS
   let cursor = 0
 
   return counts.map((count, colIndex) => {
-    const column: { book: MarqueeBook; sizeIndex: number }[] = []
+    const column: { photo: GridPhoto; sizePx: number }[] = []
     for (let i = 0; i < count; i++) {
-      const book = books[cursor % books.length]
-      const sizeIndex = (colIndex * 3 + i * 2) % SIZE_TIERS.length
-      column.push({ book, sizeIndex })
+      const photo = photos[cursor % photos.length]
+      const sizePx = SIZE_PX[(colIndex + i) % SIZE_PX.length]
+      column.push({ photo, sizePx })
       cursor++
     }
     return column
@@ -95,38 +82,38 @@ function buildColumns(books: MarqueeBook[], reverse = false) {
 }
 
 function MarqueeRow({
-  books,
+  photos,
   direction,
   duration,
   reversePattern,
 }: {
-  books: MarqueeBook[]
+  photos: GridPhoto[]
   direction: "left" | "right"
   duration: number
   reversePattern?: boolean
 }) {
   const columns = useMemo(
-    () => buildColumns(books, reversePattern),
-    [books, reversePattern],
+    () => buildColumns(photos, reversePattern),
+    [photos, reversePattern],
   )
 
   const track = (
-    <div className="flex items-end gap-3 md:gap-4 px-3 md:px-4">
+    <div className="flex items-end gap-2 px-2">
       {columns.map((column, colIndex) => (
         <div
           key={colIndex}
-          className="flex flex-col gap-3 md:gap-4"
+          className="flex flex-col gap-2"
           style={{
-            paddingBottom: colIndex % 3 === 0 ? 0 : colIndex % 3 === 1 ? 24 : 12,
-            paddingTop: colIndex % 4 === 0 ? 20 : colIndex % 4 === 2 ? 36 : 0,
+            paddingBottom: colIndex % 3 === 1 ? 10 : 0,
+            paddingTop: colIndex % 3 === 2 ? 14 : colIndex % 4 === 0 ? 6 : 0,
           }}
         >
-          {column.map(({ book, sizeIndex }, i) => (
-            <BookTile
-              key={`${colIndex}-${i}-${book.title}`}
-              book={book}
-              sizeIndex={sizeIndex}
-              priority={colIndex < 4 && i < 2}
+          {column.map(({ photo, sizePx }, i) => (
+            <PhotoTile
+              key={`${colIndex}-${i}-${photo.id}`}
+              photo={photo}
+              sizePx={sizePx}
+              priority={colIndex < 3 && i < 2}
             />
           ))}
         </div>
@@ -135,11 +122,11 @@ function MarqueeRow({
   )
 
   return (
-    <div className="relative flex overflow-hidden py-2">
+    <div className="flex overflow-hidden">
       <div
         className="flex shrink-0 will-change-transform"
         style={{
-          animation: `${direction === "left" ? "bookMarqueeLeft" : "bookMarqueeRight"} ${duration}s linear infinite`,
+          animation: `${direction === "left" ? "unsplashMarqueeLeft" : "unsplashMarqueeRight"} ${duration}s linear infinite`,
         }}
       >
         {track}
@@ -150,7 +137,7 @@ function MarqueeRow({
 }
 
 export function BookCoverMarquee() {
-  const [books, setBooks] = useState<MarqueeBook[]>([])
+  const [photos, setPhotos] = useState<GridPhoto[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -158,27 +145,40 @@ export function BookCoverMarquee() {
 
     async function load() {
       try {
-        const res = await fetch("/api/books?action=trending&limit=15", { cache: "no-store" })
-        const json = await res.json()
+        const results = await Promise.all(
+          SEARCH_QUERIES.map(async query => {
+            const params = new URLSearchParams({
+              action: "search",
+              query,
+              orientation: "squarish",
+              per_page: "8",
+              order_by: "relevant",
+            })
+            const res = await fetch(`/api/unsplash?${params}`, { cache: "no-store" })
+            if (!res.ok) return [] as UnsplashPhotoView[]
+            const json = await res.json()
+            return (json.photos ?? []) as UnsplashPhotoView[]
+          }),
+        )
+
         if (cancelled) return
 
-        const mapped: MarqueeBook[] = ((json.books ?? []) as BookCard[])
-          .map(book => {
-            const coverSrc = resolveBookCoverImage(book, "L")
-            if (!coverSrc) return null
-            return {
-              ...book,
-              coverSrc,
-              coverFallback: book.isbn
-                ? `https://covers.openlibrary.org/b/isbn/${book.isbn}-L.jpg?default=false`
-                : undefined,
-            }
-          })
-          .filter((b): b is MarqueeBook => b !== null)
+        const merged = results.flat()
+        const seen = new Set<string>()
+        const unique: GridPhoto[] = []
 
-        setBooks(mapped.length > 0 ? mapped : [])
+        for (const photo of merged) {
+          if (seen.has(photo.id)) continue
+          seen.add(photo.id)
+          unique.push({
+            ...photo,
+            squareSrc: squareUrl(photo.urls.small, 96),
+          })
+        }
+
+        setPhotos(unique)
       } catch {
-        if (!cancelled) setBooks([])
+        if (!cancelled) setPhotos([])
       } finally {
         if (!cancelled) setLoading(false)
       }
@@ -191,71 +191,37 @@ export function BookCoverMarquee() {
   }, [])
 
   return (
-    <section className="relative overflow-hidden border-y border-border bg-[#0a0a0b] py-14 md:py-20">
-      {/* Ambient glow */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-60"
-        style={{
-          background: `
-            radial-gradient(ellipse 70% 50% at 20% 30%, rgba(99,102,241,0.12) 0%, transparent 55%),
-            radial-gradient(ellipse 60% 45% at 80% 70%, rgba(236,72,153,0.08) 0%, transparent 50%),
-            radial-gradient(ellipse 50% 40% at 50% 50%, rgba(14,165,233,0.06) 0%, transparent 45%)
-          `,
-        }}
-      />
-
-      {/* Edge fades */}
-      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-[#0a0a0b] to-transparent md:w-32" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-[#0a0a0b] to-transparent md:w-32" />
-
-      <div className="relative z-[1] mb-8 px-6 md:mb-10 md:px-12">
-        <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-4 md:flex-row md:items-end">
-          <div>
-            <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-indigo-400/80">
-              Curated shelf
-            </p>
-            <h2 className="mt-2 font-serif text-2xl font-light tracking-tight text-white md:text-4xl">
-              Psychology, code &amp; habits —{" "}
-              <span className="italic text-white/55">in motion</span>
-            </h2>
-          </div>
-          <Link
-            href="/books"
-            className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs text-white/70 backdrop-blur-md transition-colors hover:bg-white/10 hover:text-white"
-          >
-            Explore all books
-            <ArrowUpRight className="size-3.5" />
-          </Link>
-        </div>
-      </div>
+    <section className="relative max-h-[500px] overflow-hidden bg-transparent py-4">
+      {/* Soft edge fade — uses page background */}
+      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-background to-transparent md:w-20" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-background to-transparent md:w-20" />
 
       {loading ? (
-        <div className="flex gap-4 overflow-hidden px-6 opacity-40">
-          {Array.from({ length: 12 }).map((_, i) => (
-            <div
-              key={i}
-              className="shrink-0 animate-pulse rounded-2xl bg-white/10"
-              style={{
-                width: 100 + (i % 3) * 28,
-                height: 150 + (i % 4) * 36,
-                marginTop: (i % 3) * 16,
-              }}
-            />
-          ))}
+        <div className="flex max-h-[460px] gap-2 overflow-hidden px-4 opacity-30">
+          {Array.from({ length: 18 }).map((_, i) => {
+            const s = SIZE_PX[i % SIZE_PX.length]
+            return (
+              <div
+                key={i}
+                className="shrink-0 animate-pulse rounded-xl bg-muted"
+                style={{ width: s, height: s, marginTop: (i % 3) * 8 }}
+              />
+            )
+          })}
         </div>
-      ) : books.length === 0 ? null : (
-        <div className="space-y-4 md:space-y-6 motion-reduce:[&_*]:!animate-none">
-          <MarqueeRow books={books} direction="left" duration={55} />
-          <MarqueeRow books={[...books].reverse()} direction="right" duration={48} reversePattern />
+      ) : photos.length === 0 ? null : (
+        <div className="flex max-h-[460px] flex-col justify-center gap-3 motion-reduce:[&_*]:!animate-none">
+          <MarqueeRow photos={photos} direction="left" duration={42} />
+          <MarqueeRow photos={[...photos].reverse()} direction="right" duration={36} reversePattern />
         </div>
       )}
 
       <style>{`
-        @keyframes bookMarqueeLeft {
+        @keyframes unsplashMarqueeLeft {
           from { transform: translateX(0); }
           to { transform: translateX(-50%); }
         }
-        @keyframes bookMarqueeRight {
+        @keyframes unsplashMarqueeRight {
           from { transform: translateX(-50%); }
           to { transform: translateX(0); }
         }
