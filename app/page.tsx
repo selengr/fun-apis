@@ -23,6 +23,7 @@ import { ArtGallerySlider } from "@/components/art-gallery-slider";
 import { QuickQrMaker } from "@/components/quick-qr-maker";
 import { QuickFileConverter } from "@/components/quick-file-converter";
 import { BookCoverMarquee } from "@/components/book-cover-marquee";
+import { CountriesShowcase } from "@/components/countries-showcase";
 
 // ─── Intersection Observer hook ──────────────────────────────────────────────
 function useInView(threshold = 0.15) {
