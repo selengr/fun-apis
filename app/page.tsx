@@ -448,6 +448,8 @@ export default function AgenticPage() {
         </div>
       </section> */}
 
+      {/* // here */}
+
       {/* ── DEVELOPER EXPERIENCE ──────────────────────────────────────────── */}
       <DevExSection />
 
