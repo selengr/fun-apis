@@ -117,21 +117,7 @@ export function BookCoverMarquee() {
 
     async function load() {
       try {
-        const results = await Promise.all(
-          SEARCH_QUERIES.map(async query => {
-            const params = new URLSearchParams({
-              action: "search",
-              query,
-              orientation: "squarish",
-              per_page: "8",
-              order_by: "relevant",
-            })
-            const res = await fetch(`/api/unsplash?${params}`, { cache: "no-store" })
-            if (!res.ok) return [] as UnsplashPhotoView[]
-            const json = await res.json()
-            return (json.photos ?? []) as UnsplashPhotoView[]
-          }),
-        )
+        const results = await Promise.all(SEARCH_QUERIES.map(fetchQueryPages))
 
         if (cancelled) return
 
