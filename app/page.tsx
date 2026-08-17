@@ -22,7 +22,7 @@ import { EnglishSuiteSection } from "@/components/english-suite";
 import { ArtGallerySlider } from "@/components/art-gallery-slider";
 import { QuickQrMaker } from "@/components/quick-qr-maker";
 import { QuickFileConverter } from "@/components/quick-file-converter";
-import { CountriesShowcase } from "@/components/countries-showcase";
+import { BookCoverMarquee } from "@/components/book-cover-marquee";
 
 // ─── Intersection Observer hook ──────────────────────────────────────────────
 function useInView(threshold = 0.15) {
@@ -448,7 +448,7 @@ export default function AgenticPage() {
         </div>
       </section> */}
 
-      {/* // here */}
+      <BookCoverMarquee />
 
       {/* ── DEVELOPER EXPERIENCE ──────────────────────────────────────────── */}
       <DevExSection />
