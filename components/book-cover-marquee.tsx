@@ -4,10 +4,12 @@ import { useEffect, useMemo, useState } from "react"
 import { cn } from "@/lib/utils"
 import type { UnsplashPhotoView } from "@/types/unsplash"
 
-/** Compact square tiles — closer to the reference grid */
-const SIZE_PX = [36, 40, 44, 48, 52] as const
+/** Same squircle size per tile — wave comes from column height, like the reference */
+const TILE_PX = 44
+const TILE_GAP = 8
 
-const COLUMN_COUNTS = [4, 6, 5, 7, 4, 6, 5, 7, 4, 6, 5, 7, 4, 6]
+/** Column lengths — uneven stacks create the top/bottom wave silhouette */
+const COLUMN_COUNTS = [5, 8, 6, 9, 7, 8, 5, 9, 6, 8, 7, 5, 8, 6, 9, 7, 8, 5, 6, 9, 7, 8, 5, 6]
 
 const SEARCH_QUERIES = [
   "psychology brain",
@@ -29,14 +31,12 @@ function squareUrl(url: string, size: number) {
 
 function PhotoTile({
   photo,
-  sizePx,
   priority,
 }: {
   photo: GridPhoto
-  sizePx: number
   priority?: boolean
 }) {
-  const src = squareUrl(photo.urls.small, sizePx * 2)
+  const src = squareUrl(photo.urls.small, TILE_PX * 2)
 
   return (
     <a
@@ -44,11 +44,11 @@ function PhotoTile({
       target="_blank"
       rel="noopener noreferrer"
       className={cn(
-        "group relative shrink-0 overflow-hidden rounded-xl",
-        "bg-neutral-950/90 ring-1 ring-border/40",
-        "transition-transform duration-300 hover:scale-105 hover:ring-border/80",
+        "group relative shrink-0 overflow-hidden rounded-[14px]",
+        "bg-[#141414] shadow-sm",
+        "transition-transform duration-300 hover:scale-[1.06]",
       )}
-      style={{ width: sizePx, height: sizePx }}
+      style={{ width: TILE_PX, height: TILE_PX }}
       title={photo.alt}
     >
       <img
@@ -57,88 +57,31 @@ function PhotoTile({
         loading={priority ? "eager" : "lazy"}
         decoding="async"
         draggable={false}
-        className="h-full w-full object-cover"
+        className="h-full w-full object-cover opacity-90 transition-opacity group-hover:opacity-100"
       />
     </a>
   )
 }
 
-function buildColumns(photos: GridPhoto[], reverse = false) {
+function buildColumns(photos: GridPhoto[]) {
   if (photos.length === 0) return []
 
-  const counts = reverse ? [...COLUMN_COUNTS].reverse() : COLUMN_COUNTS
   let cursor = 0
-
-  return counts.map((count, colIndex) => {
-    const column: { photo: GridPhoto; sizePx: number }[] = []
+  return COLUMN_COUNTS.map((count, colIndex) => {
+    const column: GridPhoto[] = []
     for (let i = 0; i < count; i++) {
-      const photo = photos[cursor % photos.length]
-      const sizePx = SIZE_PX[(colIndex + i) % SIZE_PX.length]
-      column.push({ photo, sizePx })
+      column.push(photos[cursor % photos.length])
       cursor++
     }
-    return column
+    return { id: colIndex, photos: column }
   })
-}
-
-function MarqueeRow({
-  photos,
-  direction,
-  duration,
-  reversePattern,
-}: {
-  photos: GridPhoto[]
-  direction: "left" | "right"
-  duration: number
-  reversePattern?: boolean
-}) {
-  const columns = useMemo(
-    () => buildColumns(photos, reversePattern),
-    [photos, reversePattern],
-  )
-
-  const track = (
-    <div className="flex items-end gap-2 px-2">
-      {columns.map((column, colIndex) => (
-        <div
-          key={colIndex}
-          className="flex flex-col gap-2"
-          style={{
-            paddingBottom: colIndex % 3 === 1 ? 10 : 0,
-            paddingTop: colIndex % 3 === 2 ? 14 : colIndex % 4 === 0 ? 6 : 0,
-          }}
-        >
-          {column.map(({ photo, sizePx }, i) => (
-            <PhotoTile
-              key={`${colIndex}-${i}-${photo.id}`}
-              photo={photo}
-              sizePx={sizePx}
-              priority={colIndex < 3 && i < 2}
-            />
-          ))}
-        </div>
-      ))}
-    </div>
-  )
-
-  return (
-    <div className="flex overflow-hidden">
-      <div
-        className="flex shrink-0 will-change-transform"
-        style={{
-          animation: `${direction === "left" ? "unsplashMarqueeLeft" : "unsplashMarqueeRight"} ${duration}s linear infinite`,
-        }}
-      >
-        {track}
-        {track}
-      </div>
-    </div>
-  )
 }
 
 export function BookCoverMarquee() {
   const [photos, setPhotos] = useState<GridPhoto[]>([])
   const [loading, setLoading] = useState(true)
+
+  const columns = useMemo(() => buildColumns(photos), [photos])
 
   useEffect(() => {
     let cancelled = false
@@ -163,11 +106,10 @@ export function BookCoverMarquee() {
 
         if (cancelled) return
 
-        const merged = results.flat()
         const seen = new Set<string>()
         const unique: GridPhoto[] = []
 
-        for (const photo of merged) {
+        for (const photo of results.flat()) {
           if (seen.has(photo.id)) continue
           seen.add(photo.id)
           unique.push({
@@ -190,29 +132,61 @@ export function BookCoverMarquee() {
     }
   }, [])
 
+  const track = (
+    <div
+      className="flex items-center gap-2 px-2"
+      style={{ gap: TILE_GAP }}
+    >
+      {columns.map(col => (
+        <div
+          key={col.id}
+          className="flex flex-col"
+          style={{ gap: TILE_GAP }}
+        >
+          {col.photos.map((photo, i) => (
+            <PhotoTile
+              key={`${col.id}-${photo.id}-${i}`}
+              photo={photo}
+              priority={col.id < 4 && i < 2}
+            />
+          ))}
+        </div>
+      ))}
+    </div>
+  )
+
   return (
-    <section className="relative max-h-[500px] overflow-hidden bg-transparent py-4">
-      {/* Soft edge fade — uses page background */}
-      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-background to-transparent md:w-20" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-background to-transparent md:w-20" />
+    <section className="relative max-h-[500px] overflow-hidden bg-transparent py-6">
+      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-background to-transparent md:w-24" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-background to-transparent md:w-24" />
 
       {loading ? (
-        <div className="flex max-h-[460px] gap-2 overflow-hidden px-4 opacity-30">
-          {Array.from({ length: 18 }).map((_, i) => {
-            const s = SIZE_PX[i % SIZE_PX.length]
-            return (
-              <div
-                key={i}
-                className="shrink-0 animate-pulse rounded-xl bg-muted"
-                style={{ width: s, height: s, marginTop: (i % 3) * 8 }}
-              />
-            )
-          })}
+        <div className="flex items-center gap-2 overflow-hidden px-4 opacity-25">
+          {Array.from({ length: 14 }).map((_, i) => (
+            <div
+              key={i}
+              className="flex flex-col gap-2"
+              style={{ marginTop: (i % 3) * 12 }}
+            >
+              {Array.from({ length: 4 + (i % 5) }).map((_, j) => (
+                <div
+                  key={j}
+                  className="animate-pulse rounded-[14px] bg-muted"
+                  style={{ width: TILE_PX, height: TILE_PX }}
+                />
+              ))}
+            </div>
+          ))}
         </div>
       ) : photos.length === 0 ? null : (
-        <div className="flex max-h-[460px] flex-col justify-center gap-3 motion-reduce:[&_*]:!animate-none">
-          <MarqueeRow photos={photos} direction="left" duration={42} />
-          <MarqueeRow photos={[...photos].reverse()} direction="right" duration={36} reversePattern />
+        <div className="flex overflow-hidden motion-reduce:[&_*]:!animate-none">
+          <div
+            className="flex shrink-0 will-change-transform"
+            style={{ animation: "unsplashMarqueeLeft 50s linear infinite" }}
+          >
+            {track}
+            {track}
+          </div>
         </div>
       )}
 
@@ -220,10 +194,6 @@ export function BookCoverMarquee() {
         @keyframes unsplashMarqueeLeft {
           from { transform: translateX(0); }
           to { transform: translateX(-50%); }
-        }
-        @keyframes unsplashMarqueeRight {
-          from { transform: translateX(-50%); }
-          to { transform: translateX(0); }
         }
       `}</style>
     </section>
