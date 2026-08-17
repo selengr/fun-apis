@@ -22,7 +22,36 @@ const SEARCH_QUERIES = [
   "mindfulness",
 ]
 
+/** How many API pages to prefetch per topic — then loop that pool in the marquee */
+const MAX_PAGES = 5
+const PER_PAGE = 10
+
 type GridPhoto = UnsplashPhotoView & { squareSrc: string }
+
+async function fetchSearchPage(query: string, page: number) {
+  const params = new URLSearchParams({
+    action: "search",
+    query,
+    orientation: "squarish",
+    per_page: String(PER_PAGE),
+    page: String(page),
+    order_by: "relevant",
+  })
+  const res = await fetch(`/api/unsplash?${params}`, { cache: "no-store" })
+  if (!res.ok) return [] as UnsplashPhotoView[]
+  const json = await res.json()
+  return (json.photos ?? []) as UnsplashPhotoView[]
+}
+
+async function fetchQueryPages(query: string) {
+  const pages: UnsplashPhotoView[] = []
+  for (let page = 1; page <= MAX_PAGES; page++) {
+    const batch = await fetchSearchPage(query, page)
+    if (batch.length === 0) break
+    pages.push(...batch)
+  }
+  return pages
+}
 
 function squareUrl(url: string, size: number) {
   const base = url.split("?")[0]
